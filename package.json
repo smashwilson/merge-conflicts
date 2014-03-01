@@ -1,0 +1,15 @@
+{
+  "name": "merge-conflicts",
+  "main": "./lib/merge-conflicts",
+  "version": "0.0.0",
+  "private": true,
+  "description": "A short description of your package",
+  "activationEvents": ["merge-conflicts:toggle"],
+  "repository": "https://github.com/smashwilson/merge-conflicts",
+  "license": "MIT",
+  "engines": {
+    "atom": ">0.50.0"
+  },
+  "dependencies": {
+  }
+}
