@@ -10,10 +10,10 @@ describe "GitBridge", ->
       stdout("UU lib/file0.rb")
       stdout("UU lib/file1.rb")
       stdout("M  lib/file2.rb")
+      exit(0)
 
     conflicts = []
-    GitBridge.conflictsIn ".", (path) ->
-      conflicts.push(path)
+    GitBridge.conflictsIn ".", (cs) -> conflicts = cs
 
     expect(conflicts).toEqual(["lib/file0.rb", "lib/file1.rb"])
     expect(c).toBe("git")

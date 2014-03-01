@@ -9,11 +9,11 @@ class GitBridge
   constructor: (@repo) ->
 
   @conflictsIn: (baseDir, handler) ->
+    conflicts = []
 
     stdoutHandler = (line) ->
       [_, mineCode, yoursCode, path] = line.match /^(.)(.) (.+)$/
-      if mineCode is "U" and yoursCode is "U"
-        handler(path)
+      conflicts.push path if mineCode is "U" and yoursCode is "U"
 
     stderrHandler = (line) ->
       console.log("git status error: #{line}")
@@ -21,6 +21,7 @@ class GitBridge
     exitHandler = (code) ->
       unless code is 0
         console.log("git status exit: #{code}")
+      handler(conflicts)
 
     @process({
       command: "git",
