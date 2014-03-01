@@ -9,6 +9,7 @@ describe "GitBridge", ->
       [c, a, o] = [command, args, options]
       stdout("UU lib/file0.rb")
       stdout("UU lib/file1.rb")
+      stdout("M  lib/file2.rb")
 
     conflicts = []
     GitBridge.conflictsIn ".", (path) ->
