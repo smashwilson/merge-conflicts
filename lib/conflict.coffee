@@ -2,6 +2,17 @@ module.exports =
 class Conflict
   constructor: (@mine, @mineRef, @yours, @yoursRef, @parent) ->
 
+  @all: (content) ->
+    hunkPattern = /<{7}[^]+?>{7}/mg
+    conflicts = []
+
+    m = hunkPattern.exec(content)
+    while m?
+      conflicts.push Conflict.parse(m[0])
+      m = hunkPattern.exec(content)
+
+    conflicts
+
   @parse: (hunk) ->
     [mine, yours] = ["", ""]
     [mineRef, yoursRef] = [null, null]
@@ -11,22 +22,22 @@ class Conflict
 
     appender = invalid
 
-    hunk.split(/\r?\n/).forEach (line) ->
+    for line in hunk.split(/\r?\n/)
       opening = line.match(/^<{7} (\S+)$/)
       if opening
         mineRef = opening[1]
         appender = (line) -> mine += "#{line}\n"
-        return
+        continue
 
       if line.match(/^={7}$/)
         appender = (line) -> yours += "#{line}\n"
-        return
+        continue
 
       closing = line.match(/^>{7} (\S+)$/)
       if closing
         yoursRef = closing[1]
         appender = invalid
-        return
+        continue
 
       # Not a marker: use the active appender
       appender(line)
