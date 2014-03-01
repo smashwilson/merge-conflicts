@@ -5,7 +5,7 @@
   "private": true,
   "description": "A short description of your package",
   "activationEvents": [
-    "merge-conflicts:toggle"
+    "merge-conflicts:detect"
   ],
   "repository": "https://github.com/smashwilson/merge-conflicts",
   "license": "MIT",

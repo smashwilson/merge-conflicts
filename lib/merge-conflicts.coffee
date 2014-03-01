@@ -1,13 +1,11 @@
 MergeConflictsView = require './merge-conflicts-view'
 
 module.exports =
-  mergeConflictsView: null
 
   activate: (state) ->
-    @mergeConflictsView = new MergeConflictsView(state.mergeConflictsViewState)
+    atom.workspaceView.command "merge-conflicts:detect", ->
+      MergeConflictsView.detect()
 
   deactivate: ->
-    @mergeConflictsView.destroy()
 
   serialize: ->
-    mergeConflictsViewState: @mergeConflictsView.serialize()
