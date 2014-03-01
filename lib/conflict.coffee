@@ -1,9 +1,10 @@
 module.exports =
 class Conflict
-  constructor: (@mine, @yours, @parent) ->
+  constructor: (@mine, @mineRef, @yours, @yoursRef, @parent) ->
 
   @parse: (hunk) ->
     [mine, yours] = ["", ""]
+    [mineRef, yoursRef] = [null, null]
 
     invalid = (line) ->
       console.log("Invalid hunk! #{line} outside of conflict markers")
@@ -13,6 +14,7 @@ class Conflict
     hunk.split(/\r?\n/).forEach (line) ->
       opening = line.match(/^<{7} (\S+)$/)
       if opening
+        mineRef = opening[1]
         appender = (line) -> mine += "#{line}\n"
         return
 
@@ -22,10 +24,11 @@ class Conflict
 
       closing = line.match(/^>{7} (\S+)$/)
       if closing
+        yoursRef = closing[1]
         appender = invalid
         return
 
       # Not a marker: use the active appender
       appender(line)
 
-    new Conflict(mine, yours, null)
+    new Conflict(mine, mineRef, yours, yoursRef, null)
