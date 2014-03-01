@@ -3,17 +3,20 @@
 module.exports =
 class GitBridge
 
-  # External process call implementation. Stored here for mockability (tm).
-  @process = BufferedProcess
+  # Indirection for Mockability (tm)
+  @process: (args) -> new BufferedProcess(args)
 
   constructor: (@repo) ->
 
   @conflictsIn: (baseDir, handler) ->
     conflicts = []
 
-    stdoutHandler = (line) ->
-      [_, mineCode, yoursCode, path] = line.match /^(.)(.) (.+)$/
-      conflicts.push path if mineCode is "U" and yoursCode is "U"
+    stdoutHandler = (chunk) ->
+      chunk.split("\n").forEach (line) ->
+        m = line.match /^(.)(.) (.+)$/
+        if m
+          [_, mineCode, yoursCode, path] = m
+          conflicts.push path if mineCode is "U" and yoursCode is "U"
 
     stderrHandler = (line) ->
       console.log("git status error: #{line}")
@@ -23,7 +26,7 @@ class GitBridge
         console.log("git status exit: #{code}")
       handler(conflicts)
 
-    @process({
+    GitBridge.process({
       command: "git",
       args: ["status", "--porcelain"],
       options: { "cwd": baseDir },
