@@ -10,7 +10,7 @@ class Conflict
   constructor: (@ours, @theirs, @parent) ->
 
   @all: (editorView) ->
-    editorView.find(".line:contains('<<<<<<<')").each ->
+    editorView.find(".line:contains('<<<<<<<')").map ->
       Conflict.parse $ @
 
   @parse: (line) ->

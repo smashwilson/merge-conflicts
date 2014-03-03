@@ -56,7 +56,7 @@ describe "Conflict", ->
     cs = Conflict.all(lines)
     expect(cs.length).toBe(2)
     expect(cs[0].ours.lines[1].text()).toBe("Multi-line even")
-    expect(cs[1].theirs.lines[0].text()).toBe("More of my changes")
+    expect(cs[1].theirs.lines[0].text()).toBe("More of your changes")
 
   it "parses itself from a three-way diff marking"
   it "names the incoming changes"
