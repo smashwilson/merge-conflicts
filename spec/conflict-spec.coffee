@@ -1,6 +1,13 @@
 Conflict = require '../lib/conflict'
+{$$} = require 'atom'
 
 describe "Conflict", ->
+
+  asLines = (hunk) ->
+    $$ ->
+      @div class: 'container', =>
+        for line in hunk.split /\n/
+          @div class: 'line', line
 
   it "parses itself from a two-way diff marking", ->
     hunk = """
@@ -9,12 +16,16 @@ describe "Conflict", ->
            =======
            These are your changes
            >>>>>>> master
+
+           Past the end!
            """
-    c = Conflict.parse(hunk)
-    expect(c.mine).toBe("These are my changes\n")
-    expect(c.mineRef).toBe("HEAD")
-    expect(c.yours).toBe("These are your changes\n")
-    expect(c.yoursRef).toBe("master")
+    lines = asLines(hunk)
+
+    c = Conflict.parse lines.find('.line').eq(0)
+    expect(c.ours.lines[0].text()).toBe("These are my changes")
+    expect(c.ours.ref).toBe("HEAD")
+    expect(c.theirs.lines[0].text()).toBe("These are your changes")
+    expect(c.theirs.ref).toBe("master")
     expect(c.parent).toBeNull()
 
   it "finds conflict markings from a file", ->
@@ -40,11 +51,12 @@ describe "Conflict", ->
 
               Stuff at the end.
               """
+    lines = asLines content
 
-    cs = Conflict.all(content)
+    cs = Conflict.all(lines)
     expect(cs.length).toBe(2)
-    expect(cs[0].mine).toBe("My changes\nMulti-line even\n")
-    expect(cs[1].mine).toBe("More of my changes\n")
+    expect(cs[0].ours.lines[1].text()).toBe("Multi-line even")
+    expect(cs[1].theirs.lines[0].text()).toBe("More of my changes")
 
   it "parses itself from a three-way diff marking"
   it "names the incoming changes"

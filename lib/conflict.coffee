@@ -1,45 +1,51 @@
+{$} = require 'atom'
+
+class Side
+  constructor: (@ref, @lines) ->
+
+  text: -> @lines.text()
+
 module.exports =
 class Conflict
-  constructor: (@mine, @mineRef, @yours, @yoursRef, @parent) ->
+  constructor: (@ours, @theirs, @parent) ->
 
-  @all: (content) ->
-    hunkPattern = /<{7}[^]+?>{7}/mg
-    conflicts = []
+  @all: (editorView) ->
+    editorView.find(".line:contains('<<<<<<<')").each ->
+      Conflict.parse $ @
 
-    m = hunkPattern.exec(content)
-    while m?
-      conflicts.push Conflict.parse(m[0])
-      m = hunkPattern.exec(content)
+  @parse: (line) ->
+    [ourLines, theirLines] = [[], []]
+    [ourRef, theirRef] = [null, null]
+    current = line
 
-    conflicts
+    appender = (e) =>
+      console.log("Invalid hunk! #{e.text()} outside of conflict markers")
+      return
 
-  @parse: (hunk) ->
-    [mine, yours] = ["", ""]
-    [mineRef, yoursRef] = [null, null]
+    while current?
+      text = current.text()
 
-    invalid = (line) ->
-      console.log("Invalid hunk! #{line} outside of conflict markers")
-
-    appender = invalid
-
-    for line in hunk.split(/\r?\n/)
-      opening = line.match(/^<{7} (\S+)$/)
+      opening = text.match(/^<{7} (\S+)$/)
       if opening
-        mineRef = opening[1]
-        appender = (line) -> mine += "#{line}\n"
+        ourRef = opening[1]
+        appender = (e) -> ourLines.push e
+        current = current.next('.line')
         continue
 
-      if line.match(/^={7}$/)
-        appender = (line) -> yours += "#{line}\n"
+      if text.match(/^={7}$/)
+        appender = (e) -> theirLines.push e
+        current = current.next('.line')
         continue
 
-      closing = line.match(/^>{7} (\S+)$/)
+      closing = text.match(/^>{7} (\S+)$/)
       if closing
-        yoursRef = closing[1]
-        appender = invalid
-        continue
+        theirRef = closing[1]
+        break
 
       # Not a marker: use the active appender
-      appender(line)
+      appender(current)
+      current = current.next('.line')
 
-    new Conflict(mine, mineRef, yours, yoursRef, null)
+    ours = new Side(ourRef, ourLines)
+    theirs = new Side(theirRef, theirLines)
+    new Conflict(ours, theirs, null)
