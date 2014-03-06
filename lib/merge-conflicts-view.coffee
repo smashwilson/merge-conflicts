@@ -22,14 +22,6 @@ class MergeConflictsView extends View
     path = element.find(".path").text()
     atom.workspace.open(path)
 
-    view = atom.workspaceView.getActiveView()
-    for c in Conflict.all(view)
-      oursView = new SideView(c.ours)
-      oursView.installIn view
-
-      theirsView = new SideView(c.theirs)
-      theirsView.installIn view
-
   # Returns an object that can be retrieved when package is activated
   serialize: ->
 
