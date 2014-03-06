@@ -22,10 +22,14 @@ describe "Conflict", ->
     lines = asLines(hunk)
 
     c = Conflict.parse lines.find('.line').eq(0)
-    expect(c.ours.lines[0].text()).toBe("These are my changes")
+    expect(c.ours.marker.text()).toBe("<<<<<<< HEAD")
+    expect(c.ours.lines.eq(0).text()).toBe("These are my changes")
     expect(c.ours.ref).toBe("HEAD")
-    expect(c.theirs.lines[0].text()).toBe("These are your changes")
+    expect(c.ours.separator.text()).toBe("=======")
+    expect(c.theirs.separator.text()).toBe("=======")
+    expect(c.theirs.lines.eq(0).text()).toBe("These are your changes")
     expect(c.theirs.ref).toBe("master")
+    expect(c.theirs.marker.text()).toBe(">>>>>>> master")
     expect(c.parent).toBeNull()
 
   it "finds conflict markings from a file", ->
@@ -55,8 +59,8 @@ describe "Conflict", ->
 
     cs = Conflict.all(lines)
     expect(cs.length).toBe(2)
-    expect(cs[0].ours.lines[1].text()).toBe("Multi-line even")
-    expect(cs[1].theirs.lines[0].text()).toBe("More of your changes")
+    expect(cs[0].ours.lines.eq(1).text()).toBe("Multi-line even")
+    expect(cs[1].theirs.lines.eq(0).text()).toBe("More of your changes")
 
   it "parses itself from a three-way diff marking"
   it "names the incoming changes"

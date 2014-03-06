@@ -1,7 +1,7 @@
 {$} = require 'atom'
 
 class Side
-  constructor: (@ref, @lines) ->
+  constructor: (@ref, @lines, @site, @marker, @separator) ->
 
   text: -> @lines.text()
 
@@ -14,7 +14,8 @@ class Conflict
       Conflict.parse $ @
 
   @parse: (line) ->
-    [ourLines, theirLines] = [[], []]
+    [ourLines, theirLines] = [$(), $()]
+    [ourMarker, theirMarker, separator] = [null, null, null]
     [ourRef, theirRef] = [null, null]
     current = line
 
@@ -28,17 +29,20 @@ class Conflict
       opening = text.match(/^<{7} (\S+)$/)
       if opening
         ourRef = opening[1]
-        appender = (e) -> ourLines.push e
+        ourMarker = current
+        appender = (e) -> ourLines = ourLines.add e
         current = current.next('.line')
         continue
 
       if text.match(/^={7}$/)
-        appender = (e) -> theirLines.push e
+        separator = current
+        appender = (e) -> theirLines = theirLines.add e
         current = current.next('.line')
         continue
 
       closing = text.match(/^>{7} (\S+)$/)
       if closing
+        theirMarker = current
         theirRef = closing[1]
         break
 
@@ -46,6 +50,6 @@ class Conflict
       appender(current)
       current = current.next('.line')
 
-    ours = new Side(ourRef, ourLines)
-    theirs = new Side(theirRef, theirLines)
+    ours = new Side(ourRef, ourLines, 1, ourMarker, separator)
+    theirs = new Side(theirRef, theirLines, 2, theirMarker, separator)
     new Conflict(ours, theirs, null)
