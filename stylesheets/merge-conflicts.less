@@ -13,3 +13,30 @@
     background-color: @background-color-highlight;
   }
 }
+
+.editor {
+  .conflict-line.ours {
+    border-left: solid 2px @ui-site-color-1;
+    border-right: solid 2px @ui-site-color-1;
+    background: desaturate(@ui-site-color-1, 70%);
+    padding-left: 4px;
+  }
+
+  .conflict-line.theirs {
+    border-left: solid 2px @ui-site-color-2;
+    border-right: solid 2px @ui-site-color-2;
+    background: desaturate(@ui-site-color-2, 70%);
+    padding-left: 4px;
+  }
+
+  .side {
+    padding: 0 20px;
+    width: 100%;
+    span {
+      margin-left: 10px;
+    }
+    button {
+      margin-top: 5px;
+    }
+  }
+}
