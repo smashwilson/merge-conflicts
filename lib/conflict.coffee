@@ -1,9 +1,25 @@
 {$} = require 'atom'
 
 class Side
-  constructor: (@ref, @lines, @site, @marker, @separator) ->
+  constructor: (@ref, @lines, @marker, @separator) ->
 
   text: -> @lines.text()
+
+class OurSide extends Side
+
+  site: -> 1
+
+  klass: -> 'ours'
+
+  description: -> 'our changes'
+
+class TheirSide extends Side
+
+  site: -> 2
+
+  klass: -> 'theirs'
+
+  description: -> 'their changes'
 
 module.exports =
 class Conflict
@@ -50,6 +66,6 @@ class Conflict
       appender(current)
       current = current.next('.line')
 
-    ours = new Side(ourRef, ourLines, 1, ourMarker, separator)
-    theirs = new Side(theirRef, theirLines, 2, theirMarker, separator)
+    ours = new OurSide(ourRef, ourLines, ourMarker, separator)
+    theirs = new TheirSide(theirRef, theirLines, theirMarker, separator)
     new Conflict(ours, theirs, null)

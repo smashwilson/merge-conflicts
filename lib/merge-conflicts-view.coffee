@@ -1,7 +1,7 @@
 {$, View} = require 'atom'
 GitBridge = require './git-bridge'
 Conflict = require './conflict'
-SideView = require './conflict-view'
+SideView = require './side-view'
 
 module.exports =
 class MergeConflictsView extends View
@@ -9,7 +9,7 @@ class MergeConflictsView extends View
     @div class: 'merge-conflicts tool-panel panel-bottom padded', =>
       @div class: 'panel-heading', =>
         @text 'Conflicts'
-        @button class: 'btn pull-right', click: 'conflict', 'Hide'
+        @button class: 'btn pull-right', 'Hide'
       @ul class: 'list-group', =>
         for path in conflicts
           @li click: 'navigate', class: 'list-item status-modified navigate', =>
@@ -20,9 +20,9 @@ class MergeConflictsView extends View
 
   navigate: (event, element) ->
     path = element.find(".path").text()
-    atom.workspace.open(path)
+    atom.workspace.open(path).then (view) ->
+      console.log view
 
-  conflict: (event, element) ->
     view = atom.workspaceView.getActiveView()
     for c in Conflict.all(view)
       oursView = new SideView(c.ours)
