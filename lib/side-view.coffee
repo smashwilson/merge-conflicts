@@ -18,6 +18,6 @@ class SideView extends View
     @appendTo editorView.find(".overlayer")
 
   useMe: ->
-    console.log "useMe clicked"
+    @side.resolve()
 
   getModel: -> null
