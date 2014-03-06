@@ -18,20 +18,21 @@
   .conflict-line.ours {
     border-left: solid 2px @ui-site-color-1;
     border-right: solid 2px @ui-site-color-1;
-    background: desaturate(@ui-site-color-1, 70%);
+    background: mix(@ui-site-color-1, @base-background-color);
     padding-left: 4px;
   }
 
   .conflict-line.theirs {
     border-left: solid 2px @ui-site-color-2;
     border-right: solid 2px @ui-site-color-2;
-    background: desaturate(@ui-site-color-2, 70%);
+    background: mix(@ui-site-color-2, @base-background-color);
     padding-left: 4px;
   }
 
   .side {
     padding: 0 20px;
     width: 100%;
+    position: absolute;
     span {
       margin-left: 10px;
     }

@@ -11,6 +11,12 @@ class SideView extends View
 
   initialize: (@side) ->
 
+  installIn: (editorView) ->
+    side.lines.addClass("conflict-line ours")
+    @offset(left: 0, top: side.marker.position().top)
+    @height(side.marker.height())
+    @appendTo(editorView.find(".overlayer"))
+
   useMe: ->
     console.log "useMe clicked"
 
