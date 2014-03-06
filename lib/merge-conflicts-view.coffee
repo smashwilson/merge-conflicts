@@ -20,26 +20,15 @@ class MergeConflictsView extends View
 
   navigate: (event, element) ->
     path = element.find(".path").text()
-    atom.workspace.open(path).then (view) ->
-      console.log view
+    atom.workspace.open(path)
 
     view = atom.workspaceView.getActiveView()
     for c in Conflict.all(view)
       oursView = new SideView(c.ours)
-      c.ours.lines.addClass("conflict-line ours")
-      oursView.offset(left: 0, top: c.ours.marker.position().top)
-      oursView.height(c.ours.marker.height())
-      oursView.css("position", "absolute");
-      oursView.appendTo(view.find(".overlayer"))
+      oursView.installIn view
 
       theirsView = new SideView(c.theirs)
-      c.theirs.lines.addClass("conflict-line theirs")
-      theirsView.offset(left: 0, top: c.theirs.marker.position().top)
-      theirsView.height(c.theirs.marker.height())
-      theirsView.css("position", "absolute");
-      theirsView.appendTo(view.find(".overlayer"))
-
-      console.log "replaced!"
+      theirsView.installIn view
 
   # Returns an object that can be retrieved when package is activated
   serialize: ->
