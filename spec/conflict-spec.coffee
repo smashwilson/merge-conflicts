@@ -10,8 +10,8 @@ describe "Conflict", ->
     [conflict] = []
 
     beforeEach ->
-      editor = util.openPath('single-2way-diff.txt').getEditor()
-      conflict = Conflict.all(editor)[0]
+      editorView = util.openPath('single-2way-diff.txt')
+      conflict = Conflict.all(editorView)[0]
 
     it 'identifies the correct rows', ->
       expect(rowRangeFrom conflict.ours.marker).toEqual([1, 2])
@@ -27,8 +27,8 @@ describe "Conflict", ->
       expect(rowRangeFrom conflict.separatorMarker).toEqual([2, 3])
 
   it "finds multiple conflict markings", ->
-    editor = util.openPath('multi-2way-diff.txt').getEditor()
-    cs = Conflict.all(editor)
+    editorView = util.openPath('multi-2way-diff.txt')
+    cs = Conflict.all(editorView)
 
     expect(cs.length).toBe(2)
     expect(rowRangeFrom cs[0].ours.marker).toEqual([5, 7])
@@ -40,8 +40,8 @@ describe "Conflict", ->
     [conflict] = []
 
     beforeEach ->
-      editor = util.openPath('single-2way-diff.txt').getEditor()
-      [conflict] = Conflict.all editor
+      editorView = util.openPath('single-2way-diff.txt')
+      [conflict] = Conflict.all editorView
 
     it 'retains a reference to conflict', ->
       expect(conflict.ours.conflict).toBe(conflict)

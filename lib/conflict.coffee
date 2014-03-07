@@ -36,8 +36,9 @@ class Conflict
     theirs.conflict = @
     @resolution = null
 
-  @all: (editor) ->
+  @all: (editorView) ->
     results = []
+    editor = editorView.getEditor()
     buffer = editor.getBuffer()
     buffer.scan CONFLICT_REGEX, (m) ->
       [x, ourRef, ourText, theirText, theirRef] = m.match
@@ -68,5 +69,7 @@ class Conflict
 
       theirs = new TheirSide(theirRef, theirMarker, theirBannerMarker)
 
-      results.push new Conflict(ours, theirs, null, separatorMarker)
+      c = new Conflict(ours, theirs, null, separatorMarker)
+      c.editorView = editorView
+      results.push c
     results
