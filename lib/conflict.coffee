@@ -27,7 +27,7 @@ class TheirSide extends Side
 
   description: -> 'their changes'
 
-CONFLICT_REGEX = /^<{7} (\S+)\n([^]*?)={7}\n([^]*?)>{7} (\S+)$/m
+CONFLICT_REGEX = /^<{7} (\S+)\n([^]*?)={7}\n([^]*?)>{7} (\S+)$/mg
 
 module.exports =
 class Conflict

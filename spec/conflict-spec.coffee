@@ -13,23 +13,25 @@ describe "Conflict", ->
     editorView = atom.workspaceView.getActiveView()
     editor = editorView.getEditor()
 
+  rowRangeFrom = (marker) ->
+    [marker.getTailBufferPosition().row, marker.getHeadBufferPosition().row]
+
   it "parses itself from a two-way diff marking", ->
-    loadPath('single-2way-diff.txt')s
+    loadPath('single-2way-diff.txt')
     c = Conflict.all(editor)[0]
 
-    expect(c.ours.marker.getTailBufferPosition().toArray()).toEqual([1, 0])
-    expect(c.ours.marker.getHeadBufferPosition().toArray()).toEqual([2, 0])
+    expect(rowRangeFrom c.ours.marker).toEqual([1, 2])
+    expect(rowRangeFrom c.theirs.marker).toEqual([3, 4])
 
-    expect(c.theirs.marker.getTailBufferPosition().toArray()).toEqual([3, 0])
-    expect(c.theirs.marker.getHeadBufferPosition().toArray()).toEqual([4, 0])
-
-  it "finds conflict markings from a file", ->
+  it "finds multiple conflict markings", ->
     loadPath('multi-2way-diff.txt')
-    cs = Conflict.all(lines)
+    cs = Conflict.all(editor)
 
     expect(cs.length).toBe(2)
-    expect(cs[0].ours.lines.eq(1).text()).toBe("Multi-line even")
-    expect(cs[1].theirs.lines.eq(0).text()).toBe("More of your changes")
+    expect(rowRangeFrom cs[0].ours.marker).toEqual([5, 7])
+    expect(rowRangeFrom cs[0].theirs.marker).toEqual([8, 9])
+    expect(rowRangeFrom cs[1].ours.marker).toEqual([14, 15])
+    expect(rowRangeFrom cs[1].theirs.marker).toEqual([16, 17])
 
   describe 'sides', ->
     hunk = """
