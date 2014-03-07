@@ -14,11 +14,8 @@ describe "Conflict", ->
     editor = editorView.getEditor()
 
   it "parses itself from a two-way diff marking", ->
-    loadPath('single-2way-diff.txt')
-
-    cs = Conflict.all editor
-    c = cs[0]
-    console.log c.ours.marker
+    loadPath('single-2way-diff.txt')s
+    c = Conflict.all(editor)[0]
 
     expect(c.ours.marker.getTailBufferPosition().toArray()).toEqual([1, 0])
     expect(c.ours.marker.getHeadBufferPosition().toArray()).toEqual([2, 0])
@@ -27,31 +24,9 @@ describe "Conflict", ->
     expect(c.theirs.marker.getHeadBufferPosition().toArray()).toEqual([4, 0])
 
   it "finds conflict markings from a file", ->
-    content = """
-              This is some text before the marking.
-
-              More text.
-
-              <<<<<<< HEAD
-              My changes
-              Multi-line even
-              =======
-              Your changes
-              >>>>>>> other-branch
-
-              Text in between.
-
-              <<<<<<< HEAD
-              More of my changes
-              =======
-              More of your changes
-              >>>>>>> other-branch
-
-              Stuff at the end.
-              """
-    lines = asLines content
-
+    loadPath('multi-2way-diff.txt')
     cs = Conflict.all(lines)
+
     expect(cs.length).toBe(2)
     expect(cs[0].ours.lines.eq(1).text()).toBe("Multi-line even")
     expect(cs[1].theirs.lines.eq(0).text()).toBe("More of your changes")
