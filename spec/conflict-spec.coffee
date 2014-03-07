@@ -34,15 +34,11 @@ describe "Conflict", ->
     expect(rowRangeFrom cs[1].theirs.marker).toEqual([16, 17])
 
   describe 'sides', ->
-    hunk = """
-           <<<<<<< HEAD
-           These are my changes
-           =======
-           These are your changes
-           >>>>>>> master
-           """
-    lines = asLines(hunk)
-    conflict = Conflict.parse lines.find('.line').eq(0)
+    [conflict] = []
+
+    beforeEach ->
+      loadPath('single-2way-diff.txt')
+      [conflict] = Conflict.all editor
 
     it 'retains a reference to conflict', ->
       expect(conflict.ours.conflict).toBe(conflict)
