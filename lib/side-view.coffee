@@ -12,10 +12,28 @@ class SideView extends View
   initialize: (@side) ->
 
   installIn: (editorView) ->
-    # @side.lines.addClass("conflict-line #{@side.klass()}")
-    @offset @side.refBannerOffset()
-    @height '200px'
+    console.log "== Initial installation // #{@side.description()}"
+    @reposition(editorView, true)
     @appendTo editorView.overlayer
+
+    @side.refBannerMarker.on "changed", =>
+      console.log ">> Banner marker changed // #{@side.description()}"
+      @reposition(editorView)
+
+  reposition: (editorView, initial) ->
+    # @side.lines().addClass("conflict-line #{@side.klass()}")
+    anchor = editorView.renderedLines.offset()
+    ref = @side.refBannerOffset()
+    if initial
+      top = ref.top
+    else
+      top = ref.top + anchor.top
+
+    console.log "anchor: #{anchor.top} moving to: #{top}"
+    console.log "matched lines: #{@side.lines().text()}"
+
+    @offset top: top
+    @height @side.refBannerLine().height()
 
   useMe: ->
     @side.resolve()

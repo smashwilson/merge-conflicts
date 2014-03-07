@@ -11,6 +11,22 @@ class Side
 
   editorView: -> @conflict.editorView
 
+  editor: -> @editorView().getEditor()
+
+  lines: ->
+    fromBuffer = @marker.getTailBufferPosition()
+    fromScreen = @editor().screenPositionForBufferPosition fromBuffer
+    toBuffer = @marker.getHeadBufferPosition()
+    toScreen = @editor().screenPositionForBufferPosition toBuffer
+
+    lines = @editorView().renderedLines.children('.line')
+    lines.slice(fromScreen.row, toScreen.row)
+
+  refBannerLine: ->
+    position = @refBannerMarker.getTailBufferPosition()
+    screen = @editor().screenPositionForBufferPosition position
+    @editorView().renderedLines.children('.line').eq screen.row
+
   refBannerOffset: ->
     position = @refBannerMarker.getTailBufferPosition()
     @editorView().pixelPositionForBufferPosition position

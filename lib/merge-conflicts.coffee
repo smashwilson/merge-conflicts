@@ -9,12 +9,13 @@ module.exports =
       MergeConflictsView.detect()
 
     atom.workspaceView.eachEditorView (view) ->
-      for c in Conflict.all(view)
-        oursView = new SideView(c.ours)
-        oursView.installIn view
+      if view.attached and view.getPane()?
+        for c in Conflict.all(view)
+          oursView = new SideView(c.ours)
+          oursView.installIn view
 
-        theirsView = new SideView(c.theirs)
-        theirsView.installIn view
+          theirsView = new SideView(c.theirs)
+          theirsView.installIn view
 
   deactivate: ->
 

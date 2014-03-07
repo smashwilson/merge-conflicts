@@ -16,6 +16,7 @@ describe 'SideView', ->
     console.log editorView
     view.installIn editorView
     expect(view.offset()).toEqual(ours.refBannerOffset())
+    expect(view.height()).toEqual(ours.refBannerLine().height())
 
   it 'triggers conflict resolution', ->
     spyOn(ours, "resolve")

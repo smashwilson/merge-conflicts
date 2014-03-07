@@ -5,6 +5,7 @@ module.exports = {
     fullPath = atom.project.resolve(path)
 
     atom.workspaceView = new WorkspaceView
+    atom.workspaceView.attachToDom()
     atom.workspaceView.openSync(fullPath)
 
     atom.workspaceView.getActiveView()

@@ -26,6 +26,12 @@ describe "Conflict", ->
     it 'finds the separator', ->
       expect(rowRangeFrom conflict.separatorMarker).toEqual([2, 3])
 
+    it 'iterates the DOM lines', ->
+      lines = conflict.theirs.lines()
+
+      expect(lines.length).toBe(1)
+      expect(lines.eq(0).text()).toBe("These are your changes")
+
   it "finds multiple conflict markings", ->
     editorView = util.openPath('multi-2way-diff.txt')
     cs = Conflict.all(editorView)
