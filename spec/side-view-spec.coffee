@@ -1,34 +1,26 @@
 SideView = require '../lib/side-view'
 
-describe 'SideView', ->
+Conflict = require '../lib/conflict'
+util = require './util'
 
-  side = null
-  view = null
-  line = null
+describe 'SideView', ->
+  [view, ours, theirs] = []
 
   beforeEach ->
-    line = {}
-    side = {
-      klass: -> 'klass',
-      site: -> 99,
-      description: -> '',
-      lines: -> [line]
-    }
-    view = new SideView(side)
+    editor = util.openPath("single-2way-diff.txt").getEditor()
+    conflict = Conflict.all(editor)[0]
+    [ours, theirs] = [conflict.ours, conflict.theirs]
+    view = new SideView(ours)
 
   it 'triggers conflict resolution', ->
-    side.resolve = -> null
-    spyOn(side, "resolve")
-
+    spyOn(ours, "resolve")
     view.useMe()
-
-    expect(side.resolve).toHaveBeenCalled()
+    expect(ours.resolve).toHaveBeenCalled()
 
   describe 'when chosen as the resolution', ->
 
     beforeEach ->
-      side.wasChosen = -> true
-      line.addClass = -> null
+      ours.resolve()
 
     it 'adds the "resolved" class'
     it 'deletes the marker line'
@@ -36,7 +28,7 @@ describe 'SideView', ->
   describe 'when not chosen as the resolution', ->
 
     beforeEach ->
-      side.wasChosen = -> true
+      theirs.resolve()
 
     it 'deletes its hunks lines'
     it ''
