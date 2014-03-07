@@ -2,7 +2,7 @@
 _ = require 'underscore-plus'
 
 class Side
-  constructor: (@ref, @marker) ->
+  constructor: (@ref, @marker, @refBannerMarker) ->
     @conflict = null
 
   text: -> @lines.text()
@@ -27,11 +27,11 @@ class TheirSide extends Side
 
   description: -> 'their changes'
 
-CONFLICT_REGEX = /^<{7} (\S+)\n([^]*?)={7}\n([^]*?)>{7} (\S+)$/mg
+CONFLICT_REGEX = /^<{7} (\S+)\n([^]*?)={7}\n([^]*?)>{7} (\S+)\n?/mg
 
 module.exports =
 class Conflict
-  constructor: (@ours, @theirs, @parent) ->
+  constructor: (@ours, @theirs, @parent, @separatorMarker) ->
     ours.conflict = @
     theirs.conflict = @
     @resolution = null
@@ -47,10 +47,15 @@ class Conflict
       ourRowStart = baseRow + 1
       ourRowEnd = ourRowStart + ourLines.length - 1
 
+      ourBannerMarker = editor.markBufferRange(
+        [[baseRow, 0], [ourRowStart, 0]])
       ourMarker = editor.markBufferRange(
         [[ourRowStart, 0], [ourRowEnd, 0]])
 
-      ours = new OurSide(ourRef, ourMarker)
+      ours = new OurSide(ourRef, ourMarker, ourBannerMarker)
+
+      separatorMarker = editor.markBufferRange(
+        [[ourRowEnd, 0], [ourRowEnd + 1, 0]])
 
       theirLines = theirText.split /\n/
       theirRowStart = ourRowEnd + 1
@@ -58,8 +63,10 @@ class Conflict
 
       theirMarker = editor.markBufferRange(
         [[theirRowStart, 0], [theirRowEnd, 0]])
+      theirBannerMarker = editor.markBufferRange(
+        [[theirRowEnd, 0], [m.range.end.row, 0]])
 
-      theirs = new TheirSide(theirRef, theirMarker)
+      theirs = new TheirSide(theirRef, theirMarker, theirBannerMarker)
 
-      results.push new Conflict(ours, theirs, null)
+      results.push new Conflict(ours, theirs, null, separatorMarker)
     results
