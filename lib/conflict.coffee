@@ -1,7 +1,8 @@
 {$} = require 'atom'
+_ = require 'underscore-plus'
 
 class Side
-  constructor: (@ref, @lines, @marker, @separator) ->
+  constructor: (@marker) ->
     @conflict = null
 
   text: -> @lines.text()
@@ -26,6 +27,8 @@ class TheirSide extends Side
 
   description: -> 'their changes'
 
+CONFLICT_REGEX = /^<{7} (\S+)\n([^]*?)={7}\n([^]*?)>{7} (\S+)$/m
+
 module.exports =
 class Conflict
   constructor: (@ours, @theirs, @parent) ->
@@ -33,47 +36,31 @@ class Conflict
     theirs.conflict = @
     @resolution = null
 
-  @all: (editorView) ->
-    editorView.find(".line:contains('<<<<<<<')").map ->
-      Conflict.parse $ @
+  @all: (editor) ->
+    results = []
+    buffer = editor.getBuffer()
+    buffer.scan CONFLICT_REGEX, (m) ->
+      [x, ourRef, ourText, theirText, theirRef] = m.match
+      [baseRow, baseCol] = m.range.start.toArray()
 
-  @parse: (line) ->
-    [ourLines, theirLines] = [$(), $()]
-    [ourMarker, theirMarker, separator] = [null, null, null]
-    [ourRef, theirRef] = [null, null]
-    current = line
+      ourLines = ourText.split /\n/
+      ourRowStart = baseRow + 1
+      ourRowEnd = ourRowStart + ourLines.length - 1
 
-    appender = (e) =>
-      console.log("Invalid hunk! #{e.text()} outside of conflict markers")
-      return
+      console.log ourLines
+      ourMarker = editor.markBufferRange(
+        [[ourRowStart, 0], [ourRowEnd, 0]])
 
-    while current?
-      text = current.text()
+      ours = new OurSide(ourMarker)
 
-      opening = text.match(/^<{7} (\S+)$/)
-      if opening
-        ourRef = opening[1]
-        ourMarker = current
-        appender = (e) -> ourLines = ourLines.add e
-        current = current.next('.line')
-        continue
+      theirLines = theirText.split /\n/
+      theirRowStart = ourRowEnd + 1
+      theirRowEnd = theirRowStart + theirLines.length - 1
 
-      if text.match(/^={7}$/)
-        separator = current
-        appender = (e) -> theirLines = theirLines.add e
-        current = current.next('.line')
-        continue
+      theirMarker = editor.markBufferRange(
+        [[theirRowStart, 0], [theirRowEnd, 0]])
 
-      closing = text.match(/^>{7} (\S+)$/)
-      if closing
-        theirMarker = current
-        theirRef = closing[1]
-        break
+      theirs = new TheirSide(theirMarker)
 
-      # Not a marker: use the active appender
-      appender(current)
-      current = current.next('.line')
-
-    ours = new OurSide(ourRef, ourLines, ourMarker, separator)
-    theirs = new TheirSide(theirRef, theirLines, theirMarker, separator)
-    new Conflict(ours, theirs, null)
+      results.push new Conflict(ours, theirs, null)
+    results

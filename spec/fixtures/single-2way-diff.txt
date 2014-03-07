@@ -4,4 +4,4 @@ These are my changes
 These are your changes
 >>>>>>> master
 
-Past the end!s
+Past the end

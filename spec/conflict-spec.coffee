@@ -10,21 +10,21 @@ describe "Conflict", ->
     atom.workspaceView = new WorkspaceView
     atom.workspaceView.openSync(fullPath)
 
-    runs ->
-      editorView = atom.workspaceView.getActiveView()
-      editor = editorView.getEditor
+    editorView = atom.workspaceView.getActiveView()
+    editor = editorView.getEditor()
 
   it "parses itself from a two-way diff marking", ->
     loadPath('single-2way-diff.txt')
 
-    console.log editor
-    c = Conflict.parse editor
+    cs = Conflict.all editor
+    c = cs[0]
+    console.log c.ours.marker
 
-    expect(c.ours.marker.getTailPosition().toArray()).toEqual([1, 0])
-    expect(c.ours.marker.getHeadPosition().toArray()).toEqual([1, 21])
+    expect(c.ours.marker.getTailBufferPosition().toArray()).toEqual([1, 0])
+    expect(c.ours.marker.getHeadBufferPosition().toArray()).toEqual([2, 0])
 
-    expect(c.theirs.marker.getTailPosition().toArray()).toEqual([3, 0])
-    expect(c.theirs.marker.getHeadPosition().toArray()).toEqual([3, 23])
+    expect(c.theirs.marker.getTailBufferPosition().toArray()).toEqual([3, 0])
+    expect(c.theirs.marker.getHeadBufferPosition().toArray()).toEqual([4, 0])
 
   it "finds conflict markings from a file", ->
     content = """
