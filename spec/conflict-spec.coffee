@@ -1,23 +1,13 @@
 Conflict = require '../lib/conflict'
-{$$, WorkspaceView} = require 'atom'
+util = require './util'
 
 describe "Conflict", ->
-  [editor] = []
-
-  loadPath = (path) ->
-    fullPath = atom.project.resolve(path)
-
-    atom.workspaceView = new WorkspaceView
-    atom.workspaceView.openSync(fullPath)
-
-    editorView = atom.workspaceView.getActiveView()
-    editor = editorView.getEditor()
 
   rowRangeFrom = (marker) ->
     [marker.getTailBufferPosition().row, marker.getHeadBufferPosition().row]
 
   it "parses itself from a two-way diff marking", ->
-    loadPath('single-2way-diff.txt')
+    editor = util.openPath('single-2way-diff.txt').getEditor()
     c = Conflict.all(editor)[0]
 
     expect(rowRangeFrom c.ours.marker).toEqual([1, 2])
@@ -26,7 +16,7 @@ describe "Conflict", ->
     expect(c.theirs.ref).toBe('master')
 
   it "finds multiple conflict markings", ->
-    loadPath('multi-2way-diff.txt')
+    editor = util.openPath('multi-2way-diff.txt').getEditor()
     cs = Conflict.all(editor)
 
     expect(cs.length).toBe(2)
@@ -39,7 +29,7 @@ describe "Conflict", ->
     [conflict] = []
 
     beforeEach ->
-      loadPath('single-2way-diff.txt')
+      editor = util.openPath('single-2way-diff.txt').getEditor()
       [conflict] = Conflict.all editor
 
     it 'retains a reference to conflict', ->
