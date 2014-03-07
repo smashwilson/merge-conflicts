@@ -5,11 +5,15 @@ class Side
   constructor: (@ref, @marker, @refBannerMarker) ->
     @conflict = null
 
-  text: -> @lines.text()
-
   resolve: -> @conflict.resolution = @
 
   wasChosen: -> @conflict.resolution is @
+
+  editorView: -> @conflict.editorView
+
+  refBannerOffset: ->
+    position = @refBannerMarker.getTailBufferPosition()
+    @editorView().pixelPositionForBufferPosition position
 
 class OurSide extends Side
 

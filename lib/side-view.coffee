@@ -12,10 +12,10 @@ class SideView extends View
   initialize: (@side) ->
 
   installIn: (editorView) ->
-    @side.lines.addClass("conflict-line #{@side.klass()}")
-    @offset left: 0, top: @side.marker.position().top
-    @height @side.marker.height()
-    @appendTo editorView.find(".overlayer")
+    # @side.lines.addClass("conflict-line #{@side.klass()}")
+    @offset @side.refBannerOffset()
+    @height '200px'
+    @appendTo editorView.overlayer
 
   useMe: ->
     @side.resolve()
