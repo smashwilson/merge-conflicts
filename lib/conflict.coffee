@@ -2,8 +2,13 @@
 
 class Side
   constructor: (@ref, @lines, @marker, @separator) ->
+    @conflict = null
 
   text: -> @lines.text()
+
+  resolve: -> @conflict.resolution = @
+
+  wasChosen: -> @conflict.resolution is @
 
 class OurSide extends Side
 
@@ -24,6 +29,9 @@ class TheirSide extends Side
 module.exports =
 class Conflict
   constructor: (@ours, @theirs, @parent) ->
+    ours.conflict = @
+    theirs.conflict = @
+    @resolution = null
 
   @all: (editorView) ->
     editorView.find(".line:contains('<<<<<<<')").map ->

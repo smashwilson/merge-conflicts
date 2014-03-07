@@ -62,6 +62,35 @@ describe "Conflict", ->
     expect(cs[0].ours.lines.eq(1).text()).toBe("Multi-line even")
     expect(cs[1].theirs.lines.eq(0).text()).toBe("More of your changes")
 
+  describe 'sides', ->
+    hunk = """
+           <<<<<<< HEAD
+           These are my changes
+           =======
+           These are your changes
+           >>>>>>> master
+           """
+    lines = asLines(hunk)
+    conflict = Conflict.parse lines.find('.line').eq(0)
+
+    it 'retains a reference to conflict', ->
+      expect(conflict.ours.conflict).toBe(conflict)
+      expect(conflict.theirs.conflict).toBe(conflict)
+
+    it 'resolves as "ours"', ->
+      conflict.ours.resolve()
+
+      expect(conflict.resolution).toBe(conflict.ours)
+      expect(conflict.ours.wasChosen()).toBe(true)
+      expect(conflict.theirs.wasChosen()).toBe(false)
+
+    it 'resolves as "theirs"', ->
+      conflict.theirs.resolve()
+
+      expect(conflict.resolution).toBe(conflict.theirs)
+      expect(conflict.ours.wasChosen()).toBe(false)
+      expect(conflict.theirs.wasChosen()).toBe(true)
+
   it "parses itself from a three-way diff marking"
   it "names the incoming changes"
   it "resolves HEAD"
