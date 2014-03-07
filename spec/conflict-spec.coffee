@@ -21,7 +21,9 @@ describe "Conflict", ->
     c = Conflict.all(editor)[0]
 
     expect(rowRangeFrom c.ours.marker).toEqual([1, 2])
+    expect(c.ours.ref).toBe('HEAD')
     expect(rowRangeFrom c.theirs.marker).toEqual([3, 4])
+    expect(c.theirs.ref).toBe('master')
 
   it "finds multiple conflict markings", ->
     loadPath('multi-2way-diff.txt')

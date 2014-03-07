@@ -2,7 +2,7 @@
 _ = require 'underscore-plus'
 
 class Side
-  constructor: (@marker) ->
+  constructor: (@ref, @marker) ->
     @conflict = null
 
   text: -> @lines.text()
@@ -47,11 +47,10 @@ class Conflict
       ourRowStart = baseRow + 1
       ourRowEnd = ourRowStart + ourLines.length - 1
 
-      console.log ourLines
       ourMarker = editor.markBufferRange(
         [[ourRowStart, 0], [ourRowEnd, 0]])
 
-      ours = new OurSide(ourMarker)
+      ours = new OurSide(ourRef, ourMarker)
 
       theirLines = theirText.split /\n/
       theirRowStart = ourRowEnd + 1
@@ -60,7 +59,7 @@ class Conflict
       theirMarker = editor.markBufferRange(
         [[theirRowStart, 0], [theirRowEnd, 0]])
 
-      theirs = new TheirSide(theirMarker)
+      theirs = new TheirSide(theirRef, theirMarker)
 
       results.push new Conflict(ours, theirs, null)
     results
