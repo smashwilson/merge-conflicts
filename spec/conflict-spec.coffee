@@ -1,36 +1,30 @@
 Conflict = require '../lib/conflict'
-{$$} = require 'atom'
+{$$, WorkspaceView} = require 'atom'
 
 describe "Conflict", ->
+  [editor] = []
 
-  asLines = (hunk) ->
-    $$ ->
-      @div class: 'container', =>
-        for line in hunk.split /\n/
-          @div class: 'line', line
+  loadPath = (path) ->
+    fullPath = atom.project.resolve(path)
+
+    atom.workspaceView = new WorkspaceView
+    atom.workspaceView.openSync(fullPath)
+
+    runs ->
+      editorView = atom.workspaceView.getActiveView()
+      editor = editorView.getEditor
 
   it "parses itself from a two-way diff marking", ->
-    hunk = """
-           <<<<<<< HEAD
-           These are my changes
-           =======
-           These are your changes
-           >>>>>>> master
+    loadPath('single-2way-diff.txt')
 
-           Past the end!
-           """
-    lines = asLines(hunk)
+    console.log editor
+    c = Conflict.parse editor
 
-    c = Conflict.parse lines.find('.line').eq(0)
-    expect(c.ours.marker.text()).toBe("<<<<<<< HEAD")
-    expect(c.ours.lines.eq(0).text()).toBe("These are my changes")
-    expect(c.ours.ref).toBe("HEAD")
-    expect(c.ours.separator.text()).toBe("=======")
-    expect(c.theirs.separator.text()).toBe("=======")
-    expect(c.theirs.lines.eq(0).text()).toBe("These are your changes")
-    expect(c.theirs.ref).toBe("master")
-    expect(c.theirs.marker.text()).toBe(">>>>>>> master")
-    expect(c.parent).toBeNull()
+    expect(c.ours.marker.getTailPosition().toArray()).toEqual([1, 0])
+    expect(c.ours.marker.getHeadPosition().toArray()).toEqual([1, 21])
+
+    expect(c.theirs.marker.getTailPosition().toArray()).toEqual([3, 0])
+    expect(c.theirs.marker.getHeadPosition().toArray()).toEqual([3, 23])
 
   it "finds conflict markings from a file", ->
     content = """
