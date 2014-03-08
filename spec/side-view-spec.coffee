@@ -13,7 +13,6 @@ describe 'SideView', ->
     view = new SideView(ours)
 
   it 'positions itself over the banner line', ->
-    console.log editorView
     view.installIn editorView
     expect(view.offset().top).toEqual(ours.refBannerOffset().top)
     expect(view.height()).toEqual(ours.refBannerLine().height())
