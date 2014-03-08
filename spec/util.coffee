@@ -9,4 +9,7 @@ module.exports = {
     atom.workspaceView.openSync(fullPath)
 
     atom.workspaceView.getActiveView()
+
+  rowRangeFrom: (marker) ->
+    [marker.getTailBufferPosition().row, marker.getHeadBufferPosition().row]
 }
