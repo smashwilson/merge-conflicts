@@ -14,17 +14,30 @@ class SideView extends View
   installIn: (editorView) ->
     @appendTo editorView.overlayer
     @reposition(editorView)
+    @remark(editorView)
 
     @side.refBannerMarker.on "changed", =>
       @reposition(editorView)
 
-  reposition: (editorView, initial) ->
-    # @side.lines().addClass("conflict-line #{@side.klass()}")
+    updateScheduled = true
+
+    @side.marker.on "changed", =>
+      updateScheduled = true
+
+    editorView.on "editor:display-updated", =>
+      if updateScheduled
+        @remark(editorView)
+        updateScheduled = false
+
+  reposition: (editorView) ->
     anchor = editorView.renderedLines.offset()
     ref = @side.refBannerOffset()
 
     @offset top: ref.top + anchor.top
     @height @side.refBannerLine().height()
+
+  remark: (editorView) ->
+    @side.lines().addClass("conflict-line #{@side.klass()}")
 
   useMe: ->
     @side.resolve()
