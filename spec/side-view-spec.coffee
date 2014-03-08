@@ -15,7 +15,7 @@ describe 'SideView', ->
   it 'positions itself over the banner line', ->
     console.log editorView
     view.installIn editorView
-    expect(view.offset()).toEqual(ours.refBannerOffset())
+    expect(view.offset().top).toEqual(ours.refBannerOffset().top)
     expect(view.height()).toEqual(ours.refBannerLine().height())
 
   it 'triggers conflict resolution', ->
