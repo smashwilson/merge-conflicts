@@ -1,5 +1,6 @@
 MergeConflictsView = require './merge-conflicts-view'
 SideView = require './side-view'
+NavigationView = require './navigation-view'
 Conflict = require './conflict'
 
 module.exports =
@@ -16,6 +17,9 @@ module.exports =
 
           theirsView = new SideView(c.theirs)
           theirsView.installIn view
+
+          navView = new NavigationView(c)
+          navView.installIn view
 
   deactivate: ->
 
