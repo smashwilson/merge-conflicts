@@ -16,6 +16,7 @@ class SideView extends View
         @chosenAsResolution()
       else
         @rejectedAsResolution()
+      @hide()
 
   installIn: (editorView) ->
     @appendTo editorView.overlayer
@@ -43,15 +44,17 @@ class SideView extends View
     @height @side.refBannerLine().height()
 
   remark: (editorView) ->
-    @side.lines().addClass("conflict-line #{@side.klass()}")
+    lines = @side.lines()
+    unless @side.conflict.isResolved()
+      lines.addClass("conflict-line #{@side.klass()}").removeClass("resolved")
+    else
+      lines.removeClass(@side.klass()).addClass("conflict-line resolved")
 
   trimMarkerLines: ->
     @side.buffer().delete @side.refBannerMarker.getBufferRange()
 
   chosenAsResolution: ->
-    lines = @side.lines()
-    lines.removeClass(@side.klass())
-    lines.addClass("resolved")
+    @remark()
 
   rejectedAsResolution: ->
     @side.buffer().delete @side.marker.getBufferRange()

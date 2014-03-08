@@ -61,6 +61,8 @@ class Conflict
     theirs.conflict = @
     @resolution = null
 
+  isResolved: -> @resolution?
+
   resolveAs: (side) ->
     @resolution = side
     @emit("conflict:resolved")
