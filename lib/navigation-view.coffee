@@ -7,11 +7,15 @@ class NavigationView extends View
       @text ' '
       @span class: 'pull-right', =>
         @button class: 'btn btn-xs', click: 'down', =>
-          @span class: 'icon icon-arrow-small-down', 'prev'
+          @span class: 'icon icon-arrow-down', 'prev'
         @button class: 'btn btn-xs', click: 'up', =>
-          @span class: 'icon icon-arrow-small-up', 'next'
+          @span class: 'icon icon-arrow-up', 'next'
 
   initialize: (@conflict) ->
+    @conflict.on "conflict:resolved", =>
+      buffer = @editorView.getEditor().getBuffer()
+      buffer.delete @conflict.separatorMarker.getBufferRange()
+      @hide()
 
   installIn: (@editorView) ->
     @appendTo @editorView.overlayer
