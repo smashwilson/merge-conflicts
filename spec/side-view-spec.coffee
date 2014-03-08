@@ -25,9 +25,16 @@ describe 'SideView', ->
   describe 'when chosen as the resolution', ->
 
     beforeEach ->
+      view.installIn editorView
       ours.resolve()
 
-    it 'adds the "resolved" class'
+    it 'adds the "resolved" class', ->
+      classes = line.className.split /\W+/ for line in ours.lines()
+      expect(classes).toContain("resolved")
+      expect(classes).toContain("conflict-line")
+      expect(classes).not.toContain("ours")
+      expect(classes).not.toContain("theirs")
+
     it 'deletes the marker line'
 
   describe 'when not chosen as the resolution', ->
@@ -36,4 +43,3 @@ describe 'SideView', ->
       theirs.resolve()
 
     it 'deletes its hunks lines'
-    it ''
