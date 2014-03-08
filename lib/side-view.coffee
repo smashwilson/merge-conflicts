@@ -11,8 +11,11 @@ class SideView extends View
 
   initialize: (@side) ->
     @side.conflict.on "conflict:resolved", =>
-      @side.lines().removeClass(@side.klass())
-      @side.lines().addClass("resolved")
+      @trimMarkerLines()
+      if @side.wasChosen()
+        @chosenAsResolution()
+      else
+        @rejectedAsResolution()
 
   installIn: (editorView) ->
     @appendTo editorView.overlayer
@@ -41,6 +44,17 @@ class SideView extends View
 
   remark: (editorView) ->
     @side.lines().addClass("conflict-line #{@side.klass()}")
+
+  trimMarkerLines: ->
+    @side.buffer().delete @side.refBannerMarker.getBufferRange()
+
+  chosenAsResolution: ->
+    lines = @side.lines()
+    lines.removeClass(@side.klass())
+    lines.addClass("resolved")
+
+  rejectedAsResolution: ->
+    @side.buffer().delete @side.marker.getBufferRange()
 
   useMe: ->
     @side.resolve()

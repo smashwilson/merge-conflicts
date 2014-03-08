@@ -13,6 +13,8 @@ class Side
 
   editor: -> @editorView().getEditor()
 
+  buffer: -> @editor().getBuffer()
+
   lines: ->
     fromBuffer = @marker.getTailBufferPosition()
     fromScreen = @editor().screenPositionForBufferPosition fromBuffer

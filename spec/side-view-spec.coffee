@@ -6,6 +6,8 @@ util = require './util'
 describe 'SideView', ->
   [view, editorView, ours, theirs] = []
 
+  text = -> editorView.getEditor().getText()
+
   beforeEach ->
     editorView = util.openPath("single-2way-diff.txt")
     conflict = Conflict.all(editorView)[0]
@@ -35,11 +37,16 @@ describe 'SideView', ->
       expect(classes).not.toContain("ours")
       expect(classes).not.toContain("theirs")
 
-    it 'deletes the marker line'
+    it 'deletes the marker line', ->
+      expect(text()).not.toContain("<<<<<<< HEAD")
 
   describe 'when not chosen as the resolution', ->
 
     beforeEach ->
       theirs.resolve()
 
-    it 'deletes its hunks lines'
+    it 'deletes its lines', ->
+      expect(text()).not.toContain("These are my changes")
+
+    it 'deletes the marker line', ->
+      expect(text()).not.toContain("<<<<<<< HEAD")
