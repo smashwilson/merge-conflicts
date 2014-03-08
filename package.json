@@ -3,7 +3,7 @@
   "main": "./lib/merge-conflicts",
   "version": "0.0.1",
   "private": true,
-  "description": "A short description of your package",
+  "description": "Resolve git conflicts within Atom",
   "activationEvents": [
     "merge-conflicts:detect"
   ],
