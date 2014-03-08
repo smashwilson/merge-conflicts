@@ -10,6 +10,9 @@ class SideView extends View
         @button class: 'btn btn-xs pull-right', click: 'useMe', "Use Me"
 
   initialize: (@side) ->
+    @side.conflict.on "conflict:resolved", =>
+      @side.lines().removeClass(@side.klass())
+      @side.lines().addClass("resolved")
 
   installIn: (editorView) ->
     @appendTo editorView.overlayer

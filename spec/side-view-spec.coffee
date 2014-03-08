@@ -29,7 +29,7 @@ describe 'SideView', ->
       ours.resolve()
 
     it 'adds the "resolved" class', ->
-      classes = line.className.split /\W+/ for line in ours.lines()
+      classes = line.className.split /\s+/ for line in ours.lines()
       expect(classes).toContain("resolved")
       expect(classes).toContain("conflict-line")
       expect(classes).not.toContain("ours")
