@@ -67,6 +67,12 @@ describe "Conflict", ->
       expect(conflict.ours.wasChosen()).toBe(false)
       expect(conflict.theirs.wasChosen()).toBe(true)
 
+    it 'broadcasts an event', ->
+      resolved = false
+      conflict.on "conflict:resolved", -> resolved = true
+      conflict.ours.resolve()
+      expect(resolved).toBe(true)
+
   it "parses itself from a three-way diff marking"
   it "names the incoming changes"
   it "resolves HEAD"

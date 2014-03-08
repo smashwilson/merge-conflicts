@@ -1,11 +1,11 @@
 {$} = require 'atom'
-_ = require 'underscore-plus'
+{Emitter} = require 'emissary'
 
 class Side
   constructor: (@ref, @marker, @refBannerMarker) ->
     @conflict = null
 
-  resolve: -> @conflict.resolution = @
+  resolve: -> @conflict.resolveAs @
 
   wasChosen: -> @conflict.resolution is @
 
@@ -51,10 +51,17 @@ CONFLICT_REGEX = /^<{7} (\S+)\n([^]*?)={7}\n([^]*?)>{7} (\S+)\n?/mg
 
 module.exports =
 class Conflict
+
+  Emitter.includeInto(this)
+
   constructor: (@ours, @theirs, @parent, @separatorMarker) ->
     ours.conflict = @
     theirs.conflict = @
     @resolution = null
+
+  resolveAs: (side) ->
+    @resolution = side
+    @emit("conflict:resolved")
 
   @all: (editorView) ->
     results = []
