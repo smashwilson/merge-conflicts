@@ -8,7 +8,7 @@ describe "Conflict", ->
 
     beforeEach ->
       editorView = util.openPath('single-2way-diff.txt')
-      conflict = Conflict.all(editorView)[0]
+      conflict = Conflict.all(editorView.getEditor())[0]
 
     it 'identifies the correct rows', ->
       expect(util.rowRangeFrom conflict.ours.marker).toEqual([1, 2])

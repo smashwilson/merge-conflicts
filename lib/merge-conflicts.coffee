@@ -11,7 +11,7 @@ module.exports =
 
     atom.workspaceView.eachEditorView (view) ->
       if view.attached and view.getPane()?
-        for c in Conflict.all(view)
+        for c in Conflict.all(view.getEditor())
           oursView = new SideView(c.ours)
           oursView.installIn view
 

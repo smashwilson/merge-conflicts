@@ -6,12 +6,6 @@ class Side
 
   wasChosen: -> @conflict.resolution is @
 
-  editorView: -> @conflict.editorView
-
-  editor: -> @editorView().getEditor()
-
-  buffer: -> @editor().getBuffer()
-
   lines: ->
     fromBuffer = @marker.getTailBufferPosition()
     fromScreen = @editor().screenPositionForBufferPosition fromBuffer

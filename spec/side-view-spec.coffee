@@ -12,10 +12,13 @@ describe 'SideView', ->
     editorView = util.openPath("single-2way-diff.txt")
     conflict = Conflict.all(editorView)[0]
     [ours, theirs] = [conflict.ours, conflict.theirs]
-    view = new SideView(ours)
+    view = new SideView(ours, editorView)
+
+  it 'identifies its lines in the editor', ->
+    text = line.text() for line in view.lines()
+    expect(text).toEqual(["These are my changes"])
 
   it 'positions itself over the banner line', ->
-    view.installIn editorView
     expect(view.offset().top).toEqual(ours.refBannerOffset().top)
     expect(view.height()).toEqual(ours.refBannerLine().height())
 
@@ -27,7 +30,6 @@ describe 'SideView', ->
   describe 'when chosen as the resolution', ->
 
     beforeEach ->
-      view.installIn editorView
       ours.resolve()
 
     it 'adds the "resolved" class', ->
