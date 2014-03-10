@@ -14,18 +14,14 @@ class SideView extends CoveringView
     super editorView
 
     @side.conflict.on "conflict:resolved", =>
-      @buffer().delete @side.refBannerMarker.getBufferRange()
+      @deleteMarker @side.refBannerMarker
       if @side.wasChosen()
         @remark()
       else
-        @buffer().delete @side.marker.getBufferRange()
+        @deleteMarker @side.marker
       @hide()
 
-    @appendTo @editorView.overlayer
-    @reposition()
     @remark()
-
-    @side.refBannerMarker.on "changed", => @reposition()
 
     # The editor DOM isn't actually updated until editor:display-updated is
     # emitted, but you don't want to fire on *every* display-updated event.
@@ -39,26 +35,15 @@ class SideView extends CoveringView
         @remark()
         updateScheduled = false
 
-  reposition: ->
-    anchor = @editorView.renderedLines.offset()
-    ref = @refBannerOffset()
-
-    @offset top: ref.top + anchor.top
-    @height @refBannerLine().height()
+  cover: -> @side.refBannerMarker
 
   remark: ->
-    lines = @lines()
+    lines = @linesForMarker @side.marker
     unless @side.conflict.isResolved()
       lines.addClass("conflict-line #{@side.klass()}").removeClass("resolved")
     else
       lines.removeClass(@side.klass()).addClass("conflict-line resolved")
 
   useMe: -> @side.resolve()
-
-  lines: -> @linesForMarker(@side.marker)
-
-  refBannerLine: -> @linesForMarker(@side.refBannerMarker).eq 0
-
-  refBannerOffset: -> @offsetForMarker(@side.refBannerMarker)
 
   getModel: -> null

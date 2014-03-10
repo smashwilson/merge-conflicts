@@ -4,6 +4,22 @@ module.exports =
 class CoveringView extends View
 
   initialize: (@editorView) ->
+    @appendTo @editorView.overlayer
+    @reposition()
+
+    @cover().on "changed", => @reposition()
+
+  # Override to specify the marker of the first line that should be covered.
+  cover: -> null
+
+  reposition: ->
+    marker = @cover()
+    anchor = @editorView.renderedLines.offset()
+    ref = @offsetForMarker marker
+    line = @linesForMarker(marker).eq 0
+
+    @offset top: ref.top + anchor.top
+    @height line.height()
 
   editor: -> @editorView.getEditor()
 

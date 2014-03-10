@@ -14,17 +14,10 @@ describe 'SideView', ->
     [ours, theirs] = [conflict.ours, conflict.theirs]
     view = new SideView(ours, editorView)
 
-  it 'identifies its lines in the editor', ->
-    linetext = $(line).text() for line in view.lines()
-    expect(linetext).toEqual("These are my changes")
-
-  it 'identifies the ref banner line', ->
-    linetext = view.refBannerLine().text()
-    expect(linetext).toBe('<<<<<<< HEAD')
-
   it 'positions itself over the banner line', ->
-    expect(view.offset().top).toEqual(view.refBannerOffset().top)
-    expect(view.height()).toEqual(view.refBannerLine().height())
+    refBanner = editorView.find('.line:contains(">>>>>>>")').eq 0
+    expect(view.offset().top).toEqual(refBanner.offset().top)
+    expect(view.height()).toEqual(refBanner.height())
 
   it 'triggers conflict resolution', ->
     spyOn(ours, "resolve")
@@ -37,7 +30,8 @@ describe 'SideView', ->
       ours.resolve()
 
     it 'adds the "resolved" class', ->
-      classes = line.className.split /\s+/ for line in view.lines()
+      lines = view.linesForMarker ours.marker
+      classes = line.className.split /\s+/ for line in lines
       expect(classes).toContain("resolved")
       expect(classes).toContain("conflict-line")
       expect(classes).not.toContain("ours")
