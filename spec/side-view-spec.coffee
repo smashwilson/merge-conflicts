@@ -1,5 +1,5 @@
+{$} = require 'atom'
 SideView = require '../lib/side-view'
-
 Conflict = require '../lib/conflict'
 util = require './util'
 
@@ -10,17 +10,21 @@ describe 'SideView', ->
 
   beforeEach ->
     editorView = util.openPath("single-2way-diff.txt")
-    conflict = Conflict.all(editorView)[0]
+    conflict = Conflict.all(editorView.getEditor())[0]
     [ours, theirs] = [conflict.ours, conflict.theirs]
     view = new SideView(ours, editorView)
 
   it 'identifies its lines in the editor', ->
-    text = line.text() for line in view.lines()
-    expect(text).toEqual(["These are my changes"])
+    linetext = $(line).text() for line in view.lines()
+    expect(linetext).toEqual("These are my changes")
+
+  it 'identifies the ref banner line', ->
+    linetext = view.refBannerLine().text()
+    expect(linetext).toBe('<<<<<<< HEAD')
 
   it 'positions itself over the banner line', ->
-    expect(view.offset().top).toEqual(ours.refBannerOffset().top)
-    expect(view.height()).toEqual(ours.refBannerLine().height())
+    expect(view.offset().top).toEqual(view.refBannerOffset().top)
+    expect(view.height()).toEqual(view.refBannerLine().height())
 
   it 'triggers conflict resolution', ->
     spyOn(ours, "resolve")
@@ -33,7 +37,7 @@ describe 'SideView', ->
       ours.resolve()
 
     it 'adds the "resolved" class', ->
-      classes = line.className.split /\s+/ for line in ours.lines()
+      classes = line.className.split /\s+/ for line in view.lines()
       expect(classes).toContain("resolved")
       expect(classes).toContain("conflict-line")
       expect(classes).not.toContain("ours")

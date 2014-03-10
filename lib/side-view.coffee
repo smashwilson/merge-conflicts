@@ -11,42 +11,40 @@ class SideView extends View
 
   initialize: (@side, @editorView) ->
     @side.conflict.on "conflict:resolved", =>
-      @side.buffer().delete @side.refBannerMarker.getBufferRange()
+      @buffer().delete @side.refBannerMarker.getBufferRange()
       if @side.wasChosen()
         @remark()
       else
-        @side.buffer().delete @side.marker.getBufferRange()
+        @buffer().delete @side.marker.getBufferRange()
       @hide()
 
     @appendTo @editorView.overlayer
     @reposition()
     @remark()
 
-    @side.refBannerMarker.on "changed", =>
-      @reposition(editorView)
+    @side.refBannerMarker.on "changed", => @reposition()
 
     # The editor DOM isn't actually updated until editor:display-updated is
     # emitted, but you don't want to fire on *every* display-updated event.
 
     updateScheduled = true
 
-    @side.marker.on "changed", =>
-      updateScheduled = true
+    @side.marker.on "changed", => updateScheduled = true
 
     editorView.on "editor:display-updated", =>
       if updateScheduled
-        @remark(editorView)
+        @remark()
         updateScheduled = false
 
   reposition: ->
     anchor = @editorView.renderedLines.offset()
-    ref = @side.refBannerOffset()
+    ref = @refBannerOffset()
 
     @offset top: ref.top + anchor.top
-    @height @side.refBannerLine().height()
+    @height @refBannerLine().height()
 
   remark: ->
-    lines = @side.lines()
+    lines = @lines()
     unless @side.conflict.isResolved()
       lines.addClass("conflict-line #{@side.klass()}").removeClass("resolved")
     else
@@ -54,5 +52,30 @@ class SideView extends View
 
   useMe: ->
     @side.resolve()
+
+  editor: -> @editorView.getEditor()
+
+  buffer: -> @editor().getBuffer()
+
+  lines: -> @linesForMarker(@side.marker)
+
+  refBannerLine: -> @linesForMarker(@side.refBannerMarker).eq 0
+
+  refBannerOffset: -> @offsetForMarker(@side.refBannerMarker)
+
+  linesForMarker: (marker) ->
+    fromBuffer = marker.getTailBufferPosition()
+    fromScreen = @editor().screenPositionForBufferPosition fromBuffer
+    toBuffer = marker.getHeadBufferPosition()
+    toScreen = @editor().screenPositionForBufferPosition toBuffer
+
+    lines = @editorView.renderedLines.children('.line')
+    lines.slice(fromScreen.row, toScreen.row)
+
+  offsetForMarker: (marker) ->
+    position = marker.getTailBufferPosition()
+    @editorView.pixelPositionForBufferPosition position
+
+  deleteMarker: (marker) -> @buffer().delete marker.getBufferRange()
 
   getModel: -> null

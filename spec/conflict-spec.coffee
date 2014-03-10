@@ -23,15 +23,9 @@ describe "Conflict", ->
     it 'finds the separator', ->
       expect(util.rowRangeFrom conflict.separatorMarker).toEqual([2, 3])
 
-    it 'iterates the DOM lines', ->
-      lines = conflict.theirs.lines()
-
-      expect(lines.length).toBe(1)
-      expect(lines.eq(0).text()).toBe("These are your changes")
-
   it "finds multiple conflict markings", ->
     editorView = util.openPath('multi-2way-diff.txt')
-    cs = Conflict.all(editorView)
+    cs = Conflict.all(editorView.getEditor())
 
     expect(cs.length).toBe(2)
     expect(util.rowRangeFrom cs[0].ours.marker).toEqual([5, 7])
@@ -44,7 +38,7 @@ describe "Conflict", ->
 
     beforeEach ->
       editorView = util.openPath('single-2way-diff.txt')
-      [conflict] = Conflict.all editorView
+      [conflict] = Conflict.all editorView.getEditor()
 
     it 'retains a reference to conflict', ->
       expect(conflict.ours.conflict).toBe(conflict)
@@ -64,7 +58,7 @@ describe "Conflict", ->
       expect(conflict.ours.wasChosen()).toBe(false)
       expect(conflict.theirs.wasChosen()).toBe(true)
 
-    it 'broadcasts an event', ->
+    it 'broadcasts an event on resolution', ->
       resolved = false
       conflict.on "conflict:resolved", -> resolved = true
       conflict.ours.resolve()

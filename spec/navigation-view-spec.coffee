@@ -8,7 +8,7 @@ describe 'NavigationView', ->
 
   beforeEach ->
     editorView = util.openPath("single-2way-diff.txt")
-    conflict = Conflict.all(editorView)[0]
+    conflict = Conflict.all(editorView.getEditor())[0]
     view = new NavigationView(conflict)
     view.installIn editorView
 
