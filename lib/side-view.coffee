@@ -1,7 +1,8 @@
 {View, $} = require 'atom'
+CoveringView = require './covering-view'
 
 module.exports =
-class SideView extends View
+class SideView extends CoveringView
   @content: (side, editorView) ->
     @div class: "side #{side.klass()} ui-site-#{side.site()}", =>
       @div class: 'controls', =>
@@ -9,7 +10,9 @@ class SideView extends View
         @span class: 'text-subtle', "// #{side.description()}"
         @button class: 'btn btn-xs pull-right', click: 'useMe', "Use Me"
 
-  initialize: (@side, @editorView) ->
+  initialize: (@side, editorView) ->
+    super editorView
+
     @side.conflict.on "conflict:resolved", =>
       @buffer().delete @side.refBannerMarker.getBufferRange()
       if @side.wasChosen()
@@ -50,32 +53,12 @@ class SideView extends View
     else
       lines.removeClass(@side.klass()).addClass("conflict-line resolved")
 
-  useMe: ->
-    @side.resolve()
-
-  editor: -> @editorView.getEditor()
-
-  buffer: -> @editor().getBuffer()
+  useMe: -> @side.resolve()
 
   lines: -> @linesForMarker(@side.marker)
 
   refBannerLine: -> @linesForMarker(@side.refBannerMarker).eq 0
 
   refBannerOffset: -> @offsetForMarker(@side.refBannerMarker)
-
-  linesForMarker: (marker) ->
-    fromBuffer = marker.getTailBufferPosition()
-    fromScreen = @editor().screenPositionForBufferPosition fromBuffer
-    toBuffer = marker.getHeadBufferPosition()
-    toScreen = @editor().screenPositionForBufferPosition toBuffer
-
-    lines = @editorView.renderedLines.children('.line')
-    lines.slice(fromScreen.row, toScreen.row)
-
-  offsetForMarker: (marker) ->
-    position = marker.getTailBufferPosition()
-    @editorView.pixelPositionForBufferPosition position
-
-  deleteMarker: (marker) -> @buffer().delete marker.getBufferRange()
 
   getModel: -> null
