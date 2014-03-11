@@ -9,11 +9,7 @@ describe 'NavigationView', ->
   beforeEach ->
     editorView = util.openPath("single-2way-diff.txt")
     conflict = Conflict.all(editorView.getEditor())[0]
-    view = new NavigationView(conflict)
-    view.installIn editorView
-
-  it 'accesses the line', ->
-    expect(view.line().text()).toBe('=======')
+    view = new NavigationView(conflict, editorView)
 
   it 'deletes the separator line on resolution', ->
     conflict.ours.resolve()
