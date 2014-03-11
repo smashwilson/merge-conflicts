@@ -64,6 +64,33 @@ describe "Conflict", ->
       conflict.ours.resolve()
       expect(resolved).toBe(true)
 
+  describe 'navigator', ->
+    [conflicts, navigator] = []
+
+    beforeEach ->
+      editorView = util.openPath('triple-2way-diff.txt')
+      conflicts = Conflict.all(editorView.getEditor())
+      navigator = conflicts[1].navigator
+
+    it 'knows its conflict', ->
+      expect(navigator.conflict).toBe(conflicts[1])
+
+    it 'links to the previous conflict', ->
+      expect(navigator.previous).toBe(conflicts[0])
+
+    it 'links to the next conflict', ->
+      expect(navigator.next).toBe(conflicts[2])
+
+    it 'skips resolved conflicts', ->
+      nav = conflicts[0].navigator
+      conflicts[1].ours.resolve()
+      expect(nav.nextUnresolved()).toBe(conflicts[2])
+
+    it 'returns null at the end', ->
+      nav = conflicts[2].navigator
+      expect(nav.next).toBeNull()
+      expect(nav.nextUnresolved()).toBeNull()
+
   it "parses itself from a three-way diff marking"
   it "names the incoming changes"
   it "resolves HEAD"
