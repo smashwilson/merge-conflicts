@@ -15,7 +15,7 @@ describe 'SideView', ->
     view = new SideView(ours, editorView)
 
   it 'positions itself over the banner line', ->
-    refBanner = editorView.find('.line:contains(">>>>>>>")').eq 0
+    refBanner = editorView.find('.line:contains("<<<<<<<")').eq 0
     expect(view.offset().top).toEqual(refBanner.offset().top)
     expect(view.height()).toEqual(refBanner.height())
 
