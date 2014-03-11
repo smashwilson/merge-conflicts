@@ -12,14 +12,9 @@ module.exports =
     atom.workspaceView.eachEditorView (view) ->
       if view.attached and view.getPane()?
         for c in Conflict.all(view.getEditor())
-          oursView = new SideView(c.ours)
-          oursView.installIn view
-
-          theirsView = new SideView(c.theirs)
-          theirsView.installIn view
-
-          navView = new NavigationView(c)
-          navView.installIn view
+          oursView = new SideView(c.ours, view)
+          theirsView = new SideView(c.theirs, view)
+          navView = new NavigationView(c, view)
 
   deactivate: ->
 
