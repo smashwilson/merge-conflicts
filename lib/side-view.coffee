@@ -13,7 +13,7 @@ class SideView extends CoveringView
   initialize: (@side, editorView) ->
     super editorView
 
-    @side.conflict.on "conflict:resolved", =>
+    @side.conflict.on 'conflict:resolved', =>
       @deleteMarker @side.refBannerMarker
       if @side.wasChosen()
         @remark()

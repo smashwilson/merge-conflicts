@@ -1,8 +1,8 @@
-{View} = require 'atom'
+CoveringView = require './covering-view'
 
 module.exports =
-class NavigationView extends View
-  @content: (conflict) ->
+class NavigationView extends CoveringView
+  @content: (conflict, editorView) ->
     @div class: 'controls navigation', =>
       @text ' '
       @span class: 'pull-right', =>
@@ -11,35 +11,14 @@ class NavigationView extends View
         @button class: 'btn btn-xs', click: 'up', =>
           @span class: 'icon icon-arrow-up', 'next'
 
-  initialize: (@conflict) ->
-    @conflict.on "conflict:resolved", =>
-      buffer = @editorView.getEditor().getBuffer()
-      buffer.delete @conflict.separatorMarker.getBufferRange()
+  initialize: (@conflict, editorView) ->
+    super editorView
+
+    @conflict.on 'conflict:resolved', =>
+      @deleteMarker @cover()
       @hide()
 
-  installIn: (@editorView) ->
-    @appendTo @editorView.overlayer
-    @reposition()
-
-    @conflict.separatorMarker.on "changed", =>
-      @reposition()
-
-  line: ->
-    editor = @editorView.getEditor()
-    position = @conflict.separatorMarker.getTailBufferPosition()
-    screen = editor.screenPositionForBufferPosition position
-    @editorView.renderedLines.children('.line').eq screen.row
-
-  separatorOffset: ->
-    position = @conflict.separatorMarker.getTailBufferPosition()
-    @editorView.pixelPositionForBufferPosition position
-
-  reposition: ->
-    anchor = @editorView.renderedLines.offset()
-    ref = @separatorOffset()
-
-    @offset top: ref.top + anchor.top
-    @height @line().height()
+  cover: -> @conflict.separatorMarker
 
   up: ->
 
