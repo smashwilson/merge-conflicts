@@ -28,5 +28,5 @@ describe 'NavigationView', ->
   it 'scrolls to the previous diff', ->
     spyOn(editor, "setCursorBufferPosition")
     view.up()
-    p = conflicts[1].ours.marker.getTailBufferPosition()
+    p = conflicts[0].ours.marker.getTailBufferPosition()
     expect(editor.setCursorBufferPosition).toHaveBeenCalledWith(p)

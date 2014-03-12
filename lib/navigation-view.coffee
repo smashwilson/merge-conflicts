@@ -20,6 +20,6 @@ class NavigationView extends CoveringView
 
   cover: -> @navigator.separatorMarker
 
-  up: ->
+  up: -> @scrollTo @navigator.previousUnresolved()?.scrollTarget()
 
-  down: ->
+  down: -> @scrollTo @navigator.nextUnresolved()?.scrollTarget()

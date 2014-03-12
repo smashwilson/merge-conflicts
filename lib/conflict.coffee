@@ -23,6 +23,8 @@ class Conflict
     @resolution = side
     @emit("conflict:resolved")
 
+  scrollTarget: -> @ours.marker.getTailBufferPosition()
+
   @all: (editor) ->
     results = []
     buffer = editor.getBuffer()
