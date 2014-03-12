@@ -6,10 +6,10 @@ class NavigationView extends CoveringView
     @div class: 'controls navigation', =>
       @text ' '
       @span class: 'pull-right', =>
-        @button class: 'btn btn-xs', click: 'down', =>
-          @span class: 'icon icon-arrow-down', 'prev'
         @button class: 'btn btn-xs', click: 'up', =>
-          @span class: 'icon icon-arrow-up', 'next'
+          @span class: 'icon icon-arrow-up', 'prev'
+        @button class: 'btn btn-xs', click: 'down', =>
+          @span class: 'icon icon-arrow-down', 'next'
 
   initialize: (@navigator, editorView) ->
     super editorView
