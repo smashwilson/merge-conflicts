@@ -12,9 +12,9 @@ Your changes
 Text in between.
 
 <<<<<<< HEAD
-More of my changes
+My middle changes
 =======
-More of your changes
+Your middle changes
 >>>>>>> other-branch
 
 Text in between.
