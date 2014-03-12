@@ -2,7 +2,7 @@ CoveringView = require './covering-view'
 
 module.exports =
 class NavigationView extends CoveringView
-  @content: (conflict, editorView) ->
+  @content: (navigator, editorView) ->
     @div class: 'controls navigation', =>
       @text ' '
       @span class: 'pull-right', =>
@@ -11,14 +11,14 @@ class NavigationView extends CoveringView
         @button class: 'btn btn-xs', click: 'up', =>
           @span class: 'icon icon-arrow-up', 'next'
 
-  initialize: (@conflict, editorView) ->
+  initialize: (@navigator, editorView) ->
     super editorView
 
-    @conflict.on 'conflict:resolved', =>
+    @navigator.conflict.on 'conflict:resolved', =>
       @deleteMarker @cover()
       @hide()
 
-  cover: -> @conflict.separatorMarker
+  cover: -> @navigator.separatorMarker
 
   up: ->
 

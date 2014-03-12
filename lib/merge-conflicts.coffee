@@ -14,7 +14,7 @@ module.exports =
         for c in Conflict.all(view.getEditor())
           oursView = new SideView(c.ours, view)
           theirsView = new SideView(c.theirs, view)
-          navView = new NavigationView(c, view)
+          navView = new NavigationView(c.navigator, view)
 
   deactivate: ->
 

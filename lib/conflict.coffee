@@ -2,6 +2,7 @@
 {Emitter} = require 'emissary'
 
 {Side, OurSide, TheirSide} = require './side'
+Navigator = require './navigator'
 
 CONFLICT_REGEX = /^<{7} (\S+)\n([^]*?)={7}\n([^]*?)>{7} (\S+)\n?/mg
 
@@ -10,9 +11,10 @@ class Conflict
 
   Emitter.includeInto(this)
 
-  constructor: (@ours, @theirs, @parent, @separatorMarker) ->
-    ours.conflict = @
-    theirs.conflict = @
+  constructor: (@ours, @theirs, @parent, @navigator) ->
+    @ours.conflict = @
+    @theirs.conflict = @
+    @navigator.conflict = @
     @resolution = null
 
   isResolved: -> @resolution?
@@ -24,6 +26,8 @@ class Conflict
   @all: (editor) ->
     results = []
     buffer = editor.getBuffer()
+    previous = null
+
     buffer.scan CONFLICT_REGEX, (m) ->
       [x, ourRef, ourText, theirText, theirRef] = m.match
       [baseRow, baseCol] = m.range.start.toArray()
@@ -53,6 +57,11 @@ class Conflict
 
       theirs = new TheirSide(theirRef, theirMarker, theirBannerMarker)
 
-      c = new Conflict(ours, theirs, null, separatorMarker)
+      nav = new Navigator(separatorMarker)
+
+      c = new Conflict(ours, theirs, null, nav)
       results.push c
+
+      nav.linkToPrevious previous
+      previous = c
     results

@@ -21,7 +21,7 @@ describe "Conflict", ->
       expect(util.rowRangeFrom conflict.theirs.refBannerMarker).toEqual([4, 5])
 
     it 'finds the separator', ->
-      expect(util.rowRangeFrom conflict.separatorMarker).toEqual([2, 3])
+      expect(util.rowRangeFrom conflict.navigator.separatorMarker).toEqual([2, 3])
 
   it "finds multiple conflict markings", ->
     editorView = util.openPath('multi-2way-diff.txt')
@@ -92,5 +92,4 @@ describe "Conflict", ->
       expect(nav.nextUnresolved()).toBeNull()
 
   it "parses itself from a three-way diff marking"
-  it "names the incoming changes"
   it "resolves HEAD"
