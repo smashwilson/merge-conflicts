@@ -1,7 +1,11 @@
 {$, View} = require 'atom'
+_ = require 'underscore-plus'
+path = require 'path'
+
 GitBridge = require './git-bridge'
 Conflict = require './conflict'
 SideView = require './side-view'
+NavigationView = require './navigation-view'
 
 module.exports =
 class MergeConflictsView extends View
@@ -11,16 +15,16 @@ class MergeConflictsView extends View
         @text 'Conflicts'
         @button class: 'btn pull-right', 'Hide'
       @ul class: 'list-group', =>
-        for path in conflicts
+        for p in conflicts
           @li click: 'navigate', class: 'list-item status-modified navigate', =>
-            @span class: 'inline-block icon icon-diff-modified path', path
+            @span class: 'inline-block icon icon-diff-modified path', p
             @span class: 'text-subtle', "modified by both"
 
   initialize: (@conflicts) ->
 
   navigate: (event, element) ->
-    path = element.find(".path").text()
-    atom.workspace.open(path)
+    p = element.find(".path").text()
+    atom.workspace.open(p)
 
   # Returns an object that can be retrieved when package is activated
   serialize: ->
@@ -36,3 +40,20 @@ class MergeConflictsView extends View
       if conflicts
         view = new MergeConflictsView(conflicts)
         atom.workspaceView.appendToBottom(view)
+
+        atom.workspaceView.eachEditorView (view) ->
+          if view.attached and view.getPane()?
+            MergeConflictsView.markConflictsIn conflicts, view
+
+  @markConflictsIn: (conflicts, editorView) ->
+    return unless conflicts
+
+    editor = editorView.getEditor()
+    p = editor.getPath()
+    rel = path.relative atom.project.getPath(), p
+    return unless _.contains(conflicts, rel)
+
+    for c in Conflict.all(editor)
+      oursView = new SideView(c.ours, editorView)
+      theirsView = new SideView(c.theirs, editorView)
+      navView = new NavigationView(c.navigator, editorView)
