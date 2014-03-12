@@ -23,26 +23,19 @@ class SideView extends CoveringView
 
     @remark()
 
-    # The editor DOM isn't actually updated until editor:display-updated is
-    # emitted, but you don't want to fire on *every* display-updated event.
-
-    updateScheduled = true
-
-    @side.marker.on "changed", => updateScheduled = true
-
-    editorView.on "editor:display-updated", =>
-      if updateScheduled
-        @remark()
-        updateScheduled = false
+    editorView.on "editor:display-updated", => @remark()
 
   cover: -> @side.refBannerMarker
 
   remark: ->
     lines = @linesForMarker @side.marker
     unless @side.conflict.isResolved()
-      lines.addClass("conflict-line #{@side.klass()}").removeClass("resolved")
+      addClasses = "conflict-line #{@side.klass()}"
+      removeClasses = "resolved"
     else
-      lines.removeClass(@side.klass()).addClass("conflict-line resolved")
+      addClasses = "conflict-line resolved"
+      removeClasses = @side.klass()
+    lines.removeClass(removeClasses).addClass(addClasses)
 
   useMe: -> @side.resolve()
 

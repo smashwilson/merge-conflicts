@@ -1,4 +1,5 @@
-{View} = require 'atom'
+{View, $} = require 'atom'
+_ = require 'underscore-plus'
 
 module.exports =
 class CoveringView extends View
@@ -31,8 +32,10 @@ class CoveringView extends View
     toBuffer = marker.getHeadBufferPosition()
     toScreen = @editor().screenPositionForBufferPosition toBuffer
 
-    lines = @editorView.renderedLines.children('.line')
-    lines.slice(fromScreen.row, toScreen.row)
+    result = $()
+    for row in _.range(fromScreen.row, toScreen.row)
+      result = result.add @editorView.lineElementForScreenRow row
+    result
 
   offsetForMarker: (marker) ->
     position = marker.getTailBufferPosition()
