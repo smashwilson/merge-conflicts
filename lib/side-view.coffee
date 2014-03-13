@@ -22,3 +22,5 @@ class SideView extends CoveringView
   useMe: -> @side.resolve()
 
   getModel: -> null
+
+  conflict: -> @side.conflict

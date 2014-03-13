@@ -13,6 +13,9 @@ class CoveringView extends View
   # Override to specify the marker of the first line that should be covered.
   cover: -> null
 
+  # Override to return the Conflict that this view is responsible for.
+  conflict: -> null
+
   reposition: ->
     marker = @cover()
     anchor = @editorView.renderedLines.offset()

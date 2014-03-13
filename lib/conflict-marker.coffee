@@ -14,21 +14,30 @@ class ConflictMarker
 
   constructor: (@editorView) ->
     @conflicts = Conflict.all(@editorView.getEditor())
+
+    @coveringViews = []
     for c in @conflicts
-      new SideView(c.ours, @editorView)
-      new SideView(c.theirs, @editorView)
-      new NavigationView(c.navigator, @editorView)
+      @coveringViews.push new SideView(c.ours, @editorView)
+      @coveringViews.push new SideView(c.theirs, @editorView)
+      @coveringViews.push new NavigationView(c.navigator, @editorView)
+
+      c.on 'conflict:resolved', => @repositionUnresolved()
 
     if @conflicts
       @editorView.addClass 'conflicted'
       @remark()
-      @editorView.on "editor:display-updated", => @remark()
+
+      @editorView.on 'editor:display-updated', => @remark()
 
   remark: ->
     @editorView.renderedLines.removeClass(CONFLICT_CLASSES)
     @ourLines().addClass(OUR_CLASSES)
     @theirLines().addClass(THEIR_CLASSES)
     @resolvedLines().addClass(RESOLVED_CLASSES)
+
+  repositionUnresolved: ->
+    for view in @coveringViews
+      view.reposition() unless view.conflict().isResolved()
 
   ourLines: -> @linesForConflicts false, (c) -> c.ours.marker
 
