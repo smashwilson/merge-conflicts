@@ -24,34 +24,19 @@ class ConflictMarker
       @remark()
       @editorView.on "editor:display-updated", => @remark()
 
-  ourLines: ->
-    results = $()
-    for c in @conflicts
-      unless c.isResolved()
-        results = results.add @linesForMarker(c.ours.marker)
-    results
-
-  theirLines: ->
-    results = $()
-    for c in @conflicts
-      unless c.isResolved()
-        results = results.add @linesForMarker(c.theirs.marker)
-    results
-
-  resolvedLines: ->
-    results = $()
-    for c in @conflicts
-      if c.isResolved()
-        results = results.add @linesForMarker(c.resolution.marker)
-    results
-
-  editor: -> @editorView.getEditor()
-
   remark: ->
     @editorView.renderedLines.removeClass(CONFLICT_CLASSES)
     @ourLines().addClass(OUR_CLASSES)
     @theirLines().addClass(THEIR_CLASSES)
     @resolvedLines().addClass(RESOLVED_CLASSES)
+
+  ourLines: -> @linesForConflicts false, (c) -> c.ours.marker
+
+  theirLines: -> @linesForConflicts false, (c) -> c.theirs.marker
+
+  resolvedLines: -> @linesForConflicts true, (c) -> c.resolution.marker
+
+  editor: -> @editorView.getEditor()
 
   linesForMarker: (marker) ->
     fromBuffer = marker.getTailBufferPosition()
@@ -67,3 +52,11 @@ class ConflictMarker
       if low <= row and row <= high
         result = result.add @editorView.lineElementForScreenRow row
     result
+
+  linesForConflicts: (resolved, markerCallback) ->
+    results = $()
+    for c in @conflicts
+      if (resolved and c.isResolved()) or (not resolved and not c.isResolved())
+        marker = markerCallback(c)
+        results = results.add @linesForMarker marker
+    results
