@@ -13,6 +13,7 @@ class NavigationView extends CoveringView
 
   initialize: (@navigator, editorView) ->
     super editorView
+    @description = "NavigationView"
 
     @navigator.conflict.on 'conflict:resolved', =>
       @deleteMarker @cover()

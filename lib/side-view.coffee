@@ -1,5 +1,6 @@
 {View, $} = require 'atom'
 CoveringView = require './covering-view'
+_ = require 'underscore-plus'
 
 module.exports =
 class SideView extends CoveringView
@@ -12,30 +13,31 @@ class SideView extends CoveringView
 
   initialize: (@side, editorView) ->
     super editorView
+    @description = "SideView for #{@side.description()}"
 
     @side.conflict.on 'conflict:resolved', =>
       @deleteMarker @side.refBannerMarker
       if @side.wasChosen()
-        @remark()
+        # @remark()
       else
         @deleteMarker @side.marker
       @hide()
 
-    @remark()
-
-    editorView.on "editor:display-updated", => @remark()
-
   cover: -> @side.refBannerMarker
 
   remark: ->
+    console.log "Remarking #{@description} ..."
     lines = @linesForMarker @side.marker
+    classes = ["conflict-line"]
     unless @side.conflict.isResolved()
-      addClasses = "conflict-line #{@side.klass()}"
-      removeClasses = "resolved"
+      classes.push @side.klass()
     else
-      addClasses = "conflict-line resolved"
-      removeClasses = @side.klass()
-    lines.removeClass(removeClasses).addClass(addClasses)
+      classes.push "resolved"
+
+    toRemove = _.difference SIDE_CLASSES, classes
+    console.log "Adding classes #{classes} to <#{lines.text()}> for #{@description}"
+    console.log "Removing classes #{classes} from <#{lines.text()}> for #{@description}"
+    console.log "Remarking completed."
 
   useMe: -> @side.resolve()
 

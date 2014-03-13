@@ -3,9 +3,7 @@ _ = require 'underscore-plus'
 path = require 'path'
 
 GitBridge = require './git-bridge'
-Conflict = require './conflict'
-SideView = require './side-view'
-NavigationView = require './navigation-view'
+ConflictMarker = require './conflict-marker'
 
 module.exports =
 class MergeConflictsView extends View
@@ -53,11 +51,4 @@ class MergeConflictsView extends View
     rel = path.relative atom.project.getPath(), p
     return unless _.contains(conflicts, rel)
 
-    found = false
-    for c in Conflict.all(editor)
-      found = true
-      oursView = new SideView(c.ours, editorView)
-      theirsView = new SideView(c.theirs, editorView)
-      navView = new NavigationView(c.navigator, editorView)
-
-    editorView.addClass 'conflicted' if found
+    new ConflictMarker(editorView)

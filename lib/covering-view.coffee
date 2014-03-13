@@ -10,6 +10,8 @@ class CoveringView extends View
 
     @cover().on "changed", => @reposition()
 
+    @description = "undescribed CoveringView"
+
   # Override to specify the marker of the first line that should be covered.
   cover: -> null
 
@@ -17,10 +19,9 @@ class CoveringView extends View
     marker = @cover()
     anchor = @editorView.renderedLines.offset()
     ref = @offsetForMarker marker
-    line = @linesForMarker(marker).eq 0
 
     @offset top: ref.top + anchor.top
-    @height line.height()
+    @height @editorView.lineHeight
 
   editor: -> @editorView.getEditor()
 
