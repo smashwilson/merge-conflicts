@@ -10,8 +10,6 @@ class CoveringView extends View
 
     @cover().on "changed", => @reposition()
 
-    @description = "undescribed CoveringView"
-
   # Override to specify the marker of the first line that should be covered.
   cover: -> null
 
@@ -26,17 +24,6 @@ class CoveringView extends View
   editor: -> @editorView.getEditor()
 
   buffer: -> @editor().getBuffer()
-
-  linesForMarker: (marker) ->
-    fromBuffer = marker.getTailBufferPosition()
-    fromScreen = @editor().screenPositionForBufferPosition fromBuffer
-    toBuffer = marker.getHeadBufferPosition()
-    toScreen = @editor().screenPositionForBufferPosition toBuffer
-
-    result = $()
-    for row in _.range(fromScreen.row, toScreen.row)
-      result = result.add @editorView.lineElementForScreenRow row
-    result
 
   offsetForMarker: (marker) ->
     position = marker.getTailBufferPosition()
