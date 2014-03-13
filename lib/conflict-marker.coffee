@@ -7,6 +7,7 @@ NavigationView = require './navigation-view'
 CONFLICT_CLASSES = "conflict-line resolved ours theirs parent"
 OUR_CLASSES = "conflict-line ours"
 THEIR_CLASSES = "conflict-line theirs"
+RESOLVED_CLASSES = "conflict-line resolved"
 
 module.exports =
 class ConflictMarker
@@ -23,11 +24,34 @@ class ConflictMarker
       @remark()
       @editorView.on "editor:display-updated", => @remark()
 
-  ourLines: -> @linesForMarker(c.ours.marker) for c in @conflicts
+  ourLines: ->
+    results = $()
+    for c in @conflicts
+      unless c.isResolved()
+        results = results.add @linesForMarker(c.ours.marker)
+    results
 
-  theirLines: -> @linesForMarker(c.theirs.marker) for c in @conflicts
+  theirLines: ->
+    results = $()
+    for c in @conflicts
+      unless c.isResolved()
+        results = results.add @linesForMarker(c.theirs.marker)
+    results
+
+  resolvedLines: ->
+    results = $()
+    for c in @conflicts
+      if c.isResolved()
+        results = results.add @linesForMarker(c.resolution.marker)
+    results
 
   editor: -> @editorView.getEditor()
+
+  remark: ->
+    @editorView.renderedLines.removeClass(CONFLICT_CLASSES)
+    @ourLines().addClass(OUR_CLASSES)
+    @theirLines().addClass(THEIR_CLASSES)
+    @resolvedLines().addClass(RESOLVED_CLASSES)
 
   linesForMarker: (marker) ->
     fromBuffer = marker.getTailBufferPosition()
@@ -43,8 +67,3 @@ class ConflictMarker
       if low <= row and row <= high
         result = result.add @editorView.lineElementForScreenRow row
     result
-
-  remark: ->
-    @editorView.renderedLines.removeClass(CONFLICT_CLASSES)
-    batch.addClass(OUR_CLASSES) for batch in @ourLines()
-    batch.addClass(THEIR_CLASSES) for batch in @theirLines()
