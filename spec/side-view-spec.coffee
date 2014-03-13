@@ -29,14 +29,6 @@ describe 'SideView', ->
     beforeEach ->
       ours.resolve()
 
-    it 'adds the "resolved" class', ->
-      lines = view.linesForMarker ours.marker
-      classes = line.className.split /\s+/ for line in lines
-      expect(classes).toContain("resolved")
-      expect(classes).toContain("conflict-line")
-      expect(classes).not.toContain("ours")
-      expect(classes).not.toContain("theirs")
-
     it 'deletes the marker line', ->
       expect(text()).not.toContain("<<<<<<< HEAD")
 
