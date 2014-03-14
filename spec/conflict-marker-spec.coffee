@@ -107,6 +107,11 @@ describe 'ConflictMarker', ->
       expect(cs).toEqual([[5, 0]])
 
   describe 'without an active conflict', ->
-    it 'no-ops the resolution commands'
+
+    it 'no-ops the resolution commands', ->
+      for e in ['resolve-current', 'accept-ours', 'accept-theirs']
+        editorView.trigger "merge-conflicts:#{e}"
+        expect(m.active()).toEqual([])
+
     it 'jumps to the next unresolved on merge-conflicts:next-unresolved'
     it 'jumps to the previous unresolved on merge-conflicts:next-unresolved'
