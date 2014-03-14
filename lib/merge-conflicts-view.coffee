@@ -20,7 +20,7 @@ class MergeConflictsView extends View
             @progress class: 'inline-block', max: 100, value: 0
 
   initialize: (@conflicts) ->
-    atom.on 'merge-conflicts:resolve', (event) =>
+    atom.on 'merge-conflicts:resolved', (event) =>
       p = path.relative atom.project.getPath(), event.file
       progress = @pathList.find("li:contains('#{p}') progress")[0]
       progress.max = event.total

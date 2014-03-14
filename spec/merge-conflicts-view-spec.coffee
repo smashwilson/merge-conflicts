@@ -26,7 +26,7 @@ describe 'MergeConflictsView', ->
 
     it 'advances when requested', ->
       p = path.join(atom.project.getPath(), 'path', 'file1.txt')
-      atom.emit 'merge-conflicts:resolve', file: p, total: 3
+      atom.emit 'merge-conflicts:resolved', file: p, total: 3
       progress1 = progressFor 'file1.txt'
       expect(progress1.value).toBe(1)
       expect(progress1.max).toBe(3)
