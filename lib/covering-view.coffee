@@ -16,6 +16,8 @@ class CoveringView extends View
   # Override to return the Conflict that this view is responsible for.
   conflict: -> null
 
+  isDirty: -> false
+
   getModel: -> null
 
   reposition: ->

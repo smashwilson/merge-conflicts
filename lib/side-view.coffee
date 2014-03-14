@@ -16,6 +16,7 @@ class SideView extends CoveringView
 
     @detectDirty()
     @prependKeystroke @side.eventName(), @useMeBtn
+    @prependKeystroke 'merge-conflicts:revert-current', @revertBtn
 
     @side.conflict.on 'conflict:resolved', =>
       @deleteMarker @side.refBannerMarker
@@ -33,6 +34,8 @@ class SideView extends CoveringView
   cover: -> @side.refBannerMarker
 
   conflict: -> @side.conflict
+
+  isDirty: -> @side.isDirty
 
   useMe: -> @side.resolve()
 

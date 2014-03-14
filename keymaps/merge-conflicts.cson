@@ -12,6 +12,7 @@
   'cmd-alt-down': 'merge-conflicts:next-unresolved'
   'cmd-alt-up': 'merge-conflicts:previous-unresolved'
   'cmd-alt-enter': 'merge-conflicts:accept-current'
+  'cmd-alt-r': 'merge-conflicts:revert-current'
   'cmd-alt-1': 'merge-conflicts:accept-ours'
   'cmd-alt-2': 'merge-conflicts:accept-theirs'
 

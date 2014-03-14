@@ -44,6 +44,7 @@ class ConflictMarker
     @editorView.command 'merge-conflicts:accept-theirs', => @acceptTheirs()
     @editorView.command 'merge-conflicts:next-unresolved', => @nextUnresolved()
     @editorView.command 'merge-conflicts:previous-unresolved', => @previousUnresolved()
+    @editorView.command 'merge-conflicts:revert-current', => @revertCurrent()
 
   remark: ->
     @editorView.renderedLines.children().removeClass(CONFLICT_CLASSES)
@@ -117,6 +118,11 @@ class ConflictMarker
       else
         target = lastBefore
       @focusConflict target
+
+  revertCurrent: ->
+    for side in @active()
+      for view in @coveringViews when view.conflict() is side.conflict
+        view.revert() if view.isDirty()
 
   active: ->
     positions = (c.getBufferPosition() for c in @editor().getCursors())

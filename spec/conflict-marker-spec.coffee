@@ -6,6 +6,10 @@ describe 'ConflictMarker', ->
 
   cursors = -> c.getBufferPosition().toArray() for c in editor.getCursors()
 
+  detectDirty = ->
+    for sv in m.coveringViews
+      sv.detectDirty() if 'detectDirty' of sv
+
   beforeEach ->
     editorView = util.openPath("triple-2way-diff.txt")
     editorView.getFirstVisibleScreenRow = -> 0
@@ -46,8 +50,7 @@ describe 'ConflictMarker', ->
     editor = editorView.getEditor()
     editor.setCursorBufferPosition [14, 0]
     editor.insertText "Make conflict 1 dirty"
-    for sv in m.coveringViews
-      sv.detectDirty() if 'detectDirty' of sv
+    detectDirty()
 
     m.remark()
     lines = m.linesForMarker m.conflicts[1].ours.marker
@@ -107,13 +110,22 @@ describe 'ConflictMarker', ->
       editorView.trigger 'merge-conflicts:previous-unresolved'
       expect(cursors()).toEqual([[5, 0]])
 
+    it 'reverts a dirty hunk on merge-conflicts:revert-current', ->
+      editor.insertText 'this is a change'
+      detectDirty()
+      expect(active.ours.isDirty).toBe(true)
+
+      editorView.trigger 'merge-conflicts:revert-current'
+      detectDirty()
+      expect(active.ours.isDirty).toBe(false)
+
   describe 'without an active conflict', ->
 
     beforeEach ->
       editor.setCursorBufferPosition [11, 6]
 
     it 'no-ops the resolution commands', ->
-      for e in ['accept-current', 'accept-ours', 'accept-theirs']
+      for e in ['accept-current', 'accept-ours', 'accept-theirs', 'revert-current']
         editorView.trigger "merge-conflicts:#{e}"
         expect(m.active()).toEqual([])
         for c in m.conflicts
