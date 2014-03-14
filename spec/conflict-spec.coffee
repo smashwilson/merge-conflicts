@@ -34,15 +34,22 @@ describe "Conflict", ->
     expect(util.rowRangeFrom cs[1].theirs.marker).toEqual([16, 17])
 
   describe 'sides', ->
-    [conflict] = []
+    [editor, conflict] = []
 
     beforeEach ->
       editorView = util.openPath('single-2way-diff.txt')
-      [conflict] = Conflict.all editorView.getEditor()
+      editor = editorView.getEditor()
+      [conflict] = Conflict.all editor
 
     it 'retains a reference to conflict', ->
       expect(conflict.ours.conflict).toBe(conflict)
       expect(conflict.theirs.conflict).toBe(conflict)
+
+    it 'remembers its initial text', ->
+      editor.setCursorBufferPosition [1, 0]
+      editor.insertText "I prefer this text! "
+
+      expect(conflict.ours.originalText).toBe("These are my changes\n")
 
     it 'resolves as "ours"', ->
       conflict.ours.resolve()
@@ -90,6 +97,3 @@ describe "Conflict", ->
       nav = conflicts[2].navigator
       expect(nav.next).toBeNull()
       expect(nav.nextUnresolved()).toBeNull()
-
-  it "parses itself from a three-way diff marking"
-  it "resolves HEAD"
