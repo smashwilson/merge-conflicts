@@ -7,5 +7,13 @@
 
 # For more detailed documentation see
 # https://atom.io/docs/latest/advanced/keymaps
-'.workspace':
-  'ctrl-alt-o': 'merge-conflicts:toggle'
+
+'.platform-darwin .editor.conflicted':
+  'cmd-alt-down': 'merge-conflicts:next-unresolved'
+  'cmd-alt-up': 'merge-conflicts:previous-unresolved'
+  'cmd-alt-enter': 'merge-conflicts:resolve-current'
+  'cmd-alt-1': 'merge-conflicts:accept-ours'
+  'cmd-alt-2': 'merge-conflicts:accept-theirs'
+
+'.platform-darwin .workspace':
+  'cmd-alt-m': 'merge-conflicts:detect'
