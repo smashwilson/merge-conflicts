@@ -38,24 +38,32 @@ class ConflictMarker
   installEvents: ->
     @editorView.on 'editor:display-updated', => @remark()
 
-    @editorView.command 'merge-conflicts:resolve-current', =>
-      sides = @active()
-
-      # Do nothing if you have cursors in *both* sides of a single conflict.
-      duplicates = []
-      seen = {}
-      for side in sides
-        if side.conflict of seen
-          duplicates.push side
-          duplicates.push seen[side.conflict]
-        seen[side.conflict] = side
-      sides = _.difference sides, duplicates
-
-      side.resolve() for side in sides
+    @editorView.command 'merge-conflicts:resolve-current', => @resolveCurrent()
+    @editorView.command 'merge-conflicts:accept-ours', => @acceptOurs()
+    @editorView.command 'merge-conflicts:accept-theirs', => @acceptTheirs()
 
   remark: ->
     @editorView.renderedLines.children().removeClass(CONFLICT_CLASSES)
     @withConflictSideLines (lines, classes) -> lines.addClass classes
+
+  resolveCurrent: ->
+    sides = @active()
+
+    # Do nothing if you have cursors in *both* sides of a single conflict.
+    duplicates = []
+    seen = {}
+    for side in sides
+      if side.conflict of seen
+        duplicates.push side
+        duplicates.push seen[side.conflict]
+      seen[side.conflict] = side
+    sides = _.difference sides, duplicates
+
+    side.resolve() for side in sides
+
+  acceptOurs: -> side.conflict.ours.resolve() for side in @active()
+
+  acceptTheirs: -> side.conflict.theirs.resolve() for side in @active()
 
   active: ->
     positions = (c.getBufferPosition() for c in @editor().getCursors())
