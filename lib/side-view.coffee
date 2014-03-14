@@ -19,6 +19,14 @@ class SideView extends CoveringView
 
   cover: -> @side.refBannerMarker
 
+  conflict: -> @side.conflict
+
   useMe: -> @side.resolve()
 
-  conflict: -> @side.conflict
+  isDirty: ->
+    currentText = @editor().getTextInBufferRange @side.marker.getBufferRange()
+    currentText isnt @side.originalText
+
+  revert: ->
+    @editor().setTextInBufferRange @side.marker.getBufferRange(),
+      @side.originalText
