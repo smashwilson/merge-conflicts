@@ -34,6 +34,9 @@ describe 'SideView', ->
     it 'detects that its text has been edited', ->
       expect(view.isDirty).toBe(true)
 
+    it 'adds a .dirty class to the view', ->
+      expect(view.hasClass 'dirty').toBe(true)
+
     it 'reverts its text back to the original on request', ->
       view.revert()
       view.detectDirty()
