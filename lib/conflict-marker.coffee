@@ -19,8 +19,8 @@ class ConflictMarker
     @coveringViews = []
     for c in @conflicts
       @coveringViews.push new SideView(c.ours, @editorView)
-      @coveringViews.push new SideView(c.theirs, @editorView)
       @coveringViews.push new NavigationView(c.navigator, @editorView)
+      @coveringViews.push new SideView(c.theirs, @editorView)
 
       c.on 'conflict:resolved', => @repositionUnresolved()
 
