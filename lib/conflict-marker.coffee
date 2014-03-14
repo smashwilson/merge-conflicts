@@ -16,6 +16,8 @@ class ConflictMarker
   constructor: (@editorView) ->
     @conflicts = Conflict.all(@editorView.getEditor())
 
+    @editorView.addClass 'conflicted' if @conflicts
+
     @coveringViews = []
     for c in @conflicts
       @coveringViews.push new SideView(c.ours, @editorView)
@@ -31,14 +33,107 @@ class ConflictMarker
           resolved: resolvedCount
 
     if @conflicts
-      @editorView.addClass 'conflicted'
       @remark()
+      @installEvents()
 
-      @editorView.on 'editor:display-updated', => @remark()
+  installEvents: ->
+    @editorView.on 'editor:display-updated', => @remark()
+
+    @editorView.command 'merge-conflicts:accept-current', => @acceptCurrent()
+    @editorView.command 'merge-conflicts:accept-ours', => @acceptOurs()
+    @editorView.command 'merge-conflicts:accept-theirs', => @acceptTheirs()
+    @editorView.command 'merge-conflicts:next-unresolved', => @nextUnresolved()
+    @editorView.command 'merge-conflicts:previous-unresolved', => @previousUnresolved()
+    @editorView.command 'merge-conflicts:revert-current', => @revertCurrent()
 
   remark: ->
     @editorView.renderedLines.children().removeClass(CONFLICT_CLASSES)
     @withConflictSideLines (lines, classes) -> lines.addClass classes
+
+  acceptCurrent: ->
+    sides = @active()
+
+    # Do nothing if you have cursors in *both* sides of a single conflict.
+    duplicates = []
+    seen = {}
+    for side in sides
+      if side.conflict of seen
+        duplicates.push side
+        duplicates.push seen[side.conflict]
+      seen[side.conflict] = side
+    sides = _.difference sides, duplicates
+
+    side.resolve() for side in sides
+
+  acceptOurs: -> side.conflict.ours.resolve() for side in @active()
+
+  acceptTheirs: -> side.conflict.theirs.resolve() for side in @active()
+
+  nextUnresolved: ->
+    final = _.last @active()
+    if final?
+      n = final.conflict.navigator.nextUnresolved()
+      @focusConflict(n) if n?
+    else
+      orderedCursors = _.sortBy @editor().getCursors(), (c) ->
+        c.getBufferPosition().row
+      lastCursor = _.last orderedCursors
+      return unless lastCursor?
+
+      pos = lastCursor.getBufferPosition()
+      firstAfter = null
+      for c in @conflicts
+        p = c.ours.marker.getBufferRange().start
+        if p.isGreaterThanOrEqual(pos) and not firstAfter?
+          firstAfter = c
+      return unless firstAfter?
+
+      if firstAfter.isResolved()
+        target = firstAfter.navigator.nextUnresolved()
+      else
+        target = firstAfter
+      @focusConflict target
+
+  previousUnresolved: ->
+    initial = _.first @active()
+    if initial?
+      p = initial.conflict.navigator.previousUnresolved()
+      @focusConflict(p) if p?
+    else
+      orderedCursors = _.sortBy @editor().getCursors(), (c) ->
+        c.getBufferPosition().row
+      firstCursor = _.first orderedCursors
+      return unless firstCursor?
+
+      pos = firstCursor.getBufferPosition()
+      lastBefore = null
+      for c in @conflicts
+        p = c.ours.marker.getBufferRange().start
+        if p.isLessThanOrEqual pos
+          lastBefore = c
+      return unless lastBefore?
+
+      if lastBefore.isResolved()
+        target = lastBefore.navigator.previousUnresolved()
+      else
+        target = lastBefore
+      @focusConflict target
+
+  revertCurrent: ->
+    for side in @active()
+      for view in @coveringViews when view.conflict() is side.conflict
+        view.revert() if view.isDirty()
+
+  active: ->
+    positions = (c.getBufferPosition() for c in @editor().getCursors())
+    matching = []
+    for c in @conflicts
+      for p in positions
+        if c.ours.marker.getBufferRange().containsPoint p
+          matching.push c.ours
+        if c.theirs.marker.getBufferRange().containsPoint p
+          matching.push c.theirs
+    matching
 
   editor: -> @editorView.getEditor()
 
@@ -72,3 +167,7 @@ class ConflictMarker
         callback(@linesForMarker(c.theirs.marker), DIRTY_CLASSES)
       else
         callback(@linesForMarker(c.theirs.marker), THEIR_CLASSES)
+
+  focusConflict: (conflict) ->
+    st = conflict.ours.marker.getBufferRange().start
+    @editor().setCursorBufferPosition st

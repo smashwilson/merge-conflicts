@@ -16,6 +16,8 @@ class CoveringView extends View
   # Override to return the Conflict that this view is responsible for.
   conflict: -> null
 
+  isDirty: -> false
+
   getModel: -> null
 
   reposition: ->
@@ -38,3 +40,9 @@ class CoveringView extends View
 
   scrollTo: (positionOrNull) ->
     @editor().setCursorBufferPosition positionOrNull if positionOrNull?
+
+  prependKeystroke: (eventName, element) ->
+    bindings = atom.keymap.keyBindingsMatchingElement @editorView
+    for e in bindings when e.command is eventName
+      original = element.text()
+      element.text(_.humanizeKeystroke(e.keystroke) + " #{original}")

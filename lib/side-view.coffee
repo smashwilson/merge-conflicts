@@ -8,18 +8,20 @@ class SideView extends CoveringView
         @label class: 'text-highlight', side.ref
         @span class: 'text-subtle', "// #{side.description()}"
         @span class: 'pull-right', =>
-          @button class: 'btn btn-xs inline-block-tight revert', click: 'revert', 'Revert'
-          @button class: 'btn btn-xs inline-block-tight', click: 'useMe', 'Use Me'
+          @button class: 'btn btn-xs inline-block-tight revert', click: 'revert', outlet: 'revertBtn', 'Revert'
+          @button class: 'btn btn-xs inline-block-tight', click: 'useMe', outlet: 'useMeBtn', 'Use Me'
 
   initialize: (@side, editorView) ->
     super editorView
+
+    @detectDirty()
+    @prependKeystroke @side.eventName(), @useMeBtn
+    @prependKeystroke 'merge-conflicts:revert-current', @revertBtn
 
     @side.conflict.on 'conflict:resolved', =>
       @deleteMarker @side.refBannerMarker
       @deleteMarker @side.marker unless @side.wasChosen()
       @hide()
-
-    @detectDirty()
 
     @side.marker.on 'changed', (event) =>
       marker = @side.marker
@@ -32,6 +34,8 @@ class SideView extends CoveringView
   cover: -> @side.refBannerMarker
 
   conflict: -> @side.conflict
+
+  isDirty: -> @side.isDirty
 
   useMe: -> @side.resolve()
 

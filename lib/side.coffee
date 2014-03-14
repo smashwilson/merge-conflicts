@@ -15,6 +15,8 @@ class OurSide extends Side
 
   description: -> 'our changes'
 
+  eventName: -> 'merge-conflicts:accept-ours'
+
 class TheirSide extends Side
 
   site: -> 2
@@ -22,5 +24,7 @@ class TheirSide extends Side
   klass: -> 'theirs'
 
   description: -> 'their changes'
+
+  eventName: -> 'merge-conflicts:accept-theirs'
 
 module.exports = Side: Side, OurSide: OurSide, TheirSide: TheirSide
