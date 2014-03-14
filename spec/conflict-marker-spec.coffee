@@ -69,10 +69,24 @@ describe 'ConflictMarker', ->
   it 'tracks the active conflict side', ->
     expect(m.active()).toEqual([])
     editorView.getEditor().setCursorBufferPosition [14, 5]
-    expect(m.active()).toEqual([m.conflicts[1]])
+    expect(m.active()).toEqual([m.conflicts[1].ours])
 
   describe 'with an active conflict', ->
-    it 'resolves it with merge-conflicts:resolve-current'
+    [active] = []
+
+    beforeEach ->
+      editorView.getEditor().setCursorBufferPosition [14, 5]
+      active = m.conflicts[1]
+
+    it 'accepts the current side with merge-conflicts:resolve-current', ->
+      editorView.trigger 'merge-conflicts:resolve-current'
+      expect(active.resolution).toBe(active.ours)
+
+    it "does nothing if you have cursors in both sides", ->
+      editorView.getEditor().addCursorAtBufferPosition [16, 2]
+      editorView.trigger 'merge-conflicts:resolve-current'
+      expect(active.resolution).toBeNull()
+
     it 'accepts "ours" on merge-conflicts:accept-ours'
     it 'accepts "theirs" on merge-conflicts:accept-theirs'
     it 'jumps to the next unresolved on merge-conflicts:next-unresolved'

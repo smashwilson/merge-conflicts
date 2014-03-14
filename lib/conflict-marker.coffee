@@ -33,8 +33,25 @@ class ConflictMarker
     if @conflicts
       @editorView.addClass 'conflicted'
       @remark()
+      @installEvents()
 
-      @editorView.on 'editor:display-updated', => @remark()
+  installEvents: ->
+    @editorView.on 'editor:display-updated', => @remark()
+
+    @editorView.command 'merge-conflicts:resolve-current', =>
+      sides = @active()
+
+      # Do nothing if you have cursors in *both* sides of a single conflict.
+      duplicates = []
+      seen = {}
+      for side in sides
+        if side.conflict of seen
+          duplicates.push side
+          duplicates.push seen[side.conflict]
+        seen[side.conflict] = side
+      sides = _.difference sides, duplicates
+
+      side.resolve() for side in sides
 
   remark: ->
     @editorView.renderedLines.children().removeClass(CONFLICT_CLASSES)
@@ -46,9 +63,9 @@ class ConflictMarker
     for c in @conflicts
       for p in positions
         if c.ours.marker.getBufferRange().containsPoint p
-          matching.push c
+          matching.push c.ours
         if c.theirs.marker.getBufferRange().containsPoint p
-          matching.push c
+          matching.push c.theirs
     matching
 
   editor: -> @editorView.getEditor()
