@@ -6,13 +6,14 @@ class NavigationView extends CoveringView
     @div class: 'controls navigation', =>
       @text ' '
       @span class: 'pull-right', =>
-        @button class: 'btn btn-xs', click: 'up', =>
-          @span class: 'icon icon-arrow-up', 'prev'
-        @button class: 'btn btn-xs', click: 'down', =>
-          @span class: 'icon icon-arrow-down', 'next'
+        @button class: 'btn btn-xs', click: 'up', outlet: 'prevBtn', 'prev'
+        @button class: 'btn btn-xs', click: 'down', outlet: 'nextBtn', 'next'
 
   initialize: (@navigator, editorView) ->
     super editorView
+
+    @prependKeystroke 'merge-conflicts:previous-unresolved', @prevBtn
+    @prependKeystroke 'merge-conflicts:next-unresolved', @nextBtn
 
     @navigator.conflict.on 'conflict:resolved', =>
       @deleteMarker @cover()

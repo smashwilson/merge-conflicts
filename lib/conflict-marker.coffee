@@ -16,6 +16,8 @@ class ConflictMarker
   constructor: (@editorView) ->
     @conflicts = Conflict.all(@editorView.getEditor())
 
+    @editorView.addClass 'conflicted' if @conflicts
+
     @coveringViews = []
     for c in @conflicts
       @coveringViews.push new SideView(c.ours, @editorView)
@@ -31,7 +33,6 @@ class ConflictMarker
           resolved: resolvedCount
 
     if @conflicts
-      @editorView.addClass 'conflicted'
       @remark()
       @installEvents()
 

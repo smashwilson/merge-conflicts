@@ -38,3 +38,9 @@ class CoveringView extends View
 
   scrollTo: (positionOrNull) ->
     @editor().setCursorBufferPosition positionOrNull if positionOrNull?
+
+  prependKeystroke: (eventName, element) ->
+    bindings = atom.keymap.keyBindingsMatchingElement @editorView
+    for e in bindings when e.command is eventName
+      original = element.text()
+      element.text(_.humanizeKeystroke(e.keystroke) + " #{original}")
