@@ -7,7 +7,9 @@ class SideView extends CoveringView
       @div class: 'controls', =>
         @label class: 'text-highlight', side.ref
         @span class: 'text-subtle', "// #{side.description()}"
-        @button class: 'btn btn-xs pull-right', click: 'useMe', "Use Me"
+        @span class: 'pull-right', =>
+          @button class: 'btn btn-xs inline-block-tight revert', click: 'revert', 'Revert'
+          @button class: 'btn btn-xs inline-block-tight', click: 'useMe', 'Use Me'
 
   initialize: (@side, editorView) ->
     super editorView
@@ -17,8 +19,30 @@ class SideView extends CoveringView
       @deleteMarker @side.marker unless @side.wasChosen()
       @hide()
 
+    @detectDirty()
+
+    @side.marker.on 'changed', (event) =>
+      marker = @side.marker
+
+      tailSame = event.oldTailBufferPosition.isEqual marker.getTailBufferPosition()
+      headDifferent = not event.oldHeadBufferPosition.isEqual marker.getHeadBufferPosition()
+
+      @detectDirty() if tailSame and headDifferent
+
   cover: -> @side.refBannerMarker
+
+  conflict: -> @side.conflict
 
   useMe: -> @side.resolve()
 
-  conflict: -> @side.conflict
+  revert: ->
+    @editor().setTextInBufferRange @side.marker.getBufferRange(),
+      @side.originalText
+
+  detectDirty: ->
+    wasDirty = @side.isDirty
+    currentText = @editor().getTextInBufferRange @side.marker.getBufferRange()
+    @side.isDirty = currentText isnt @side.originalText
+
+    @addClass 'dirty' if @side.isDirty and not wasDirty
+    @removeClass 'dirty' if not @side.isDirty and wasDirty

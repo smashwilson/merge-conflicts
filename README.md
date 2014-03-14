@@ -13,7 +13,7 @@ These are the major features that I'd consider necessary for the package to be b
  * Identification of conflict markers. :white_check_mark:
  * Superimpose conflict resolution controls. :white_check_mark:
  * Resolve conflicts as either side, directly. :white_check_mark:
- * Resolve conflicts by editing in place.
+ * Resolve conflicts by editing in place. :white_check_mark:
  * Navigation among conflict markers within a file. :white_check_mark:
  * Keymap entries for resolution and navigation.
  * Show resolution progress for each file.

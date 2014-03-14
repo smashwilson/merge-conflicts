@@ -41,6 +41,19 @@ describe 'ConflictMarker', ->
     expect(lines.hasClass 'conflict-line').toBe(true)
     expect(lines.hasClass 'theirs').toBe(true)
 
+  it 'applies the "dirty" class to modified sides', ->
+    m = new ConflictMarker(editorView)
+    editor = editorView.getEditor()
+    editor.setCursorBufferPosition [14, 0]
+    editor.insertText "Make conflict 1 dirty"
+    for sv in m.coveringViews
+      sv.detectDirty() if 'detectDirty' of sv
+
+    m.remark()
+    lines = m.linesForMarker m.conflicts[1].ours.marker
+    expect(lines.hasClass 'dirty').toBe(true)
+    expect(lines.hasClass 'ours').toBe(false)
+
   it 'applies the "resolved" class to resolved conflicts', ->
     m = new ConflictMarker(editorView)
     m.conflicts[1].ours.resolve()
