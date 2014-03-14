@@ -4,10 +4,11 @@ Conflict = require './conflict'
 SideView = require './side-view'
 NavigationView = require './navigation-view'
 
-CONFLICT_CLASSES = "conflict-line resolved ours theirs parent"
+CONFLICT_CLASSES = "conflict-line resolved ours theirs parent dirty"
 OUR_CLASSES = "conflict-line ours"
 THEIR_CLASSES = "conflict-line theirs"
 RESOLVED_CLASSES = "conflict-line resolved"
+DIRTY_CLASSES = "conflict-line dirty"
 
 module.exports =
 class ConflictMarker
@@ -30,20 +31,12 @@ class ConflictMarker
       @editorView.on 'editor:display-updated', => @remark()
 
   remark: ->
-    @editorView.renderedLines.removeClass(CONFLICT_CLASSES)
-    @ourLines().addClass(OUR_CLASSES)
-    @theirLines().addClass(THEIR_CLASSES)
-    @resolvedLines().addClass(RESOLVED_CLASSES)
+    @editorView.renderedLines.children().removeClass(CONFLICT_CLASSES)
+    @withConflictSideLines (lines, classes) -> lines.addClass classes
 
   repositionUnresolved: ->
     for view in @coveringViews
       view.reposition() unless view.conflict().isResolved()
-
-  ourLines: -> @linesForConflicts false, (c) -> c.ours.marker
-
-  theirLines: -> @linesForConflicts false, (c) -> c.theirs.marker
-
-  resolvedLines: -> @linesForConflicts true, (c) -> c.resolution.marker
 
   editor: -> @editorView.getEditor()
 
@@ -62,10 +55,18 @@ class ConflictMarker
         result = result.add @editorView.lineElementForScreenRow row
     result
 
-  linesForConflicts: (resolved, markerCallback) ->
-    results = $()
+  withConflictSideLines: (callback) ->
     for c in @conflicts
-      if (resolved and c.isResolved()) or (not resolved and not c.isResolved())
-        marker = markerCallback(c)
-        results = results.add @linesForMarker marker
-    results
+      if c.isResolved()
+        callback(@linesForMarker(c.resolution.marker), RESOLVED_CLASSES)
+        continue
+
+      if c.ours.isDirty
+        callback(@linesForMarker(c.ours.marker), DIRTY_CLASSES)
+      else
+        callback(@linesForMarker(c.ours.marker), OUR_CLASSES)
+
+      if c.theirs.isDirty
+        callback(@linesForMarker(c.theirs.marker), DIRTY_CLASSES)
+      else
+        callback(@linesForMarker(c.theirs.marker), THEIR_CLASSES)

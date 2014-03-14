@@ -1,6 +1,7 @@
 class Side
   constructor: (@ref, @marker, @refBannerMarker, @originalText) ->
     @conflict = null
+    @isDirty = false
 
   resolve: -> @conflict.resolveAs @
 

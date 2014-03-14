@@ -7,7 +7,9 @@ class SideView extends CoveringView
       @div class: 'controls', =>
         @label class: 'text-highlight', side.ref
         @span class: 'text-subtle', "// #{side.description()}"
-        @button class: 'btn btn-xs pull-right', click: 'useMe', "Use Me"
+        @span class: 'pull-right', =>
+          @button class: 'btn btn-xs inline-block-tight revert', click: 'revert', 'Revert'
+          @button class: 'btn btn-xs inline-block-tight', click: 'useMe', 'Use Me'
 
   initialize: (@side, editorView) ->
     super editorView
@@ -33,14 +35,14 @@ class SideView extends CoveringView
 
   useMe: -> @side.resolve()
 
-  detectDirty: ->
-    wasDirty = @isDirty
-    currentText = @editor().getTextInBufferRange @side.marker.getBufferRange()
-    @isDirty = currentText isnt @side.originalText
-
-    @addClass 'dirty' if @isDirty and not wasDirty
-    @removeClass 'dirty' if not @isDirty and wasDirty
-
   revert: ->
     @editor().setTextInBufferRange @side.marker.getBufferRange(),
       @side.originalText
+
+  detectDirty: ->
+    wasDirty = @side.isDirty
+    currentText = @editor().getTextInBufferRange @side.marker.getBufferRange()
+    @side.isDirty = currentText isnt @side.originalText
+
+    @addClass 'dirty' if @side.isDirty and not wasDirty
+    @removeClass 'dirty' if not @side.isDirty and wasDirty
