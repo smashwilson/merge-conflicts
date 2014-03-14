@@ -2,12 +2,16 @@ ConflictMarker = require '../lib/conflict-marker'
 util = require './util'
 
 describe 'ConflictMarker', ->
-  [editorView, m] = []
+  [editorView, editor, m] = []
+
+  cursors = -> c.getBufferPosition().toArray() for c in editor.getCursors()
 
   beforeEach ->
     editorView = util.openPath("triple-2way-diff.txt")
     editorView.getFirstVisibleScreenRow = -> 0
     editorView.getLastVisibleScreenRow = -> 999
+
+    editor = editorView.getEditor()
 
     m = new ConflictMarker(editorView)
 
@@ -72,10 +76,9 @@ describe 'ConflictMarker', ->
     expect(m.active()).toEqual([m.conflicts[1].ours])
 
   describe 'with an active conflict', ->
-    [editor, active] = []
+    [active] = []
 
     beforeEach ->
-      editor = editorView.getEditor()
       editor.setCursorBufferPosition [14, 5]
       active = m.conflicts[1]
 
@@ -98,20 +101,29 @@ describe 'ConflictMarker', ->
 
     it 'jumps to the next unresolved on merge-conflicts:next-unresolved', ->
       editorView.trigger 'merge-conflicts:next-unresolved'
-      cs = (c.getBufferPosition().toArray() for c in editor.getCursors())
-      expect(cs).toEqual([[22, 0]])
+      expect(cursors()).toEqual([[22, 0]])
 
     it 'jumps to the previous unresolved on merge-conflicts:previous-unresolved', ->
       editorView.trigger 'merge-conflicts:previous-unresolved'
-      cs = (c.getBufferPosition().toArray() for c in editor.getCursors())
-      expect(cs).toEqual([[5, 0]])
+      expect(cursors()).toEqual([[5, 0]])
 
   describe 'without an active conflict', ->
+
+    beforeEach ->
+      editor.setCursorBufferPosition [11, 6]
 
     it 'no-ops the resolution commands', ->
       for e in ['resolve-current', 'accept-ours', 'accept-theirs']
         editorView.trigger "merge-conflicts:#{e}"
         expect(m.active()).toEqual([])
+        for c in m.conflicts
+          expect(c.isResolved()).toBe(false)
 
-    it 'jumps to the next unresolved on merge-conflicts:next-unresolved'
-    it 'jumps to the previous unresolved on merge-conflicts:next-unresolved'
+    it 'jumps to the next unresolved on merge-conflicts:next-unresolved', ->
+      expect(m.active()).toEqual([])
+      editorView.trigger 'merge-conflicts:next-unresolved'
+      expect(cursors()).toEqual([[14, 0]])
+
+    it 'jumps to the previous unresolved on merge-conflicts:next-unresolved', ->
+      editorView.trigger 'merge-conflicts:previous-unresolved'
+      expect(cursors()).toEqual([[5, 0]])

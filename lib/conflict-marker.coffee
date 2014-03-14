@@ -71,17 +71,51 @@ class ConflictMarker
     final = _.last @active()
     if final?
       n = final.conflict.navigator.nextUnresolved()
-      if n?
-        r = n.ours.marker.getBufferRange().start
-        @editor().setCursorBufferPosition r
+      @focusConflict(n) if n?
+    else
+      orderedCursors = _.sortBy @editor().getCursors(), (c) ->
+        c.getBufferPosition().row
+      lastCursor = _.last orderedCursors
+      return unless lastCursor?
+
+      pos = lastCursor.getBufferPosition()
+      firstAfter = null
+      for c in @conflicts
+        p = c.ours.marker.getBufferRange().start
+        if p.isGreaterThanOrEqual(pos) and not firstAfter?
+          firstAfter = c
+      return unless firstAfter?
+
+      if firstAfter.isResolved()
+        target = firstAfter.navigator.nextUnresolved()
+      else
+        target = firstAfter
+      @focusConflict target
 
   previousUnresolved: ->
     initial = _.first @active()
     if initial?
       p = initial.conflict.navigator.previousUnresolved()
-      if p?
-        r = p.ours.marker.getBufferRange().start
-        @editor().setCursorBufferPosition r
+      @focusConflict(p) if p?
+    else
+      orderedCursors = _.sortBy @editor().getCursors(), (c) ->
+        c.getBufferPosition().row
+      firstCursor = _.first orderedCursors
+      return unless firstCursor?
+
+      pos = firstCursor.getBufferPosition()
+      lastBefore = null
+      for c in @conflicts
+        p = c.ours.marker.getBufferRange().start
+        if p.isLessThanOrEqual pos
+          lastBefore = c
+      return unless lastBefore?
+
+      if lastBefore.isResolved()
+        target = lastBefore.navigator.previousUnresolved()
+      else
+        target = lastBefore
+      @focusConflict target
 
   active: ->
     positions = (c.getBufferPosition() for c in @editor().getCursors())
@@ -126,3 +160,7 @@ class ConflictMarker
         callback(@linesForMarker(c.theirs.marker), DIRTY_CLASSES)
       else
         callback(@linesForMarker(c.theirs.marker), THEIR_CLASSES)
+
+  focusConflict: (conflict) ->
+    st = conflict.ours.marker.getBufferRange().start
+    @editor().setCursorBufferPosition st
