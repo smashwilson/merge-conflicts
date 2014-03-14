@@ -25,7 +25,7 @@ These are the major features that I'd consider necessary for the package to be b
  * Resolve conflicts as either side, directly. :white_check_mark:
  * Resolve conflicts by editing in place. :white_check_mark:
  * Navigation among conflict markers within a file. :white_check_mark:
- * Keymap entries for resolution and navigation.
+ * Keymap entries for resolution and navigation. :white_check_mark:
  * Show resolution progress for each file. :white_check_mark:
  * Minify and restore the conflict panel.
  * Save and stage changes for each file on completion.
