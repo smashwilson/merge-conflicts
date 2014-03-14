@@ -2,7 +2,7 @@
 
 Resolve your git merge conflicts in Atom!
 
-![conflict-resolution](docs/conflict-resolution.gif)
+![conflict-resolution](https://raw.github.com/smashwilson/merge-conflicts/master/docs/conflict-resolution.gif)
 
 This package detects the conflict markers left by `git merge` and overlays a set of controls for resolving each and navigating among them. Additionally, it displays your progress through a merge.
 
