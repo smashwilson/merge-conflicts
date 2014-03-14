@@ -2,9 +2,19 @@
 
 Resolve your git merge conflicts in Atom!
 
-![conflict-resolution](https://f.cloud.github.com/assets/17565/2366627/44eb8c8a-a713-11e3-8372-cf103012fd7a.gif)
+![conflict-resolution](docs/conflict-resolution.gif)
 
 This package detects the conflict markers left by `git merge` and overlays a set of controls for resolving each and navigating among them. Additionally, it displays your progress through a merge.
+
+## Events
+
+The merge-conflicts plugin emits a number of events that other packages can subscribe to, if they wish. If you want your plugin to consume one, use code like the following:
+
+```coffeescript
+atom.on 'merge-conflicts:resolved', (event) ->
+```
+
+ * `merge-conflicts:resolved`: broadcast whenever a conflict is resolved. `event.file`: the absolute path of the file in which the conflict was found; `event.total`: the total number of conflicts in that file; `event.resolved`: the number of conflicts that are resolved, including this one.
 
 ## Roadmap
 
