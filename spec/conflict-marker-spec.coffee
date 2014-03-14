@@ -96,9 +96,17 @@ describe 'ConflictMarker', ->
       editorView.trigger 'merge-conflicts:accept-theirs'
       expect(active.resolution).toBe(active.theirs)
 
-    it 'jumps to the next unresolved on merge-conflicts:next-unresolved'
-    it 'jumps to the previous unresolved on merge-conflicts:previous-unresolved'
+    it 'jumps to the next unresolved on merge-conflicts:next-unresolved', ->
+      editorView.trigger 'merge-conflicts:next-unresolved'
+      cs = (c.getBufferPosition().toArray() for c in editor.getCursors())
+      expect(cs).toEqual([[22, 0]])
+
+    it 'jumps to the previous unresolved on merge-conflicts:previous-unresolved', ->
+      editorView.trigger 'merge-conflicts:previous-unresolved'
+      cs = (c.getBufferPosition().toArray() for c in editor.getCursors())
+      expect(cs).toEqual([[5, 0]])
 
   describe 'without an active conflict', ->
     it 'no-ops the resolution commands'
-    it 'uses navigation commands normally'
+    it 'jumps to the next unresolved on merge-conflicts:next-unresolved'
+    it 'jumps to the previous unresolved on merge-conflicts:next-unresolved'

@@ -41,6 +41,8 @@ class ConflictMarker
     @editorView.command 'merge-conflicts:resolve-current', => @resolveCurrent()
     @editorView.command 'merge-conflicts:accept-ours', => @acceptOurs()
     @editorView.command 'merge-conflicts:accept-theirs', => @acceptTheirs()
+    @editorView.command 'merge-conflicts:next-unresolved', => @nextUnresolved()
+    @editorView.command 'merge-conflicts:previous-unresolved', => @previousUnresolved()
 
   remark: ->
     @editorView.renderedLines.children().removeClass(CONFLICT_CLASSES)
@@ -64,6 +66,22 @@ class ConflictMarker
   acceptOurs: -> side.conflict.ours.resolve() for side in @active()
 
   acceptTheirs: -> side.conflict.theirs.resolve() for side in @active()
+
+  nextUnresolved: ->
+    final = _.last @active()
+    if final?
+      n = final.conflict.navigator.nextUnresolved()
+      if n?
+        r = n.ours.marker.getBufferRange().start
+        @editor().setCursorBufferPosition r
+
+  previousUnresolved: ->
+    initial = _.first @active()
+    if initial?
+      p = initial.conflict.navigator.previousUnresolved()
+      if p?
+        r = p.ours.marker.getBufferRange().start
+        @editor().setCursorBufferPosition r
 
   active: ->
     positions = (c.getBufferPosition() for c in @editor().getCursors())
