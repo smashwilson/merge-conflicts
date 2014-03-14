@@ -16,8 +16,9 @@ class MergeConflictsView extends View
         for p in conflicts
           @li click: 'navigate', class: 'list-item status-modified navigate', =>
             @span class: 'inline-block icon icon-diff-modified path', p
-            @span class: 'inline-block text-subtle', "modified by both"
-            @progress class: 'inline-block', max: 100, value: 0
+            @div class: 'pull-right', =>
+              @span class: 'inline-block text-subtle', "modified by both"
+              @progress class: 'inline-block', max: 100, value: 0
 
   initialize: (@conflicts) ->
     atom.on 'merge-conflicts:resolved', (event) =>
