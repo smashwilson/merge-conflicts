@@ -40,6 +40,17 @@ class ConflictMarker
     @editorView.renderedLines.children().removeClass(CONFLICT_CLASSES)
     @withConflictSideLines (lines, classes) -> lines.addClass classes
 
+  active: ->
+    positions = (c.getBufferPosition() for c in @editor().getCursors())
+    matching = []
+    for c in @conflicts
+      for p in positions
+        if c.ours.marker.getBufferRange().containsPoint p
+          matching.push c
+        if c.theirs.marker.getBufferRange().containsPoint p
+          matching.push c
+    matching
+
   editor: -> @editorView.getEditor()
 
   linesForMarker: (marker) ->

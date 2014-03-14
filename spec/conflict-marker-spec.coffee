@@ -65,3 +65,19 @@ describe 'ConflictMarker', ->
     expect(event.file).toBe(editorView.getEditor().getPath())
     expect(event.total).toBe(3)
     expect(event.resolved).toBe(1)
+
+  it 'tracks the active conflict side', ->
+    expect(m.active()).toEqual([])
+    editorView.getEditor().setCursorBufferPosition [14, 5]
+    expect(m.active()).toEqual([m.conflicts[1]])
+
+  describe 'with an active conflict', ->
+    it 'resolves it with merge-conflicts:resolve-current'
+    it 'accepts "ours" on merge-conflicts:accept-ours'
+    it 'accepts "theirs" on merge-conflicts:accept-theirs'
+    it 'jumps to the next unresolved on merge-conflicts:next-unresolved'
+    it 'jumps to the previous unresolved on merge-conflicts:previous-unresolved'
+
+  describe 'without an active conflict', ->
+    it 'no-ops the resolution commands'
+    it 'uses navigation commands normally'
