@@ -19,6 +19,32 @@ describe 'SideView', ->
     expect(view.offset().top).toEqual(refBanner.offset().top)
     expect(view.height()).toEqual(refBanner.height())
 
+  it 'knows if its text is unaltered', ->
+    expect(ours.isDirty).toBe(false)
+    expect(theirs.isDirty).toBe(false)
+
+  describe 'when its text has been edited', ->
+    [editor] = []
+
+    beforeEach ->
+      editor = editorView.getEditor()
+      editor.setCursorBufferPosition [1, 0]
+      editor.insertText "I won't keep them, but "
+      view.detectDirty()
+
+    it 'detects that its text has been edited', ->
+      expect(ours.isDirty).toBe(true)
+
+    it 'adds a .dirty class to the view', ->
+      expect(view.hasClass 'dirty').toBe(true)
+
+    it 'reverts its text back to the original on request', ->
+      view.revert()
+      view.detectDirty()
+      t = editor.getTextInBufferRange ours.marker.getBufferRange()
+      expect(t).toBe("These are my changes\n")
+      expect(ours.isDirty).toBe(false)
+
   it 'triggers conflict resolution', ->
     spyOn(ours, "resolve")
     view.useMe()

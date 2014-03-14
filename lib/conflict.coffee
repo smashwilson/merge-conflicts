@@ -42,8 +42,9 @@ class Conflict
         [[baseRow, 0], [ourRowStart, 0]])
       ourMarker = editor.markBufferRange(
         [[ourRowStart, 0], [ourRowEnd, 0]])
+      ourText = editor.getTextInBufferRange ourMarker.getBufferRange()
 
-      ours = new OurSide(ourRef, ourMarker, ourBannerMarker)
+      ours = new OurSide(ourRef, ourMarker, ourBannerMarker, ourText)
 
       separatorMarker = editor.markBufferRange(
         [[ourRowEnd, 0], [ourRowEnd + 1, 0]])
@@ -56,8 +57,9 @@ class Conflict
         [[theirRowStart, 0], [theirRowEnd, 0]])
       theirBannerMarker = editor.markBufferRange(
         [[theirRowEnd, 0], [m.range.end.row, 0]])
+      theirText = editor.getTextInBufferRange theirMarker.getBufferRange()
 
-      theirs = new TheirSide(theirRef, theirMarker, theirBannerMarker)
+      theirs = new TheirSide(theirRef, theirMarker, theirBannerMarker, theirText)
 
       nav = new Navigator(separatorMarker)
 

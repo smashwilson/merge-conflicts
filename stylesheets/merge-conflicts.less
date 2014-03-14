@@ -15,20 +15,28 @@
 }
 
 .editor.conflicted {
-  .conflict-line.ours {
-    border-left: solid 2px @ui-site-color-1;
-    border-right: solid 2px @ui-site-color-1;
-    background: mix(@ui-site-color-1, @base-background-color);
-  }
+  .conflict-line {
+    &.ours {
+      border-left: solid 2px @ui-site-color-1;
+      border-right: solid 2px @ui-site-color-1;
+      background: mix(@ui-site-color-1, @base-background-color);
+    }
 
-  .conflict-line.theirs {
-    border-left: solid 2px @ui-site-color-2;
-    border-right: solid 2px @ui-site-color-2;
-    background: mix(@ui-site-color-2, @base-background-color);
-  }
+    &.theirs {
+      border-left: solid 2px @ui-site-color-2;
+      border-right: solid 2px @ui-site-color-2;
+      background: mix(@ui-site-color-2, @base-background-color);
+    }
 
-  .conflict-line.resolved {
-    background: @background-color-highlight;
+    &.resolved {
+      background: @background-color-highlight;
+    }
+
+    &.dirty {
+      background: darken(@ui-site-color-5, 40%);
+      border-left: solid 2px @ui-site-color-5;
+      border-right: solid 2px @ui-site-color-5;
+    }
   }
 
   .side {
@@ -39,21 +47,37 @@
     span {
       margin-left: 10px;
     }
-  }
-
-  .side.ours {
-    border-top-left-radius: 5px;
-    border-top-right-radius: 5px;
-    button {
-      margin-top: 5px;
+    span.pull-right {
+      clear: right;
+      margin-right: 20px;
     }
-  }
 
-  .side.theirs {
-    border-bottom-left-radius: 5px;
-    border-bottom-right-radius: 5px;
-    button {
-      margin-top: -5px;
+    button.revert {
+      display: none;
+    }
+
+    &.ours {
+      border-top-left-radius: 5px;
+      border-top-right-radius: 5px;
+      button {
+        margin-top: 5px;
+      }
+    }
+
+    &.theirs {
+      border-bottom-left-radius: 5px;
+      border-bottom-right-radius: 5px;
+      button {
+        margin-top: -35px;
+      }
+    }
+
+    &.dirty {
+      background-color: @ui-site-color-5;
+
+      button.revert {
+        display: inline-block;
+      }
     }
   }
 
@@ -66,8 +90,14 @@
     position: absolute;
     left: 0;
 
+    span.pull-right {
+      clear: right;
+      margin-right: 20px;
+    }
+
     button {
       margin-left: 5px;
+      margin-top: -15px;
     }
   }
 }
