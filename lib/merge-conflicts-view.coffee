@@ -12,13 +12,18 @@ class MergeConflictsView extends View
       @div class: 'panel-heading', =>
         @text 'Conflicts'
         @button class: 'btn pull-right', 'Hide'
-      @ul class: 'list-group', =>
+      @ul class: 'list-group', outlet: 'pathList', =>
         for p in conflicts
           @li click: 'navigate', class: 'list-item status-modified navigate', =>
             @span class: 'inline-block icon icon-diff-modified path', p
-            @span class: 'text-subtle', "modified by both"
+            @span class: 'inline-block text-subtle', "modified by both"
+            @progress class: 'inline-block', max: 100, value: 0
 
   initialize: (@conflicts) ->
+    atom.on 'merge-conflicts:resolve', (event) =>
+      progress = @pathList.find("li:contains('#{event.file}') progress")[0]
+      progress.max = event.total
+      progress.value++
 
   navigate: (event, element) ->
     p = element.find(".path").text()

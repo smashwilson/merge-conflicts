@@ -1,0 +1,27 @@
+MergeConflictsView = require '../lib/merge-conflicts-view'
+Conflict = require '../lib/conflict'
+util = require './util'
+
+describe 'MergeConflictsView', ->
+  [view, conflicts] = []
+
+  beforeEach ->
+    conflictPaths = ['path/file1.txt', 'path/file2.txt']
+    editorView = util.openPath 'triple-2way-diff.txt'
+    conflicts = Conflict.all editorView.getEditor()
+
+    view = new MergeConflictsView(conflictPaths)
+
+  describe 'conflict resolution progress', ->
+    progressFor = (filename) ->
+      view.pathList.find("li:contains('#{filename}') progress")[0]
+
+    it 'starts at zero', ->
+      expect(progressFor('file1.txt').value).toBe(0)
+      expect(progressFor('file2.txt').value).toBe(0)
+
+    it 'advances when requested', ->
+      atom.emit 'merge-conflicts:resolve', file: 'path/file1.txt', total: 3
+      progress1 = progressFor 'file1.txt'
+      expect(progress1.value).toBe(1)
+      expect(progress1.max).toBe(3)
