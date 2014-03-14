@@ -39,7 +39,7 @@ class ConflictMarker
   installEvents: ->
     @editorView.on 'editor:display-updated', => @remark()
 
-    @editorView.command 'merge-conflicts:resolve-current', => @resolveCurrent()
+    @editorView.command 'merge-conflicts:accept-current', => @acceptCurrent()
     @editorView.command 'merge-conflicts:accept-ours', => @acceptOurs()
     @editorView.command 'merge-conflicts:accept-theirs', => @acceptTheirs()
     @editorView.command 'merge-conflicts:next-unresolved', => @nextUnresolved()
@@ -49,7 +49,7 @@ class ConflictMarker
     @editorView.renderedLines.children().removeClass(CONFLICT_CLASSES)
     @withConflictSideLines (lines, classes) -> lines.addClass classes
 
-  resolveCurrent: ->
+  acceptCurrent: ->
     sides = @active()
 
     # Do nothing if you have cursors in *both* sides of a single conflict.

@@ -82,13 +82,13 @@ describe 'ConflictMarker', ->
       editor.setCursorBufferPosition [14, 5]
       active = m.conflicts[1]
 
-    it 'accepts the current side with merge-conflicts:resolve-current', ->
-      editorView.trigger 'merge-conflicts:resolve-current'
+    it 'accepts the current side with merge-conflicts:accept-current', ->
+      editorView.trigger 'merge-conflicts:accept-current'
       expect(active.resolution).toBe(active.ours)
 
     it "does nothing if you have cursors in both sides", ->
       editor.addCursorAtBufferPosition [16, 2]
-      editorView.trigger 'merge-conflicts:resolve-current'
+      editorView.trigger 'merge-conflicts:accept-current'
       expect(active.resolution).toBeNull()
 
     it 'accepts "ours" on merge-conflicts:accept-ours', ->
@@ -113,7 +113,7 @@ describe 'ConflictMarker', ->
       editor.setCursorBufferPosition [11, 6]
 
     it 'no-ops the resolution commands', ->
-      for e in ['resolve-current', 'accept-ours', 'accept-theirs']
+      for e in ['accept-current', 'accept-ours', 'accept-theirs']
         editorView.trigger "merge-conflicts:#{e}"
         expect(m.active()).toEqual([])
         for c in m.conflicts
