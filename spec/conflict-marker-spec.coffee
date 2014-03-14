@@ -71,3 +71,4 @@ describe 'ConflictMarker', ->
 
     expect(event.file).toBe(editorView.getEditor().getPath())
     expect(event.total).toBe(3)
+    expect(event.resolved).toBe(1)

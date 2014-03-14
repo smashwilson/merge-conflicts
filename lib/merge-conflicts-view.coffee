@@ -25,7 +25,7 @@ class MergeConflictsView extends View
       p = path.relative atom.project.getPath(), event.file
       progress = @pathList.find("li:contains('#{p}') progress")[0]
       progress.max = event.total
-      progress.value++
+      progress.value = event.resolved
 
   navigate: (event, element) ->
     p = element.find(".path").text()
