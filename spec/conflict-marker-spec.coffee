@@ -48,3 +48,13 @@ describe 'ConflictMarker', ->
     lines = m.linesForMarker m.conflicts[1].ours.marker
     expect(lines.hasClass 'conflict-line').toBe(true)
     expect(lines.hasClass 'resolved').toBe(true)
+
+  it 'broadcasts the "merge-conflicts:resolved" event', ->
+    m = new ConflictMarker(editorView)
+
+    event = null
+    atom.on 'merge-conflicts:resolved', (e) -> event = e
+    m.conflicts[2].theirs.resolve()
+
+    expect(event.file).toBe(editorView.getEditor().getPath())
+    expect(event.total).toBe(3)

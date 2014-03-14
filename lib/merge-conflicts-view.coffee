@@ -21,7 +21,8 @@ class MergeConflictsView extends View
 
   initialize: (@conflicts) ->
     atom.on 'merge-conflicts:resolve', (event) =>
-      progress = @pathList.find("li:contains('#{event.file}') progress")[0]
+      p = path.relative atom.project.getPath(), event.file
+      progress = @pathList.find("li:contains('#{p}') progress")[0]
       progress.max = event.total
       progress.value++
 

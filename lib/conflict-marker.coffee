@@ -21,7 +21,10 @@ class ConflictMarker
       @coveringViews.push new SideView(c.theirs, @editorView)
       @coveringViews.push new NavigationView(c.navigator, @editorView)
 
-      c.on 'conflict:resolved', => @repositionUnresolved()
+      c.on 'conflict:resolved', =>
+        @repositionUnresolved()
+        atom.emit 'merge-conflicts:resolved',
+          file: @editor().getPath(), total: @conflicts.length
 
     if @conflicts
       @editorView.addClass 'conflicted'
