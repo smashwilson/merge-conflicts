@@ -72,6 +72,7 @@ describe 'ConflictMarker', ->
     expect(event.file).toBe(editorView.getEditor().getPath())
     expect(event.total).toBe(3)
     expect(event.resolved).toBe(1)
+    expect(event.source).toBe(m)
 
   it 'tracks the active conflict side', ->
     expect(m.active()).toEqual([])
@@ -119,6 +120,18 @@ describe 'ConflictMarker', ->
       detectDirty()
       expect(active.ours.isDirty).toBe(false)
 
+    it 'accepts ours-then-theirs on merge-conflicts:ours-then-theirs', ->
+      editorView.trigger 'merge-conflicts:ours-then-theirs'
+      expect(active.resolution).toBe(active.ours)
+      t = editor.getTextInBufferRange active.resolution.marker.getBufferRange()
+      expect(t).toBe("My middle changes\nYour middle changes\n")
+
+    it 'accepts theirs-then-ours on merge-conflicts:theirs-then-ours', ->
+      editorView.trigger 'merge-conflicts:theirs-then-ours'
+      expect(active.resolution).toBe(active.theirs)
+      t = editor.getTextInBufferRange active.resolution.marker.getBufferRange()
+      expect(t).toBe("Your middle changes\nMy middle changes\n")
+
   describe 'without an active conflict', ->
 
     beforeEach ->
@@ -139,3 +152,16 @@ describe 'ConflictMarker', ->
     it 'jumps to the previous unresolved on merge-conflicts:next-unresolved', ->
       editorView.trigger 'merge-conflicts:previous-unresolved'
       expect(cursors()).toEqual([[5, 0]])
+
+  describe 'if someone else broadcasts resolved', ->
+
+    beforeEach ->
+      atom.emit 'merge-conflicts:resolved', file: editor.getPath(),
+        total: 1, resolved: 1
+
+    it 'removes the .conflicted class', ->
+      expect(editorView.hasClass 'conflicted').toBe(false)
+
+    it 'removes all CoveringViews from the view', ->
+      expect(editorView.find('.side').length).toBe(0)
+      expect(editorView.find('.navigation').length).toBe(0)

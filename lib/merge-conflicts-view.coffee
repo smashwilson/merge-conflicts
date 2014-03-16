@@ -28,6 +28,9 @@ class MergeConflictsView extends View
       progress.max = event.total
       progress.value = event.resolved
 
+    @command 'merge-conflicts:entire-file-ours', @sideResolver('ours')
+    @command 'merge-conflicts:entire-file-theirs', @sideResolver('theirs')
+
   navigate: (event, element) ->
     p = element.find(".path").text()
     atom.workspace.open(p)
@@ -43,6 +46,14 @@ class MergeConflictsView extends View
   # Tear down any state and detach
   destroy: ->
     @detach()
+
+  sideResolver: (side) ->
+    (event) ->
+      p = $(event.target).find('.path').text()
+      GitBridge.checkoutSide side, p, ->
+        full = path.join atom.project.path, p
+        atom.emit 'merge-conflicts:resolved', file: full, total: 1, resolved: 1
+        atom.workspace.open p
 
   instance: null
 
