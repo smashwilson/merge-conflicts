@@ -34,4 +34,16 @@ describe 'GitBridge', ->
     expect(a).toEqual(['checkout', '--ours', 'lib/file1.txt'])
     expect(o).toEqual({ cwd: atom.project.path })
 
-  it "stages changes to a file on completion"
+  it 'stages changes to a file', ->
+    [c, a, o] = []
+    GitBridge.process = ({command, args, options, exit}) ->
+      [c, a, o] = [command, args, options]
+      exit(0)
+
+    called = false
+    GitBridge.add 'lib/file1.txt', -> called = true
+
+    expect(called).toBe(true)
+    expect(c).toBe('git')
+    expect(a).toEqual(['add', 'lib/file1.txt'])
+    expect(o).toEqual({ cwd: atom.project.path })

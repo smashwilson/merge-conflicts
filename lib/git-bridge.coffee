@@ -46,5 +46,19 @@ class GitBridge
         if code is 0
           callback()
         else
-          throw 'git checkout failed'
+          throw "git checkout failed: exit code #{code}"
+    })
+
+  @add: (path, callback) ->
+    GitBridge.process({
+      command: 'git',
+      args: ['add', path],
+      options: { 'cwd': atom.project.path },
+      stdout: (line) -> console.log line
+      stderr: (line) -> console.log line
+      exit: (code) ->
+        if code is 0
+          callback()
+        else
+          throw "git add failed: exit code #{code}"
     })
