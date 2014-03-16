@@ -49,8 +49,8 @@ class ConflictMarker
     @editorView.command 'merge-conflicts:previous-unresolved', => @previousUnresolved()
     @editorView.command 'merge-conflicts:revert-current', => @revertCurrent()
 
-    atom.on 'merge-conflicts:resolved', ({source}) =>
-      if source isnt @
+    atom.on 'merge-conflicts:resolved', ({source, total, resolved}) =>
+      if source isnt @ and total is resolved
         @editorView.removeClass 'conflicted'
         v.remove() for v in @coveringViews
 
