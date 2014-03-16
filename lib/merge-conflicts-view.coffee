@@ -51,6 +51,8 @@ class MergeConflictsView extends View
     (event) ->
       p = $(event.target).find('.path').text()
       GitBridge.checkoutSide side, p, ->
+        full = path.join atom.project.path, p
+        atom.emit 'merge-conflicts:resolved', file: full, total: 1, resolved: 1
         atom.workspace.open p
 
   instance: null
