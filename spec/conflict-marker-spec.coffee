@@ -119,6 +119,18 @@ describe 'ConflictMarker', ->
       detectDirty()
       expect(active.ours.isDirty).toBe(false)
 
+    it 'accepts ours-then-theirs on merge-conflicts:ours-then-theirs', ->
+      editorView.trigger 'merge-conflicts:ours-then-theirs'
+      expect(active.resolution).toBe(active.ours)
+      t = editor.getTextInBufferRange active.resolution.marker.getBufferRange()
+      expect(t).toBe("My middle changes\nYour middle changes\n")
+
+    it 'accepts theirs-then-ours on merge-conflicts:theirs-then-ours', ->
+      editorView.trigger 'merge-conflicts:theirs-then-ours'
+      expect(active.resolution).toBe(active.theirs)
+      t = editor.getTextInBufferRange active.resolution.marker.getBufferRange()
+      expect(t).toBe("Your middle changes\nMy middle changes\n")
+
   describe 'without an active conflict', ->
 
     beforeEach ->

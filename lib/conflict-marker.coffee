@@ -42,6 +42,8 @@ class ConflictMarker
     @editorView.command 'merge-conflicts:accept-current', => @acceptCurrent()
     @editorView.command 'merge-conflicts:accept-ours', => @acceptOurs()
     @editorView.command 'merge-conflicts:accept-theirs', => @acceptTheirs()
+    @editorView.command 'merge-conflicts:ours-then-theirs', => @acceptOursThenTheirs()
+    @editorView.command 'merge-conflicts:theirs-then-ours', => @acceptTheirsThenOurs()
     @editorView.command 'merge-conflicts:next-unresolved', => @nextUnresolved()
     @editorView.command 'merge-conflicts:previous-unresolved', => @previousUnresolved()
     @editorView.command 'merge-conflicts:revert-current', => @revertCurrent()
@@ -68,6 +70,20 @@ class ConflictMarker
   acceptOurs: -> side.conflict.ours.resolve() for side in @active()
 
   acceptTheirs: -> side.conflict.theirs.resolve() for side in @active()
+
+  acceptOursThenTheirs: ->
+    for side in @active()
+      point = @combineSides side.conflict.ours, side.conflict.theirs
+      m = side.conflict.navigator.separatorMarker
+      m.setTailBufferPosition point
+      side.conflict.ours.resolve()
+
+  acceptTheirsThenOurs: ->
+    for side in @active()
+      point = @combineSides side.conflict.theirs, side.conflict.ours
+      m = side.conflict.theirs.refBannerMarker
+      m.setTailBufferPosition point
+      side.conflict.theirs.resolve()
 
   nextUnresolved: ->
     final = _.last @active()
@@ -151,6 +167,13 @@ class ConflictMarker
       if low <= row and row <= high
         result = result.add @editorView.lineElementForScreenRow row
     result
+
+  combineSides: (first, second) ->
+    text = @editor().getTextInBufferRange second.marker.getBufferRange()
+    e = first.marker.getBufferRange().end
+    insertPoint = @editor().setTextInBufferRange([e, e], text).end
+    first.marker.setHeadBufferPosition insertPoint
+    insertPoint
 
   withConflictSideLines: (callback) ->
     for c in @conflicts
