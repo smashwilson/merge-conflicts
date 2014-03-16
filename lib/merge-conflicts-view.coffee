@@ -28,9 +28,22 @@ class MergeConflictsView extends View
       progress.max = event.total
       progress.value = event.resolved
 
+    @command 'merge-conflicts:entire-file-ours', @resolveOurs
+    @command 'merge-conflicts:entire-file-theirs', @resolveTheirs
+
   navigate: (event, element) ->
     p = element.find(".path").text()
     atom.workspace.open(p)
+
+  resolveOurs: (event) ->
+    p = $(event.target).find('.path').text()
+    GitBridge.checkoutSide 'ours', p, ->
+      atom.workspace.open(p)
+
+  resolveTheirs: (event) ->
+    p = $(event.target).find('.path').text()
+    GitBridge.checkoutSide 'theirs', p, ->
+      atom.workspace.open(p)
 
   minimize: ->
     @addClass 'minimized'

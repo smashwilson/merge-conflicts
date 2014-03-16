@@ -6,6 +6,9 @@
     'Resolve: Theirs': 'merge-conflicts:accept-theirs'
     'Resolve: Ours Then Theirs': 'merge-conflicts:ours-then-theirs'
     'Resolve: Theirs Then Ours': 'merge-conflicts:theirs-then-ours'
+  '.merge-conflicts .navigate':
+    'Resolve: Entire File Ours': 'merge-conflicts:entire-file-ours'
+    'Resolve: Entire File Theirs': 'merge-conflicts:entire-file-theirs'
 
 'menu': [
   {
