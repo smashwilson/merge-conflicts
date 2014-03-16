@@ -29,8 +29,9 @@ class ConflictMarker
         v.reposition() for v in unresolved
         resolvedCount = @conflicts.length - Math.floor(unresolved.length / 3)
         atom.emit 'merge-conflicts:resolved',
-          file: @editor().getPath(), total: @conflicts.length,
-          resolved: resolvedCount
+          file: @editor().getPath(),
+          total: @conflicts.length, resolved: resolvedCount,
+          source: @
 
     if @conflicts
       @remark()
@@ -47,6 +48,11 @@ class ConflictMarker
     @editorView.command 'merge-conflicts:next-unresolved', => @nextUnresolved()
     @editorView.command 'merge-conflicts:previous-unresolved', => @previousUnresolved()
     @editorView.command 'merge-conflicts:revert-current', => @revertCurrent()
+
+    atom.on 'merge-conflicts:resolved', ({source}) =>
+      if source isnt @
+        @editorView.removeClass 'conflicted'
+        v.remove() for v in @coveringViews
 
   remark: ->
     @editorView.renderedLines.children().removeClass(CONFLICT_CLASSES)
