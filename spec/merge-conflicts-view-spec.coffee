@@ -30,3 +30,10 @@ describe 'MergeConflictsView', ->
       progress1 = progressFor 'file1.txt'
       expect(progress1.value).toBe(2)
       expect(progress1.max).toBe(3)
+
+  it 'minimizes and restores the view on request', ->
+    expect(view.hasClass 'minimized').toBe(false)
+    view.minimize()
+    expect(view.hasClass 'minimized').toBe(true)
+    view.restore()
+    expect(view.hasClass 'minimized').toBe(false)

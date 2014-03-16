@@ -11,7 +11,8 @@ class MergeConflictsView extends View
     @div class: 'merge-conflicts tool-panel panel-bottom padded', =>
       @div class: 'panel-heading', =>
         @text 'Conflicts'
-        @button class: 'btn pull-right', 'Hide'
+        @span class: 'pull-right icon icon-fold', click: 'minimize', 'Hide'
+        @span class: 'pull-right icon icon-unfold', click: 'restore', 'Show'
       @ul class: 'list-group', outlet: 'pathList', =>
         for p in conflicts
           @li click: 'navigate', class: 'list-item status-modified navigate', =>
@@ -30,6 +31,14 @@ class MergeConflictsView extends View
   navigate: (event, element) ->
     p = element.find(".path").text()
     atom.workspace.open(p)
+
+  minimize: ->
+    @addClass 'minimized'
+    @pathList.hide 'fast'
+
+  restore: ->
+    @removeClass 'minimized'
+    @pathList.show 'fast'
 
   # Returns an object that can be retrieved when package is activated
   serialize: ->

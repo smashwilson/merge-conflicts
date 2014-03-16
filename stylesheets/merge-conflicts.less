@@ -7,10 +7,28 @@
 .merge-conflicts {
   .navigate {
     cursor: pointer;
+
+    &:hover {
+      background-color: @background-color-highlight;
+    }
   }
 
-  .navigate:hover {
-    background-color: @background-color-highlight;
+  span.icon-fold {
+    cursor: pointer;
+  }
+
+  span.icon-unfold {
+    display: none;
+    cursor: pointer;
+  }
+
+  &.minimized {
+    span.icon-fold {
+      display: none;
+    }
+    span.icon-unfold {
+      display: inline-block;
+    }
   }
 }
 
