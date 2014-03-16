@@ -40,19 +40,21 @@ class MergeConflictsView extends View
     @removeClass 'minimized'
     @pathList.show 'fast'
 
-  # Returns an object that can be retrieved when package is activated
-  serialize: ->
-
   # Tear down any state and detach
   destroy: ->
     @detach()
 
+  instance: null
+
   @detect: ->
     return unless atom.project.getRepo()
+    return if MergeConflictsView.instance?
+
     root = atom.project.getRootDirectory().getRealPathSync()
     GitBridge.conflictsIn root, (conflicts) ->
       if conflicts
         view = new MergeConflictsView(conflicts)
+        MergeConflictsView.instance = view
         atom.workspaceView.appendToBottom(view)
 
         atom.workspaceView.eachEditorView (view) ->
