@@ -34,3 +34,17 @@ class GitBridge
       stderr: stderrHandler,
       exit: exitHandler
     })
+
+  @checkoutSide: (sideName, path, callback) ->
+    GitBridge.process({
+      command: 'git',
+      args: ['checkout', "--#{sideName}", path],
+      options: { 'cwd': atom.project.path },
+      stdout: (line) -> console.log line
+      stderr: (line) -> console.log line
+      exit: (code) ->
+        if code is 0
+          callback()
+        else
+          throw 'git checkout failed'
+    })
