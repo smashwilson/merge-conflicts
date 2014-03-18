@@ -36,7 +36,7 @@ class MaybeLaterView extends MessageView
 
   @headingText = 'Maybe Later'
 
-  @highlightClass = ''
+  @highlightClass = 'warning'
 
   @bodyMarkup: ->
     @text "Careful, you've still got conflict markers left!"
@@ -50,14 +50,17 @@ class MergeConflictsView extends View
         @text 'Conflicts'
         @span class: 'pull-right icon icon-fold', click: 'minimize', 'Hide'
         @span class: 'pull-right icon icon-unfold', click: 'restore', 'Show'
-      @ul class: 'list-group', outlet: 'pathList', =>
-        for p in conflicts
-          @li click: 'navigate', class: 'list-item navigate', =>
-            @span class: 'inline-block icon icon-diff-modified status-modified path', p
-            @div class: 'pull-right', =>
-              @span class: 'inline-block text-subtle', "modified by both"
-              @progress class: 'inline-block', max: 100, value: 0
-              @span class: 'inline-block icon icon-dash staged'
+      @div class: 'block', outlet: 'body', =>
+        @ul class: 'list-group', outlet: 'pathList', =>
+          for p in conflicts
+            @li click: 'navigate', class: 'list-item navigate', =>
+              @span class: 'inline-block icon icon-diff-modified status-modified path', p
+              @div class: 'pull-right', =>
+                @span class: 'inline-block text-subtle', "modified by both"
+                @progress class: 'inline-block', max: 100, value: 0
+                @span class: 'inline-block icon icon-dash staged'
+        @div class: 'block pull-right padded', =>
+          @button class: 'btn btn-sm', click: 'quit', 'Quit'
 
   initialize: (@conflicts) ->
     atom.on 'merge-conflicts:resolved', (event) =>
@@ -77,11 +80,13 @@ class MergeConflictsView extends View
 
   minimize: ->
     @addClass 'minimized'
-    @pathList.hide 'fast'
+    @body.hide 'fast'
 
   restore: ->
     @removeClass 'minimized'
-    @pathList.show 'fast'
+    @body.show 'fast'
+
+  quit: -> @finish(MaybeLaterView)
 
   refresh: ->
     root = atom.project.getPath()
