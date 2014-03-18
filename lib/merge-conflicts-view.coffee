@@ -10,11 +10,11 @@ class MessageView extends View
   @content: ->
     @div class: 'overlay from-top merge-conflicts-message', =>
       @div class: 'panel', click: 'dismiss', =>
-        @p class: "panel-heading highlight-#{@highlightClass} padded", @headingText
+        @div class: "panel-heading text-#{@headingClass}", @headingText
         @div class: 'panel-body', =>
-          @p class: 'block', =>
+          @div class: 'block', =>
             @bodyMarkup()
-          @p class: 'block text-subtle', 'click to dismiss'
+          @div class: 'block text-subtle', 'click to dismiss'
 
   initialize: ->
 
@@ -25,7 +25,7 @@ class SuccessView extends MessageView
 
   @headingText = 'Merge Complete'
 
-  @highlightClass = 'success'
+  @headingClass = 'success'
 
   @bodyMarkup: ->
     @text "That's everything. "
@@ -36,7 +36,7 @@ class MaybeLaterView extends MessageView
 
   @headingText = 'Maybe Later'
 
-  @highlightClass = 'warning'
+  @headingClass = 'warning'
 
   @bodyMarkup: ->
     @text "Careful, you've still got conflict markers left!"
@@ -50,8 +50,8 @@ class MergeConflictsView extends View
         @text 'Conflicts'
         @span class: 'pull-right icon icon-fold', click: 'minimize', 'Hide'
         @span class: 'pull-right icon icon-unfold', click: 'restore', 'Show'
-      @div class: 'block', outlet: 'body', =>
-        @ul class: 'list-group', outlet: 'pathList', =>
+      @div outlet: 'body', =>
+        @ul class: 'block list-group', outlet: 'pathList', =>
           for p in conflicts
             @li click: 'navigate', class: 'list-item navigate', =>
               @span class: 'inline-block icon icon-diff-modified status-modified path', p
@@ -59,7 +59,7 @@ class MergeConflictsView extends View
                 @span class: 'inline-block text-subtle', "modified by both"
                 @progress class: 'inline-block', max: 100, value: 0
                 @span class: 'inline-block icon icon-dash staged'
-        @div class: 'block pull-right padded', =>
+        @div class: 'block pull-right', =>
           @button class: 'btn btn-sm', click: 'quit', 'Quit'
 
   initialize: (@conflicts) ->
