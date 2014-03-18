@@ -8,28 +8,54 @@ class GitBridge
 
   constructor: (@repo) ->
 
+  @_statusCodesFrom: (chunk, handler) ->
+    for line in chunk.split("\n")
+      m = line.match /^(.)(.) (.+)$/
+      if m
+        [__, indexCode, workCode, path] = m
+        handler(indexCode, workCode, path)
+
   @conflictsIn: (baseDir, handler) ->
     conflicts = []
 
-    stdoutHandler = (chunk) ->
-      chunk.split("\n").forEach (line) ->
-        m = line.match /^(.)(.) (.+)$/
-        if m
-          [_, mineCode, yoursCode, path] = m
-          conflicts.push path if mineCode is "U" and yoursCode is "U"
+    stdoutHandler = (chunk) =>
+      @_statusCodesFrom chunk, (index, work, path) ->
+        conflicts.push path if index is 'U' and work is 'U'
 
     stderrHandler = (line) ->
       console.log("git status error: #{line}")
 
     exitHandler = (code) ->
-      unless code is 0
-        console.log("git status exit: #{code}")
+      throw "git status exit: #{code}" unless code is 0
       handler(conflicts)
 
     GitBridge.process({
       command: "git",
       args: ["status", "--porcelain"],
       options: { "cwd": baseDir },
+      stdout: stdoutHandler,
+      stderr: stderrHandler,
+      exit: exitHandler
+    })
+
+  @isStaged: (path, handler) ->
+    staged = false
+
+    stdoutHandler = (chunk) =>
+      @_statusCodesFrom chunk, (index, work, p) ->
+        staged = index is 'M' and work is ' ' if p is path
+
+    stderrHandler = (chunk) =>
+      console.log("git status error: #{chunk}")
+
+    exitHandler = (code) ->
+      throw "git status exit: #{code}" unless code is 0
+      handler(staged)
+
+    @process({
+      command: 'git',
+      args: ['status', '--porcelain', path],
+      options: { cwd: atom.project.path },
       stdout: stdoutHandler,
       stderr: stderrHandler,
       exit: exitHandler
@@ -43,10 +69,8 @@ class GitBridge
       stdout: (line) -> console.log line
       stderr: (line) -> console.log line
       exit: (code) ->
-        if code is 0
-          callback()
-        else
-          throw "git checkout failed: exit code #{code}"
+        throw "git checkout exit: #{code}" unless code is 0
+        callback()
     })
 
   @add: (path, callback) ->

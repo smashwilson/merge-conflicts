@@ -3,6 +3,7 @@ _ = require 'underscore-plus'
 
 MergeConflictsView = require '../lib/merge-conflicts-view'
 Conflict = require '../lib/conflict'
+GitBridge = require '../lib/git-bridge'
 util = require './util'
 
 describe 'MergeConflictsView', ->

@@ -20,6 +20,25 @@ describe 'GitBridge', ->
     expect(a).toEqual(['status', '--porcelain'])
     expect(o).toEqual({ cwd: '.' })
 
+  describe 'isStaged', ->
+
+    statusMeansStaged = (status) ->
+      GitBridge.process = ({stdout, exit}) ->
+        stdout("#{status} lib/file2.txt")
+        exit(0)
+      staged = null
+      GitBridge.isStaged 'lib/file2.txt', (b) -> staged = b
+      staged
+
+    it 'is true if already resolved', ->
+      expect(statusMeansStaged 'M ').toBe(true)
+
+    it 'is false if still in conflict', ->
+      expect(statusMeansStaged 'UU').toBe(false)
+
+    it 'is false if resolved, but then modified', ->
+      expect(statusMeansStaged 'MM').toBe(false)
+
   it 'checks out "our" version of a file from the index', ->
     [c, a, o] = []
     GitBridge.process = ({command, args, options, exit}) ->
