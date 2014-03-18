@@ -29,10 +29,10 @@ class GitBridge
       throw "git status exit: #{code}" unless code is 0
       handler(conflicts)
 
-    GitBridge.process({
-      command: "git",
-      args: ["status", "--porcelain"],
-      options: { "cwd": baseDir },
+    @process({
+      command: 'git',
+      args: ['status', '--porcelain'],
+      options: { cwd: baseDir },
       stdout: stdoutHandler,
       stderr: stderrHandler,
       exit: exitHandler
@@ -62,7 +62,7 @@ class GitBridge
     })
 
   @checkoutSide: (sideName, path, callback) ->
-    GitBridge.process({
+    @process({
       command: 'git',
       args: ['checkout', "--#{sideName}", path],
       options: { 'cwd': atom.project.path },
@@ -74,7 +74,7 @@ class GitBridge
     })
 
   @add: (path, callback) ->
-    GitBridge.process({
+    @process({
       command: 'git',
       args: ['add', path],
       options: { 'cwd': atom.project.path },
