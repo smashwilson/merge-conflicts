@@ -5,6 +5,43 @@ path = require 'path'
 GitBridge = require './git-bridge'
 ConflictMarker = require './conflict-marker'
 
+class MessageView extends View
+
+  @content: ->
+    @div class: 'overlay from-top merge-conflicts-message', =>
+      @div class: 'panel', click: 'dismiss', =>
+        @p class: "panel-heading highlight-#{@highlightClass} padded", @headingText
+        @div class: 'panel-body', =>
+          @p class: 'block', =>
+            @bodyMarkup()
+          @p class: 'block text-subtle', 'click to dismiss'
+
+  initialize: ->
+
+  dismiss: ->
+    @hide 'fast', => @remove()
+
+class SuccessView extends MessageView
+
+  @headingText = 'Merge Complete'
+
+  @highlightClass = 'success'
+
+  @bodyMarkup: ->
+    @text "That's everything. "
+    @code 'git commit'
+    @text ' at will to finish the merge.'
+
+class MaybeLaterView extends MessageView
+
+  @headingText = 'Maybe Later'
+
+  @highlightClass = ''
+
+  @bodyMarkup: ->
+    @text "Careful, you've still got conflict markers left!"
+
+
 module.exports =
 class MergeConflictsView extends View
   @content: (conflicts) ->
@@ -60,11 +97,13 @@ class MergeConflictsView extends View
         else
           icon.addClass 'icon-check text-success'
 
-      @finish() if newConflicts.length is 0
+      @finish(SuccessView) if newConflicts.length is 0
 
-  finish: ->
-    @hide 'fast', ->
+  finish: (viewClass) ->
+    @hide 'fast', =>
+      MergeConflictsView.instance = null
       @remove()
+    atom.workspaceView.appendToTop new viewClass
 
   sideResolver: (side) ->
     (event) ->
