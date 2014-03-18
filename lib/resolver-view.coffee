@@ -16,12 +16,16 @@ class ResolverView extends View
       @div class: 'pull-right', =>
         @button class: 'btn btn-primary', click: 'resolve', 'Mark Resolved'
 
-  initialize: (@editor) -> @refresh()
+  initialize: (@editor) ->
+    @refresh()
+    @editor.getBuffer().on 'saved', => @refresh()
 
   getModel: -> null
 
+  relativePath: -> atom.project.getRepo().relativize @editor.getUri()
+
   refresh: ->
-    GitBridge.isStaged @editor.getUri(), (staged) =>
+    GitBridge.isStaged @relativePath(), (staged) =>
       modified = @editor.isModified()
 
       needsSaved = modified
@@ -38,4 +42,4 @@ class ResolverView extends View
 
   resolve: ->
     @editor.save()
-    GitBridge.add @editor.getUri(), => @refresh()
+    GitBridge.add @relativePath(), => @refresh()

@@ -9,6 +9,7 @@ describe 'ResolverView', ->
       isModified: -> true
       getUri: -> 'lib/file1.txt'
       save: ->
+      getBuffer: -> { on: -> }
     }
     view = new ResolverView(fakeEditor)
 
