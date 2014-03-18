@@ -45,7 +45,7 @@ class MergeConflictsView extends View
 
   # Tear down any state and detach
   destroy: ->
-    @detach()
+    @remove()
 
   sideResolver: (side) ->
     (event) ->

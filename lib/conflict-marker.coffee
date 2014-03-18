@@ -37,6 +37,8 @@ class ConflictMarker
     if @conflicts
       @remark()
       @installEvents()
+    else
+      @conflictsResolved()
 
   installEvents: ->
     @editorView.on 'editor:display-updated', => @remark()
