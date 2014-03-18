@@ -6,34 +6,36 @@ class ResolverView extends View
 
   @content: (editor) ->
     @div class: 'overlay from-top resolver', =>
-      @div class: 'block text-highlight', 'File complete'
+      @div class: 'block text-highlight', "We're done here"
+      @div class: 'block', =>
+        @div class: 'block text-info', =>
+          @text "You've dealt with all of the conflicts in this file."
+        @div class: 'block text-info', =>
+          @span outlet: 'actionText', 'Save and stage'
+          @text ' this file for commit?'
       @div class: 'pull-right', =>
-        @div class: 'block save', =>
-          @button class: 'btn inline-block', click: 'save', 'Save'
-          @span class: 'text-success icon icon-check'
-          @span class: 'text-subtle icon icon-dash'
-        @div class: 'block stage', =>
-          @button class: 'btn inline-block', click: 'stage', 'Stage'
-          @span class: 'text-success icon icon-check'
-          @span class: 'text-subtle icon icon-dash'
+        @button class: 'btn btn-primary', click: 'resolve', 'Mark Resolved'
 
-  initialize: (@editor) ->
-    @staged = false
+  initialize: (@editor) -> @refresh()
+
+  getModel: -> null
 
   refresh: ->
-    if @editor.isModified()
-      @addClass 'save-needed'
-    else
-      @removeClass 'save-needed'
+    GitBridge.isStaged @editor.getUri(), (staged) =>
+      modified = @editor.isModified()
 
-    if not @staged
-      @addClass 'stage-needed'
-    else
-      @removeClass 'stage-needed'
+      needsSaved = modified
+      needsStaged = modified or not staged
 
-  save: -> @editor.save()
+      unless needsSaved or needsStaged
+        @hide 'fast', -> @remove()
+        return
 
-  stage: ->
-    GitBridge.add @editor.getUri(), =>
-      @staged = true
-      @refresh()
+      if needsSaved
+        @actionText.text 'Save and stage'
+      else if needsStaged
+        @actionText.text 'Stage'
+
+  resolve: ->
+    @editor.save()
+    GitBridge.add @editor.getUri(), => @refresh()
