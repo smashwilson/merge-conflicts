@@ -39,7 +39,7 @@ class GitBridge
     })
 
   @isStaged: (path, handler) ->
-    staged = false
+    staged = true
 
     stdoutHandler = (chunk) =>
       @_statusCodesFrom chunk, (index, work, p) ->

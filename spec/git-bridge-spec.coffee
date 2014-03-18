@@ -22,16 +22,19 @@ describe 'GitBridge', ->
 
   describe 'isStaged', ->
 
-    statusMeansStaged = (status) ->
+    statusMeansStaged = (status, checkPath = 'lib/file2.txt') ->
       GitBridge.process = ({stdout, exit}) ->
         stdout("#{status} lib/file2.txt")
         exit(0)
       staged = null
-      GitBridge.isStaged 'lib/file2.txt', (b) -> staged = b
+      GitBridge.isStaged checkPath, (b) -> staged = b
       staged
 
     it 'is true if already resolved', ->
       expect(statusMeansStaged 'M ').toBe(true)
+
+    it 'is true if resolved as ours', ->
+      expect(statusMeansStaged ' M', 'lib/file1.txt').toBe(true)
 
     it 'is false if still in conflict', ->
       expect(statusMeansStaged 'UU').toBe(false)
