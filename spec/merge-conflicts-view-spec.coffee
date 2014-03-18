@@ -10,8 +10,7 @@ describe 'MergeConflictsView', ->
   [view, conflicts] = []
 
   beforeEach ->
-    conflictPaths = _.map ['file1.txt', 'file2.txt'], (p) ->
-      path.join(atom.project.getPath(), 'path', p)
+    conflictPaths = ['path/file1.txt', 'path/file2.txt']
     editorView = util.openPath 'triple-2way-diff.txt'
     conflicts = Conflict.all editorView.getEditor()
 
