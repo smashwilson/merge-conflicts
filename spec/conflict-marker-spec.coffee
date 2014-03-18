@@ -153,15 +153,20 @@ describe 'ConflictMarker', ->
       editorView.trigger 'merge-conflicts:previous-unresolved'
       expect(cursors()).toEqual([[5, 0]])
 
-  describe 'if someone else broadcasts resolved', ->
+  describe 'when the resolution is complete', ->
 
-    beforeEach ->
-      atom.emit 'merge-conflicts:resolved', file: editor.getPath(),
-        total: 1, resolved: 1
+    beforeEach -> c.ours.resolve() for c in m.conflicts
+
+    it 'removes all of the CoveringViews', ->
+      expect(editorView.find('.overlayer .side').length).toBe(0)
+      expect(editorView.find('.overlayer .navigation').length).toBe(0)
+
+    it 'removes all line classes', ->
+      for klass in ['ours', 'theirs', 'parent', 'dirty']
+        expect(editorView.find(".lines .#{klass}").length).toBe(0)
 
     it 'removes the .conflicted class', ->
       expect(editorView.hasClass 'conflicted').toBe(false)
 
-    it 'removes all CoveringViews from the view', ->
-      expect(editorView.find('.side').length).toBe(0)
-      expect(editorView.find('.navigation').length).toBe(0)
+    it 'appends a ResolverView to the editor', ->
+      expect(editorView.find('.resolver').length).toBe(1)

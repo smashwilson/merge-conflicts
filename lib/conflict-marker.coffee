@@ -3,6 +3,7 @@ _ = require 'underscore-plus'
 Conflict = require './conflict'
 SideView = require './side-view'
 NavigationView = require './navigation-view'
+ResolverView = require './resolver-view'
 
 CONFLICT_CLASSES = "conflict-line resolved ours theirs parent dirty"
 OUR_CLASSES = "conflict-line ours"
@@ -49,10 +50,13 @@ class ConflictMarker
     @editorView.command 'merge-conflicts:previous-unresolved', => @previousUnresolved()
     @editorView.command 'merge-conflicts:revert-current', => @revertCurrent()
 
-    atom.on 'merge-conflicts:resolved', ({source, total, resolved}) =>
-      if source isnt @ and total is resolved
-        @editorView.removeClass 'conflicted'
-        v.remove() for v in @coveringViews
+    atom.on 'merge-conflicts:resolved', ({total, resolved}) =>
+      @conflictsResolved() if total is resolved
+
+  conflictsResolved: ->
+    v.remove() for v in @coveringViews
+    @editorView.removeClass 'conflicted'
+    @editorView.append new ResolverView(@editor())
 
   remark: ->
     @editorView.renderedLines.children().removeClass(CONFLICT_CLASSES)
