@@ -27,6 +27,15 @@ class SuccessView extends MessageView
     @code 'git commit'
     @text ' at will to finish the merge.'
 
+class NothingToMergeView extends MessageView
+
+  @headingText = 'Nothing to Merge'
+
+  @headingClass = 'info'
+
+  @bodyMarkup: ->
+    @text 'No conflicts here!'
+
 class MaybeLaterView extends MessageView
 
   @headingText = 'Maybe Later'
@@ -38,4 +47,5 @@ class MaybeLaterView extends MessageView
 
 module.exports =
   SuccessView: SuccessView,
-  MaybeLayerView: MaybeLaterView
+  MaybeLayerView: MaybeLaterView,
+  NothingToMergeView: NothingToMergeView

@@ -4,7 +4,7 @@ path = require 'path'
 
 GitBridge = require './git-bridge'
 ConflictMarker = require './conflict-marker'
-{SuccessView, MaybeLaterView} = require './message-views'
+{SuccessView, MaybeLaterView, NothingToMergeView} = require './message-views'
 
 module.exports =
 class MergeConflictsView extends View
@@ -90,13 +90,15 @@ class MergeConflictsView extends View
 
     root = atom.project.getRootDirectory().getRealPathSync()
     GitBridge.conflictsIn root, (conflicts) =>
-      if conflicts
+      if conflicts.length > 0
         view = new MergeConflictsView(conflicts)
         @instance = view
         atom.workspaceView.appendToBottom(view)
 
         atom.workspaceView.eachEditorView (view) =>
           @markConflictsIn conflicts, view if view.attached and view.getPane()?
+      else
+        atom.workspaceView.appendToTop new NothingToMergeView
 
   @markConflictsIn: (conflicts, editorView) ->
     return unless conflicts
