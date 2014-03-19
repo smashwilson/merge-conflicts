@@ -4,43 +4,7 @@ path = require 'path'
 
 GitBridge = require './git-bridge'
 ConflictMarker = require './conflict-marker'
-
-class MessageView extends View
-
-  @content: ->
-    @div class: 'overlay from-top merge-conflicts-message', =>
-      @div class: 'panel', click: 'dismiss', =>
-        @div class: "panel-heading text-#{@headingClass}", @headingText
-        @div class: 'panel-body', =>
-          @div class: 'block', =>
-            @bodyMarkup()
-          @div class: 'block text-subtle', 'click to dismiss'
-
-  initialize: ->
-
-  dismiss: ->
-    @hide 'fast', => @remove()
-
-class SuccessView extends MessageView
-
-  @headingText = 'Merge Complete'
-
-  @headingClass = 'success'
-
-  @bodyMarkup: ->
-    @text "That's everything. "
-    @code 'git commit'
-    @text ' at will to finish the merge.'
-
-class MaybeLaterView extends MessageView
-
-  @headingText = 'Maybe Later'
-
-  @headingClass = 'warning'
-
-  @bodyMarkup: ->
-    @text "Careful, you've still got conflict markers left!"
-
+{SuccessView, MaybeLaterView, NothingToMergeView} = require './message-views'
 
 module.exports =
 class MergeConflictsView extends View
@@ -126,13 +90,15 @@ class MergeConflictsView extends View
 
     root = atom.project.getRootDirectory().getRealPathSync()
     GitBridge.conflictsIn root, (conflicts) =>
-      if conflicts
+      if conflicts.length > 0
         view = new MergeConflictsView(conflicts)
         @instance = view
         atom.workspaceView.appendToBottom(view)
 
         atom.workspaceView.eachEditorView (view) =>
           @markConflictsIn conflicts, view if view.attached and view.getPane()?
+      else
+        atom.workspaceView.appendToTop new NothingToMergeView
 
   @markConflictsIn: (conflicts, editorView) ->
     return unless conflicts
