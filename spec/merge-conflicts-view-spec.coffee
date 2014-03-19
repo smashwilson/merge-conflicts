@@ -3,14 +3,14 @@ _ = require 'underscore-plus'
 
 MergeConflictsView = require '../lib/merge-conflicts-view'
 Conflict = require '../lib/conflict'
+GitBridge = require '../lib/git-bridge'
 util = require './util'
 
 describe 'MergeConflictsView', ->
   [view, conflicts] = []
 
   beforeEach ->
-    conflictPaths = _.map ['file1.txt', 'file2.txt'], (p) ->
-      path.join(atom.project.getPath(), 'path', p)
+    conflictPaths = ['path/file1.txt', 'path/file2.txt']
     editorView = util.openPath 'triple-2way-diff.txt'
     conflicts = Conflict.all editorView.getEditor()
 
@@ -30,6 +30,26 @@ describe 'MergeConflictsView', ->
       progress1 = progressFor 'file1.txt'
       expect(progress1.value).toBe(2)
       expect(progress1.max).toBe(3)
+
+  describe 'tracking the progress of staging', ->
+
+    isMarkedWith = (filename, icon) ->
+      rs = view.pathList.find("li:contains('#{filename}') span.icon-#{icon}")
+      rs.length isnt 0
+
+    it 'starts without files marked as staged', ->
+      expect(isMarkedWith 'file1.txt', 'dash').toBe(true)
+      expect(isMarkedWith 'file2.txt', 'dash').toBe(true)
+
+    it 'marks files as staged on events', ->
+      GitBridge.process = ({stdout, exit}) ->
+        stdout('UU path/file2.txt')
+        exit(0)
+
+      p = path.join atom.project.getPath(), 'path', 'file1.txt'
+      atom.emit 'merge-conflicts:staged', file: p
+      expect(isMarkedWith 'file1.txt', 'check').toBe(true)
+      expect(isMarkedWith 'file2.txt', 'dash').toBe(true)
 
   it 'minimizes and restores the view on request', ->
     expect(view.hasClass 'minimized').toBe(false)

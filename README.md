@@ -15,6 +15,7 @@ atom.on 'merge-conflicts:resolved', (event) ->
 ```
 
  * `merge-conflicts:resolved`: broadcast whenever a conflict is resolved. `event.file`: the absolute path of the file in which the conflict was found; `event.total`: the total number of conflicts in that file; `event.resolved`: the number of conflicts that are resolved, including this one.
+ * `merge-conflicts:staged`: broadcast whenever a file has been completed and staged for commit. `event.file`: the absolute path of the file that was staged.
 
 ## Roadmap
 

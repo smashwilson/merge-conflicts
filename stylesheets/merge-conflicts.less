@@ -32,6 +32,26 @@
   }
 }
 
+.merge-conflicts-message {
+  cursor: pointer;
+}
+
+.resolver {
+  &.save-needed {
+    .save .text-success { display: none; }
+    .save .text-status { display: inline-block; }
+    .stage { display: none; }
+  }
+
+  &.stage-needed {
+    .stage .text-success { display: none; }
+    .stage .text-status { display: inline-block; }
+  }
+
+  .save .text-status { display: none; }
+  .stage .text-success { display: none; }
+}
+
 .editor.conflicted {
   .conflict-line {
     &.ours {
