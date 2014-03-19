@@ -87,8 +87,7 @@ class MergeConflictsView extends View
     return unless atom.project.getRepo()
     return if @instance?
 
-    root = atom.project.getRootDirectory().getRealPathSync()
-    GitBridge.conflictsIn root, (conflicts) =>
+    GitBridge.withConflicts (conflicts) =>
       if conflicts.length > 0
         view = new MergeConflictsView(conflicts)
         @instance = view
