@@ -42,8 +42,9 @@ class MergeConflictsView extends View
     @command 'merge-conflicts:entire-file-theirs', @sideResolver('theirs')
 
   navigate: (event, element) ->
-    p = element.find(".path").text()
-    atom.workspace.open(p)
+    repoPath = element.find(".path").text()
+    fullPath = path.join atom.project.getRepo().getWorkingDirectory(), repoPath
+    atom.workspace.open(fullPath)
 
   minimize: ->
     @addClass 'minimized'
