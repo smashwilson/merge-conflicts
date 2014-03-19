@@ -53,8 +53,7 @@ class MergeConflictsView extends View
   quit: -> @finish(MaybeLaterView)
 
   refresh: ->
-    root = atom.project.getPath()
-    GitBridge.conflictsIn root, (newConflicts) =>
+    GitBridge.withConflicts (newConflicts) =>
       # Any files that were present, but aren't there any more, have been
       # resolved.
       for item in @pathList.find('li')

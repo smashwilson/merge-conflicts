@@ -42,4 +42,4 @@ describe 'ResolverView', ->
     expect(fakeEditor.save).toHaveBeenCalled()
     expect(c).toBe('git')
     expect(a).toEqual(['add', 'lib/file1.txt'])
-    expect(o).toEqual({ cwd: atom.project.path })
+    expect(o).toEqual({ cwd: atom.project.getRepo().getWorkingDirectory() })
