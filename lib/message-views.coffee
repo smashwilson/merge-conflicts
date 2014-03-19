@@ -47,5 +47,5 @@ class MaybeLaterView extends MessageView
 
 module.exports =
   SuccessView: SuccessView,
-  MaybeLayerView: MaybeLaterView,
+  MaybeLaterView: MaybeLaterView,
   NothingToMergeView: NothingToMergeView
