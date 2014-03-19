@@ -28,10 +28,13 @@ class MergeConflictsView extends View
 
   initialize: (@conflicts) ->
     atom.on 'merge-conflicts:resolved', (event) =>
-      p = path.relative atom.project.getPath(), event.file
+      p = atom.project.getRepo().relativize event.file
       progress = @pathList.find("li:contains('#{p}') progress")[0]
-      progress.max = event.total
-      progress.value = event.resolved
+      if progress?
+        progress.max = event.total
+        progress.value = event.resolved
+      else
+        console.log "Unrecognized conflict path: #{p}"
 
     atom.on 'merge-conflicts:staged', => @refresh()
 

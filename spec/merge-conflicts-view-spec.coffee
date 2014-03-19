@@ -9,8 +9,15 @@ util = require './util'
 describe 'MergeConflictsView', ->
   [view, conflicts] = []
 
+  fullPath = (fname) ->
+    path.join atom.project.getPath(), 'path', fname
+
+  repoPath = (fname) ->
+    atom.project.getRepo().relativize fullPath(fname)
+
   beforeEach ->
-    conflictPaths = ['path/file1.txt', 'path/file2.txt']
+    conflictPaths = _.map ['file1.txt', 'file2.txt'], (fname) ->
+      path.join 'spec', 'fixtures', 'path', fname
     editorView = util.openPath 'triple-2way-diff.txt'
     conflicts = Conflict.all editorView.getEditor()
 
@@ -25,8 +32,11 @@ describe 'MergeConflictsView', ->
       expect(progressFor('file2.txt').value).toBe(0)
 
     it 'advances when requested', ->
-      p = path.join(atom.project.getPath(), 'path', 'file1.txt')
-      atom.emit 'merge-conflicts:resolved', file: p, total: 3, resolved: 2
+      atom.emit 'merge-conflicts:resolved', {
+        file: fullPath('file1.txt'),
+        total: 3,
+        resolved: 2
+      }
       progress1 = progressFor 'file1.txt'
       expect(progress1.value).toBe(2)
       expect(progress1.max).toBe(3)
@@ -43,11 +53,10 @@ describe 'MergeConflictsView', ->
 
     it 'marks files as staged on events', ->
       GitBridge.process = ({stdout, exit}) ->
-        stdout('UU path/file2.txt')
+        stdout("UU #{repoPath 'file2.txt'}")
         exit(0)
 
-      p = path.join atom.project.getPath(), 'path', 'file1.txt'
-      atom.emit 'merge-conflicts:staged', file: p
+      atom.emit 'merge-conflicts:staged', file: fullPath('file1.txt')
       expect(isMarkedWith 'file1.txt', 'check').toBe(true)
       expect(isMarkedWith 'file2.txt', 'dash').toBe(true)
 
