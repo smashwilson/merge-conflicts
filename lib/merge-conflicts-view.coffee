@@ -105,9 +105,8 @@ class MergeConflictsView extends View
   @markConflictsIn: (conflicts, editorView) ->
     return unless conflicts
 
-    editor = editorView.getEditor()
-    p = editor.getPath()
-    rel = path.relative atom.project.getPath(), p
-    return unless _.contains(conflicts, rel)
+    fullPath = editorView.getEditor().getPath()
+    repoPath = atom.project.getRepo().relativize fullPath
+    return unless _.contains(conflicts, repoPath)
 
     new ConflictMarker(editorView)
