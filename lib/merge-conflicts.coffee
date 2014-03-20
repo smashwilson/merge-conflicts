@@ -11,4 +11,7 @@ module.exports =
 
   deactivate: ->
 
+  configDefaults:
+    gitPath: '/usr/local/bin/git'
+
   serialize: ->
