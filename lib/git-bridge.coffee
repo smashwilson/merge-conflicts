@@ -8,6 +8,8 @@ class GitBridge
 
   constructor: ->
 
+  @_gitCommand: -> atom.config.get 'merge-conflicts.gitPath'
+
   @_repoBase: -> atom.project.getRepo()?.getWorkingDirectory()
 
   @_statusCodesFrom: (chunk, handler) ->
@@ -32,7 +34,7 @@ class GitBridge
       handler(conflicts)
 
     @process({
-      command: 'git',
+      command: @_gitCommand(),
       args: ['status', '--porcelain'],
       options: { cwd: @_repoBase() },
       stdout: stdoutHandler,
@@ -55,7 +57,7 @@ class GitBridge
       handler(staged)
 
     @process({
-      command: 'git',
+      command: @_gitCommand(),
       args: ['status', '--porcelain', path],
       options: { cwd: @_repoBase() },
       stdout: stdoutHandler,
@@ -65,7 +67,7 @@ class GitBridge
 
   @checkoutSide: (sideName, path, callback) ->
     @process({
-      command: 'git',
+      command: @_gitCommand(),
       args: ['checkout', "--#{sideName}", path],
       options: { cwd: @_repoBase() },
       stdout: (line) -> console.log line
@@ -77,7 +79,7 @@ class GitBridge
 
   @add: (path, callback) ->
     @process({
-      command: 'git',
+      command: @_gitCommand(),
       args: ['add', path],
       options: { cwd: @_repoBase() },
       stdout: (line) -> console.log line

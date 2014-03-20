@@ -13,6 +13,7 @@ describe 'ResolverView', ->
     }
     view = new ResolverView(fakeEditor)
 
+    GitBridge._gitCommand = -> 'git'
     GitBridge.process = ({stdout, exit}) ->
       stdout('UU lib/file1.txt')
       exit(0)

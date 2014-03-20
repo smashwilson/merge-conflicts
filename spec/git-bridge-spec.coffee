@@ -5,6 +5,9 @@ describe 'GitBridge', ->
 
   repoBase = -> atom.project.getRepo().getWorkingDirectory()
 
+  beforeEach ->
+    GitBridge._gitCommand = -> '/usr/bin/git'
+
   it 'checks git status for merge conflicts', ->
     [c, a, o] = []
     GitBridge.process = ({command, args, options, stdout, stderr, exit}) ->
@@ -18,7 +21,7 @@ describe 'GitBridge', ->
     GitBridge.withConflicts (cs) -> conflicts = cs
 
     expect(conflicts).toEqual(['lib/file0.rb', 'lib/file1.rb'])
-    expect(c).toBe('git')
+    expect(c).toBe('/usr/bin/git')
     expect(a).toEqual(['status', '--porcelain'])
     expect(o).toEqual({ cwd: repoBase() })
 
@@ -54,7 +57,7 @@ describe 'GitBridge', ->
     GitBridge.checkoutSide 'ours', 'lib/file1.txt', -> called = true
 
     expect(called).toBe(true)
-    expect(c).toBe('git')
+    expect(c).toBe('/usr/bin/git')
     expect(a).toEqual(['checkout', '--ours', 'lib/file1.txt'])
     expect(o).toEqual({ cwd: repoBase() })
 
@@ -68,6 +71,6 @@ describe 'GitBridge', ->
     GitBridge.add 'lib/file1.txt', -> called = true
 
     expect(called).toBe(true)
-    expect(c).toBe('git')
+    expect(c).toBe('/usr/bin/git')
     expect(a).toEqual(['add', 'lib/file1.txt'])
     expect(o).toEqual({ cwd: repoBase() })

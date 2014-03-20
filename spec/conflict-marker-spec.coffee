@@ -1,4 +1,5 @@
 ConflictMarker = require '../lib/conflict-marker'
+GitBridge = require '../lib/git-bridge'
 util = require './util'
 
 describe 'ConflictMarker', ->
@@ -11,6 +12,8 @@ describe 'ConflictMarker', ->
       sv.detectDirty() if 'detectDirty' of sv
 
   beforeEach ->
+    GitBridge._gitCommand = -> 'git'
+
     editorView = util.openPath("triple-2way-diff.txt")
     editorView.getFirstVisibleScreenRow = -> 0
     editorView.getLastVisibleScreenRow = -> 999
