@@ -28,10 +28,13 @@ class MergeConflictsView extends View
 
   initialize: (@conflicts) ->
     atom.on 'merge-conflicts:resolved', (event) =>
-      p = path.relative atom.project.getPath(), event.file
+      p = atom.project.getRepo().relativize event.file
       progress = @pathList.find("li:contains('#{p}') progress")[0]
-      progress.max = event.total
-      progress.value = event.resolved
+      if progress?
+        progress.max = event.total
+        progress.value = event.resolved
+      else
+        console.log "Unrecognized conflict path: #{p}"
 
     atom.on 'merge-conflicts:staged', => @refresh()
 
@@ -39,8 +42,9 @@ class MergeConflictsView extends View
     @command 'merge-conflicts:entire-file-theirs', @sideResolver('theirs')
 
   navigate: (event, element) ->
-    p = element.find(".path").text()
-    atom.workspace.open(p)
+    repoPath = element.find(".path").text()
+    fullPath = path.join atom.project.getRepo().getWorkingDirectory(), repoPath
+    atom.workspace.open(fullPath)
 
   minimize: ->
     @addClass 'minimized'
@@ -53,8 +57,7 @@ class MergeConflictsView extends View
   quit: -> @finish(MaybeLaterView)
 
   refresh: ->
-    root = atom.project.getPath()
-    GitBridge.conflictsIn root, (newConflicts) =>
+    GitBridge.withConflicts (newConflicts) =>
       # Any files that were present, but aren't there any more, have been
       # resolved.
       for item in @pathList.find('li')
@@ -88,8 +91,7 @@ class MergeConflictsView extends View
     return unless atom.project.getRepo()
     return if @instance?
 
-    root = atom.project.getRootDirectory().getRealPathSync()
-    GitBridge.conflictsIn root, (conflicts) =>
+    GitBridge.withConflicts (conflicts) =>
       if conflicts.length > 0
         view = new MergeConflictsView(conflicts)
         @instance = view
@@ -103,9 +105,8 @@ class MergeConflictsView extends View
   @markConflictsIn: (conflicts, editorView) ->
     return unless conflicts
 
-    editor = editorView.getEditor()
-    p = editor.getPath()
-    rel = path.relative atom.project.getPath(), p
-    return unless _.contains(conflicts, rel)
+    fullPath = editorView.getEditor().getPath()
+    repoPath = atom.project.getRepo().relativize fullPath
+    return unless _.contains(conflicts, repoPath)
 
     new ConflictMarker(editorView)

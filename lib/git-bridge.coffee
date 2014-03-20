@@ -6,7 +6,9 @@ class GitBridge
   # Indirection for Mockability (tm)
   @process: (args) -> new BufferedProcess(args)
 
-  constructor: (@repo) ->
+  constructor: ->
+
+  @_repoBase: -> atom.project.getRepo()?.getWorkingDirectory()
 
   @_statusCodesFrom: (chunk, handler) ->
     for line in chunk.split("\n")
@@ -15,7 +17,7 @@ class GitBridge
         [__, indexCode, workCode, path] = m
         handler(indexCode, workCode, path)
 
-  @conflictsIn: (baseDir, handler) ->
+  @withConflicts: (handler) ->
     conflicts = []
 
     stdoutHandler = (chunk) =>
@@ -32,7 +34,7 @@ class GitBridge
     @process({
       command: 'git',
       args: ['status', '--porcelain'],
-      options: { cwd: baseDir },
+      options: { cwd: @_repoBase() },
       stdout: stdoutHandler,
       stderr: stderrHandler,
       exit: exitHandler
@@ -55,7 +57,7 @@ class GitBridge
     @process({
       command: 'git',
       args: ['status', '--porcelain', path],
-      options: { cwd: atom.project.path },
+      options: { cwd: @_repoBase() },
       stdout: stdoutHandler,
       stderr: stderrHandler,
       exit: exitHandler
@@ -65,7 +67,7 @@ class GitBridge
     @process({
       command: 'git',
       args: ['checkout', "--#{sideName}", path],
-      options: { 'cwd': atom.project.path },
+      options: { cwd: @_repoBase() },
       stdout: (line) -> console.log line
       stderr: (line) -> console.log line
       exit: (code) ->
@@ -77,7 +79,7 @@ class GitBridge
     @process({
       command: 'git',
       args: ['add', path],
-      options: { 'cwd': atom.project.path },
+      options: { cwd: @_repoBase() },
       stdout: (line) -> console.log line
       stderr: (line) -> console.log line
       exit: (code) ->

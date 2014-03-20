@@ -3,6 +3,8 @@ GitBridge = require '../lib/git-bridge'
 
 describe 'GitBridge', ->
 
+  repoBase = -> atom.project.getRepo().getWorkingDirectory()
+
   it 'checks git status for merge conflicts', ->
     [c, a, o] = []
     GitBridge.process = ({command, args, options, stdout, stderr, exit}) ->
@@ -13,12 +15,12 @@ describe 'GitBridge', ->
       exit(0)
 
     conflicts = []
-    GitBridge.conflictsIn '.', (cs) -> conflicts = cs
+    GitBridge.withConflicts (cs) -> conflicts = cs
 
     expect(conflicts).toEqual(['lib/file0.rb', 'lib/file1.rb'])
     expect(c).toBe('git')
     expect(a).toEqual(['status', '--porcelain'])
-    expect(o).toEqual({ cwd: '.' })
+    expect(o).toEqual({ cwd: repoBase() })
 
   describe 'isStaged', ->
 
@@ -54,7 +56,7 @@ describe 'GitBridge', ->
     expect(called).toBe(true)
     expect(c).toBe('git')
     expect(a).toEqual(['checkout', '--ours', 'lib/file1.txt'])
-    expect(o).toEqual({ cwd: atom.project.path })
+    expect(o).toEqual({ cwd: repoBase() })
 
   it 'stages changes to a file', ->
     [c, a, o] = []
@@ -68,4 +70,4 @@ describe 'GitBridge', ->
     expect(called).toBe(true)
     expect(c).toBe('git')
     expect(a).toEqual(['add', 'lib/file1.txt'])
-    expect(o).toEqual({ cwd: atom.project.path })
+    expect(o).toEqual({ cwd: repoBase() })
