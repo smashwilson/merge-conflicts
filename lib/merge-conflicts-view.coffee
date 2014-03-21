@@ -1,6 +1,7 @@
 {$, View} = require 'atom'
 _ = require 'underscore-plus'
 path = require 'path'
+{Subscriber} = require 'emissary'
 
 GitBridge = require './git-bridge'
 ConflictMarker = require './conflict-marker'
@@ -8,6 +9,9 @@ ConflictMarker = require './conflict-marker'
 
 module.exports =
 class MergeConflictsView extends View
+
+  Subscriber.includeInto @
+
   @content: (conflicts) ->
     @div class: 'merge-conflicts tool-panel panel-bottom padded', =>
       @div class: 'panel-heading', =>
@@ -36,7 +40,7 @@ class MergeConflictsView extends View
       else
         console.log "Unrecognized conflict path: #{p}"
 
-    atom.on 'merge-conflicts:staged', => @refresh()
+    @subscribe atom, 'merge-conflicts:staged', => @refresh()
 
     @command 'merge-conflicts:entire-file-ours', @sideResolver('ours')
     @command 'merge-conflicts:entire-file-theirs', @sideResolver('theirs')
@@ -72,6 +76,7 @@ class MergeConflictsView extends View
       @finish(SuccessView) if newConflicts.length is 0
 
   finish: (viewClass) ->
+    @unsubscribe [atom]
     @hide 'fast', =>
       MergeConflictsView.instance = null
       @remove()

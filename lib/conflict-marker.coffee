@@ -1,5 +1,7 @@
 {$} = require 'atom'
 _ = require 'underscore-plus'
+{Subscriber} = require 'emissary'
+
 Conflict = require './conflict'
 SideView = require './side-view'
 NavigationView = require './navigation-view'
@@ -13,6 +15,8 @@ DIRTY_CLASSES = "conflict-line dirty"
 
 module.exports =
 class ConflictMarker
+
+  Subscriber.includeInto @
 
   constructor: (@editorView) ->
     @conflicts = Conflict.all(@editorView.getEditor())
@@ -52,10 +56,11 @@ class ConflictMarker
     @editorView.command 'merge-conflicts:previous-unresolved', => @previousUnresolved()
     @editorView.command 'merge-conflicts:revert-current', => @revertCurrent()
 
-    atom.on 'merge-conflicts:resolved', ({total, resolved}) =>
+    @subscribe atom, 'merge-conflicts:resolved', ({total, resolved}) =>
       @conflictsResolved() if total is resolved
 
   conflictsResolved: ->
+    @unsubscribe [atom]
     v.remove() for v in @coveringViews
     @editorView.removeClass 'conflicted'
     @editorView.append new ResolverView(@editor())
