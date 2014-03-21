@@ -1,6 +1,7 @@
 {$, View} = require 'atom'
 _ = require 'underscore-plus'
 path = require 'path'
+{Subscriber} = require 'emissary'
 
 GitBridge = require './git-bridge'
 ConflictMarker = require './conflict-marker'
@@ -8,6 +9,9 @@ ConflictMarker = require './conflict-marker'
 
 module.exports =
 class MergeConflictsView extends View
+
+  Subscriber.includeInto @
+
   @content: (conflicts) ->
     @div class: 'merge-conflicts tool-panel panel-bottom padded', =>
       @div class: 'panel-heading', =>
@@ -27,7 +31,10 @@ class MergeConflictsView extends View
           @button class: 'btn btn-sm', click: 'quit', 'Quit'
 
   initialize: (@conflicts) ->
-    atom.on 'merge-conflicts:resolved', (event) =>
+    @markers = []
+    @editorSub = null
+
+    @subscribe atom, 'merge-conflicts:resolved', (event) =>
       p = atom.project.getRepo().relativize event.file
       progress = @pathList.find("li:contains('#{p}') progress")[0]
       if progress?
@@ -36,7 +43,7 @@ class MergeConflictsView extends View
       else
         console.log "Unrecognized conflict path: #{p}"
 
-    atom.on 'merge-conflicts:staged', => @refresh()
+    @subscribe atom, 'merge-conflicts:staged', => @refresh()
 
     @command 'merge-conflicts:entire-file-ours', @sideResolver('ours')
     @command 'merge-conflicts:entire-file-theirs', @sideResolver('theirs')
@@ -72,6 +79,11 @@ class MergeConflictsView extends View
       @finish(SuccessView) if newConflicts.length is 0
 
   finish: (viewClass) ->
+    @unsubscribe()
+    m.cleanup() for m in @markers
+    @markers = []
+    @editorSub.off()
+
     @hide 'fast', =>
       MergeConflictsView.instance = null
       @remove()
@@ -97,8 +109,10 @@ class MergeConflictsView extends View
         @instance = view
         atom.workspaceView.appendToBottom(view)
 
-        atom.workspaceView.eachEditorView (view) =>
-          @markConflictsIn conflicts, view if view.attached and view.getPane()?
+        @instance.editorSub = atom.workspaceView.eachEditorView (view) =>
+          if view.attached and view.getPane()?
+            marker = @markConflictsIn conflicts, view
+            @instance.markers.push marker if marker?
       else
         atom.workspaceView.appendToTop new NothingToMergeView
 
