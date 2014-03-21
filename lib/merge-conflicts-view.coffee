@@ -76,7 +76,7 @@ class MergeConflictsView extends View
       @finish(SuccessView) if newConflicts.length is 0
 
   finish: (viewClass) ->
-    @unsubscribe [atom]
+    @unsubscribe()
     @hide 'fast', =>
       MergeConflictsView.instance = null
       @remove()

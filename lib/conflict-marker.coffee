@@ -60,7 +60,7 @@ class ConflictMarker
       @conflictsResolved() if total is resolved
 
   conflictsResolved: ->
-    @unsubscribe [atom]
+    @unsubscribe()
     v.remove() for v in @coveringViews
     @editorView.removeClass 'conflicted'
     @editorView.append new ResolverView(@editor())
