@@ -38,7 +38,7 @@ class ConflictMarker
           total: @conflicts.length, resolved: resolvedCount,
           source: @
 
-    if @conflicts
+    if @conflicts.length > 0
       @remark()
       @installEvents()
     else
@@ -59,10 +59,16 @@ class ConflictMarker
     @subscribe atom, 'merge-conflicts:resolved', ({total, resolved}) =>
       @conflictsResolved() if total is resolved
 
-  conflictsResolved: ->
+    @subscribe @editorView, 'editor:will-be-removed', =>
+      @cleanup()
+
+  cleanup: ->
     @unsubscribe()
     v.remove() for v in @coveringViews
     @editorView.removeClass 'conflicted'
+
+  conflictsResolved: ->
+    @cleanup()
     @editorView.append new ResolverView(@editor())
 
   remark: ->

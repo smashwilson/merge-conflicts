@@ -31,7 +31,10 @@ class MergeConflictsView extends View
           @button class: 'btn btn-sm', click: 'quit', 'Quit'
 
   initialize: (@conflicts) ->
-    atom.on 'merge-conflicts:resolved', (event) =>
+    @markers = []
+    @editorSub = null
+
+    @subscribe atom, 'merge-conflicts:resolved', (event) =>
       p = atom.project.getRepo().relativize event.file
       progress = @pathList.find("li:contains('#{p}') progress")[0]
       if progress?
@@ -77,6 +80,10 @@ class MergeConflictsView extends View
 
   finish: (viewClass) ->
     @unsubscribe()
+    m.cleanup() for m in @markers
+    @markers = []
+    @editorSub.off()
+
     @hide 'fast', =>
       MergeConflictsView.instance = null
       @remove()
@@ -102,8 +109,10 @@ class MergeConflictsView extends View
         @instance = view
         atom.workspaceView.appendToBottom(view)
 
-        atom.workspaceView.eachEditorView (view) =>
-          @markConflictsIn conflicts, view if view.attached and view.getPane()?
+        @instance.editorSub = atom.workspaceView.eachEditorView (view) =>
+          if view.attached and view.getPane()?
+            marker = @markConflictsIn conflicts, view
+            @instance.markers.push marker if marker?
       else
         atom.workspaceView.appendToTop new NothingToMergeView
 
