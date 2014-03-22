@@ -1,7 +1,7 @@
 {
   "name": "merge-conflicts",
   "main": "./lib/merge-conflicts",
-  "version": "0.0.9",
+  "version": "0.0.10",
   "private": true,
   "description": "Resolve git conflicts within Atom",
   "activationEvents": [
