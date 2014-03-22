@@ -56,8 +56,9 @@ class ConflictMarker
     @editorView.command 'merge-conflicts:previous-unresolved', => @previousUnresolved()
     @editorView.command 'merge-conflicts:revert-current', => @revertCurrent()
 
-    @subscribe atom, 'merge-conflicts:resolved', ({total, resolved}) =>
-      @conflictsResolved() if total is resolved
+    @subscribe atom, 'merge-conflicts:resolved', ({total, resolved, file}) =>
+      if file is @editor().getPath() and total is resolved
+        @conflictsResolved()
 
     @subscribe @editorView, 'editor:will-be-removed', =>
       @cleanup()
