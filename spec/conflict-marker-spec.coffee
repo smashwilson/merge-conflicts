@@ -78,6 +78,7 @@ describe 'ConflictMarker', ->
     expect(event.source).toBe(m)
 
   it 'tracks the active conflict side', ->
+    editorView.getEditor().setCursorBufferPosition [11, 0]
     expect(m.active()).toEqual([])
     editorView.getEditor().setCursorBufferPosition [14, 5]
     expect(m.active()).toEqual([m.conflicts[1].ours])
