@@ -21,7 +21,7 @@ class SideView extends CoveringView
     @side.conflict.on 'conflict:resolved', =>
       @deleteMarker @side.refBannerMarker
       @deleteMarker @side.marker unless @side.wasChosen()
-      @detach()
+      @remove()
 
     @side.marker.on 'changed', (event) =>
       marker = @side.marker
