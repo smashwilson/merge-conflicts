@@ -30,6 +30,10 @@ class Conflict
     buffer = editor.getBuffer()
     previous = null
 
+    options =
+      persistent: false
+      invalidate: 'never'
+
     buffer.scan CONFLICT_REGEX, (m) ->
       [x, ourRef, ourText, theirText, theirRef] = m.match
       [baseRow, baseCol] = m.range.start.toArray()
@@ -39,24 +43,25 @@ class Conflict
       ourRowEnd = ourRowStart + ourLines.length - 1
 
       ourBannerMarker = editor.markBufferRange(
-        [[baseRow, 0], [ourRowStart, 0]])
+        [[baseRow, 0], [ourRowStart, 0]], options)
+
       ourMarker = editor.markBufferRange(
-        [[ourRowStart, 0], [ourRowEnd, 0]])
+        [[ourRowStart, 0], [ourRowEnd, 0]], options)
       ourText = editor.getTextInBufferRange ourMarker.getBufferRange()
 
       ours = new OurSide(ourRef, ourMarker, ourBannerMarker, ourText)
 
       separatorMarker = editor.markBufferRange(
-        [[ourRowEnd, 0], [ourRowEnd + 1, 0]])
+        [[ourRowEnd, 0], [ourRowEnd + 1, 0]], options)
 
       theirLines = theirText.split /\n/
       theirRowStart = ourRowEnd + 1
       theirRowEnd = theirRowStart + theirLines.length - 1
 
       theirMarker = editor.markBufferRange(
-        [[theirRowStart, 0], [theirRowEnd, 0]])
+        [[theirRowStart, 0], [theirRowEnd, 0]], options)
       theirBannerMarker = editor.markBufferRange(
-        [[theirRowEnd, 0], [m.range.end.row, 0]])
+        [[theirRowEnd, 0], [m.range.end.row, 0]], options)
       theirText = editor.getTextInBufferRange theirMarker.getBufferRange()
 
       theirs = new TheirSide(theirRef, theirMarker, theirBannerMarker, theirText)
