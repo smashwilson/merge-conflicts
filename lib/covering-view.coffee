@@ -36,7 +36,9 @@ class CoveringView extends View
     position = marker.getTailBufferPosition()
     @editorView.pixelPositionForBufferPosition position
 
-  deleteMarker: (marker) -> @buffer().delete marker.getBufferRange()
+  deleteMarker: (marker) ->
+    @buffer().delete marker.getBufferRange()
+    marker.destroy()
 
   scrollTo: (positionOrNull) ->
     @editor().setCursorBufferPosition positionOrNull if positionOrNull?
