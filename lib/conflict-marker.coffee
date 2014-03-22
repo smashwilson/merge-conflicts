@@ -41,6 +41,7 @@ class ConflictMarker
     if @conflicts.length > 0
       @remark()
       @installEvents()
+      @focusConflict @conflicts[0]
     else
       @conflictsResolved()
 
