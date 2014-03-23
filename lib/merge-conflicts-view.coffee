@@ -61,7 +61,9 @@ class MergeConflictsView extends View
     @removeClass 'minimized'
     @body.show 'fast'
 
-  quit: -> @finish(MaybeLaterView)
+  quit: ->
+    atom.emit 'merge-conflicts:quit'
+    @finish(MaybeLaterView)
 
   refresh: ->
     GitBridge.withConflicts (newConflicts) =>
@@ -76,7 +78,9 @@ class MergeConflictsView extends View
         else
           icon.addClass 'icon-check text-success'
 
-      @finish(SuccessView) if newConflicts.length is 0
+      if newConflicts.length is 0
+        atom.emit 'merge-conflicts:done'
+        @finish(SuccessView)
 
   finish: (viewClass) ->
     @unsubscribe()
