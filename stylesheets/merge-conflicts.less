@@ -55,14 +55,10 @@
 .editor.conflicted {
   .conflict-line {
     &.ours {
-      border-left: solid 2px @ui-site-color-1;
-      border-right: solid 2px @ui-site-color-1;
       background: mix(@ui-site-color-1, @base-background-color);
     }
 
     &.theirs {
-      border-left: solid 2px @ui-site-color-2;
-      border-right: solid 2px @ui-site-color-2;
       background: mix(@ui-site-color-2, @base-background-color);
     }
 
@@ -72,8 +68,6 @@
 
     &.dirty {
       background: darken(@ui-site-color-5, 40%);
-      border-left: solid 2px @ui-site-color-5;
-      border-right: solid 2px @ui-site-color-5;
     }
   }
 
@@ -122,8 +116,6 @@
   .navigation {
     padding: 0 20px;
     background: @base-background-color;
-    border-left: solid 2px @background-color-highlight;
-    border-right: solid 2px @background-color-highlight;
     width: 100%;
     position: absolute;
     left: 0;
