@@ -36,6 +36,7 @@ Here's the process in a nutshell:
  1. Fork it. :fork_and_knife:
  2. Run `apm develop merge-conflicts` from your terminal to get a clone of this repo. By default, this will end up in a subdirectory of `${HOME}/github`, but you can customize it by setting `${ATOM_REPOS_HOME}`.
  3. Fix up your remotes. The convention is to have `origin` pointing to your fork and `upstream` pointing to this repo. You can do this with something like:
+
    ```bash
    cd ${ATOM_REPOS_HOME:-~/github}/merge-conflicts
    git remote rename origin upstream
