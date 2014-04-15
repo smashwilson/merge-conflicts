@@ -10,7 +10,9 @@ class GitBridge
 
   @_gitCommand: -> atom.config.get 'merge-conflicts.gitPath'
 
-  @_repoBase: -> atom.project.getRepo()?.getWorkingDirectory()
+  @_repoWorkDir: -> atom.project.getRepo()?.getWorkingDirectory()
+
+  @_repoGitDir: -> atom.project.getRepo()?.getPath()
 
   @_statusCodesFrom: (chunk, handler) ->
     for line in chunk.split("\n")
@@ -36,7 +38,7 @@ class GitBridge
     @process({
       command: @_gitCommand(),
       args: ['status', '--porcelain'],
-      options: { cwd: @_repoBase() },
+      options: { cwd: @_repoWorkDir() },
       stdout: stdoutHandler,
       stderr: stderrHandler,
       exit: exitHandler
@@ -59,7 +61,7 @@ class GitBridge
     @process({
       command: @_gitCommand(),
       args: ['status', '--porcelain', path],
-      options: { cwd: @_repoBase() },
+      options: { cwd: @_repoWorkDir() },
       stdout: stdoutHandler,
       stderr: stderrHandler,
       exit: exitHandler
@@ -69,7 +71,7 @@ class GitBridge
     @process({
       command: @_gitCommand(),
       args: ['checkout', "--#{sideName}", path],
-      options: { cwd: @_repoBase() },
+      options: { cwd: @_repoWorkDir() },
       stdout: (line) -> console.log line
       stderr: (line) -> console.log line
       exit: (code) ->
@@ -81,7 +83,7 @@ class GitBridge
     @process({
       command: @_gitCommand(),
       args: ['add', path],
-      options: { cwd: @_repoBase() },
+      options: { cwd: @_repoWorkDir() },
       stdout: (line) -> console.log line
       stderr: (line) -> console.log line
       exit: (code) ->
