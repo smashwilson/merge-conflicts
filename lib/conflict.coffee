@@ -12,9 +12,9 @@ class Conflict
   Emitter.includeInto(this)
 
   constructor: (@ours, @theirs, @parent, @navigator) ->
-    @ours.conflict = @
-    @theirs.conflict = @
-    @navigator.conflict = @
+    @ours.conflict = this
+    @theirs.conflict = this
+    @navigator.conflict = this
     @resolution = null
 
   isResolved: -> @resolution?

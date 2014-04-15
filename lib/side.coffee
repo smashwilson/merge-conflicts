@@ -3,9 +3,9 @@ class Side
     @conflict = null
     @isDirty = false
 
-  resolve: -> @conflict.resolveAs @
+  resolve: -> @conflict.resolveAs this
 
-  wasChosen: -> @conflict.resolution is @
+  wasChosen: -> @conflict.resolution is this
 
 class OurSide extends Side
 
