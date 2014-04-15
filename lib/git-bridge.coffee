@@ -32,7 +32,7 @@ class GitBridge
       console.log("git status error: #{line}")
 
     exitHandler = (code) ->
-      throw "git status exit: #{code}" unless code is 0
+      throw new Error("git status exit: #{code}") unless code is 0
       handler(conflicts)
 
     @process({
@@ -55,7 +55,7 @@ class GitBridge
       console.log("git status error: #{chunk}")
 
     exitHandler = (code) ->
-      throw "git status exit: #{code}" unless code is 0
+      throw Error("git status exit: #{code}") unless code is 0
       handler(staged)
 
     @process({
@@ -75,7 +75,7 @@ class GitBridge
       stdout: (line) -> console.log line
       stderr: (line) -> console.log line
       exit: (code) ->
-        throw "git checkout exit: #{code}" unless code is 0
+        throw Error("git checkout exit: #{code}") unless code is 0
         callback()
     })
 
@@ -90,5 +90,5 @@ class GitBridge
         if code is 0
           callback()
         else
-          throw "git add failed: exit code #{code}"
+          throw Error("git add failed: exit code #{code}")
     })
