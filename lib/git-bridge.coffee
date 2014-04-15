@@ -53,7 +53,7 @@ class GitBridge
       @_statusCodesFrom chunk, (index, work, p) ->
         staged = index is 'M' and work is ' ' if p is path
 
-    stderrHandler = (chunk) =>
+    stderrHandler = (chunk) ->
       console.log("git status error: #{chunk}")
 
     exitHandler = (code) ->
