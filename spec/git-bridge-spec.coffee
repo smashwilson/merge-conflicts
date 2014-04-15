@@ -1,5 +1,6 @@
 GitBridge = require '../lib/git-bridge'
 {BufferedProcess} = require 'atom'
+path = require 'path'
 
 describe 'GitBridge', ->
 
@@ -77,18 +78,21 @@ describe 'GitBridge', ->
 
   describe 'rebase detection', ->
 
-    withRoot = (gitDir) ->
+    withRoot = (gitDir, callback) ->
       fullDir = path.join atom.project.getRootDirectory().getPath(), gitDir
+      saved = GitBridge._repoGitDir
       GitBridge._repoGitDir = -> fullDir
+      callback()
+      GitBridge._repoGitDir = saved
 
     it 'recognizes a non-interactive rebase', ->
-      withRoot 'rebasing.git'
-      expect(GitBridge.isRebasing()).toBe(true)
+      withRoot 'rebasing.git', ->
+        expect(GitBridge.isRebasing()).toBe(true)
 
     it 'recognizes an interactive rebase', ->
-      withRoot 'irebasing.git'
-      expect(GitBridge.isRebasing()).toBe(true)
+      withRoot 'irebasing.git', ->
+        expect(GitBridge.isRebasing()).toBe(true)
 
     it 'returns false if not rebasing', ->
-      withRoot 'merging.git'
-      expect(GitBridge.isRebasing()).toBe(false)
+      withRoot 'merging.git', ->
+        expect(GitBridge.isRebasing()).toBe(false)

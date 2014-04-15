@@ -20,15 +20,15 @@ class GitBridge
     for line in chunk.split("\n")
       m = line.match /^(.)(.) (.+)$/
       if m
-        [__, indexCode, workCode, path] = m
-        handler(indexCode, workCode, path)
+        [__, indexCode, workCode, p] = m
+        handler(indexCode, workCode, p)
 
   @withConflicts: (handler) ->
     conflicts = []
 
     stdoutHandler = (chunk) =>
-      @_statusCodesFrom chunk, (index, work, path) ->
-        conflicts.push path if index is 'U' and work is 'U'
+      @_statusCodesFrom chunk, (index, work, p) ->
+        conflicts.push p if index is 'U' and work is 'U'
 
     stderrHandler = (line) ->
       console.log("git status error: #{line}")
@@ -46,12 +46,12 @@ class GitBridge
       exit: exitHandler
     })
 
-  @isStaged: (path, handler) ->
+  @isStaged: (filepath, handler) ->
     staged = true
 
     stdoutHandler = (chunk) =>
       @_statusCodesFrom chunk, (index, work, p) ->
-        staged = index is 'M' and work is ' ' if p is path
+        staged = index is 'M' and work is ' ' if p is filepath
 
     stderrHandler = (chunk) ->
       console.log("git status error: #{chunk}")
@@ -62,17 +62,17 @@ class GitBridge
 
     @process({
       command: @_gitCommand(),
-      args: ['status', '--porcelain', path],
+      args: ['status', '--porcelain', filepath],
       options: { cwd: @_repoWorkDir() },
       stdout: stdoutHandler,
       stderr: stderrHandler,
       exit: exitHandler
     })
 
-  @checkoutSide: (sideName, path, callback) ->
+  @checkoutSide: (sideName, filepath, callback) ->
     @process({
       command: @_gitCommand(),
-      args: ['checkout', "--#{sideName}", path],
+      args: ['checkout', "--#{sideName}", filepath],
       options: { cwd: @_repoWorkDir() },
       stdout: (line) -> console.log line
       stderr: (line) -> console.log line
@@ -81,10 +81,10 @@ class GitBridge
         callback()
     })
 
-  @add: (path, callback) ->
+  @add: (filepath, callback) ->
     @process({
       command: @_gitCommand(),
-      args: ['add', path],
+      args: ['add', filepath],
       options: { cwd: @_repoWorkDir() },
       stdout: (line) -> console.log line
       stderr: (line) -> console.log line
@@ -96,7 +96,7 @@ class GitBridge
     })
 
   @isRebasing: ->
-    root = atom.project.getRepo()?.getPath()
+    root = @_repoGitDir()
     return false unless root?
 
     rebaseDir = path.join root, 'rebase-apply'
