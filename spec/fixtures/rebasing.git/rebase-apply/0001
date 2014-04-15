@@ -1,0 +1,19 @@
+From 205331815ca02331b81f804b81763ce4fed3d101 Mon Sep 17 00:00:00 2001
+From: Ash Wilson <smashwilson@gmail.com>
+Date: Sat, 1 Mar 2014 11:45:27 -0500
+Subject: aaaa
+
+---
+ file | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/file b/file
+index e69de29bb2d1d6434b8b29ae775ad8c2e48c5391..ccc3e7b48da0932cc0f7c4ce7b4fd834c7032fe1 100644
+--- a/file
++++ b/file
+@@ -0,0 +1 @@
++aaaaa
+-- 
+1.9.1
+
+

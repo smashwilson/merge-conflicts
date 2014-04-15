@@ -1,0 +1,21 @@
+From 04a3e0388ccaa0722592d849e6777c4c74eeacba Mon Sep 17 00:00:00 2001
+From: Ash Wilson <smashwilson@gmail.com>
+Date: Sat, 1 Mar 2014 12:23:31 -0500
+Subject: file1 mod
+
+---
+ file1 | 1 +
+ 1 file changed, 1 insertion(+)
+ create mode 100644 file1
+
+diff --git a/file1 b/file1
+new file mode 100644
+index 0000000000000000000000000000000000000000..8bd6648ed130ac9ece0f89cd9a8fbbfd2608427a
+--- /dev/null
++++ b/file1
+@@ -0,0 +1 @@
++asdf
+-- 
+1.9.1
+
+
