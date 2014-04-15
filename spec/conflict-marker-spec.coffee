@@ -3,7 +3,7 @@ GitBridge = require '../lib/git-bridge'
 util = require './util'
 
 describe 'ConflictMarker', ->
-  [editorView, editor, m] = []
+  [editorView, editor, state, m] = []
 
   cursors = -> c.getBufferPosition().toArray() for c in editor.getCursors()
 
@@ -19,8 +19,10 @@ describe 'ConflictMarker', ->
     editorView.getLastVisibleScreenRow = -> 999
 
     editor = editorView.getEditor()
+    state =
+      isRebase: false
 
-    m = new ConflictMarker(editorView)
+    m = new ConflictMarker(state, editorView)
 
   it 'attaches two SideViews and a NavigationView for each conflict', ->
     expect(editorView.find('.side').length).toBe(6)

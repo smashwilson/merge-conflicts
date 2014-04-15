@@ -16,9 +16,9 @@ DIRTY_CLASSES = "conflict-line dirty"
 module.exports =
 class ConflictMarker
 
-  Subscriber.includeInto @
+  Subscriber.includeInto this
 
-  constructor: (@editorView) ->
+  constructor: (@state, @editorView) ->
     @conflicts = Conflict.all(@editorView.getEditor())
 
     @editorView.addClass 'conflicted' if @conflicts
@@ -36,7 +36,7 @@ class ConflictMarker
         atom.emit 'merge-conflicts:resolved',
           file: @editor().getPath(),
           total: @conflicts.length, resolved: resolvedCount,
-          source: @
+          source: this
 
     if @conflicts.length > 0
       @remark()
