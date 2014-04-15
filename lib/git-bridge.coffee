@@ -1,4 +1,6 @@
 {BufferedProcess} = require 'atom'
+fs = require 'fs'
+path = require 'path'
 
 module.exports =
 class GitBridge
@@ -92,3 +94,15 @@ class GitBridge
         else
           throw Error("git add failed: exit code #{code}")
     })
+
+  @isRebasing: ->
+    root = atom.project.getRepo()?.getPath()
+    return false unless root?
+
+    rebaseDir = path.join root, 'rebase-apply'
+    rebaseStat = fs.statSyncNoException(rebaseDir)
+    return true if rebaseStat && rebaseStat.isDirectory()
+
+    irebaseDir = path.join root, 'rebase-merge'
+    irebaseStat = fs.statSyncNoException(irebaseDir)
+    irebaseStat && irebaseStat.isDirectory()
