@@ -2,12 +2,13 @@ path = require 'path'
 _ = require 'underscore-plus'
 
 MergeConflictsView = require '../lib/merge-conflicts-view'
+MergeState = require '../lib/merge-state'
 Conflict = require '../lib/conflict'
 GitBridge = require '../lib/git-bridge'
 util = require './util'
 
 describe 'MergeConflictsView', ->
-  [view, conflicts] = []
+  [view, state] = []
 
   fullPath = (fname) ->
     path.join atom.project.getPath(), 'path', fname
@@ -19,9 +20,10 @@ describe 'MergeConflictsView', ->
     conflictPaths = _.map ['file1.txt', 'file2.txt'], (fname) ->
       path.join 'spec', 'fixtures', 'path', fname
     editorView = util.openPath 'triple-2way-diff.txt'
+    state = new MergeState conflictPaths, false
     conflicts = Conflict.all editorView.getEditor()
 
-    view = new MergeConflictsView(conflictPaths)
+    view = new MergeConflictsView state
 
   describe 'conflict resolution progress', ->
     progressFor = (filename) ->
