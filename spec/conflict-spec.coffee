@@ -33,6 +33,21 @@ describe "Conflict", ->
     expect(util.rowRangeFrom cs[1].ours.marker).toEqual([14, 15])
     expect(util.rowRangeFrom cs[1].theirs.marker).toEqual([16, 17])
 
+  describe 'when rebasing', ->
+    [conflict] = []
+
+    beforeEach ->
+      editorView = util.openPath 'rebase-2way-diff.txt'
+      conflict = Conflict.all({ isRebase: true }, editorView.getEditor())[0]
+
+    it 'swaps the lines for "ours" and "theirs"', ->
+      expect(util.rowRangeFrom conflict.theirs.marker).toEqual([3, 4])
+      expect(util.rowRangeFrom conflict.ours.marker).toEqual([5, 6])
+
+    it 'recognizes banner lines with commit shortlog messages', ->
+      expect(util.rowRangeFrom conflict.theirs.refBannerMarker).toEqual([2, 3])
+      expect(util.rowRangeFrom conflict.ours.refBannerMarker).toEqual([6, 7])
+
   describe 'sides', ->
     [editor, conflict] = []
 
