@@ -10,9 +10,13 @@ describe 'SideView', ->
 
   beforeEach ->
     editorView = util.openPath("single-2way-diff.txt")
-    conflict = Conflict.all(editorView.getEditor())[0]
+    conflict = Conflict.all({ isRebase: false }, editorView.getEditor())[0]
     [ours, theirs] = [conflict.ours, conflict.theirs]
     view = new SideView(ours, editorView)
+
+  it 'applies its position as a CSS class', ->
+    expect(view.hasClass 'top').toBe(true)
+    expect(view.hasClass 'bottom').toBe(false)
 
   it 'positions itself over the banner line', ->
     refBanner = editorView.find('.line:contains("<<<<<<<")').eq 0

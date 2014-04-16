@@ -1,0 +1,35 @@
+From 6806d7673c7e5802dc49e7a4aa3a6cd683d72eb0 Mon Sep 17 00:00:00 2001
+From: Ash Wilson <smashwilson@gmail.com>
+Date: Sat, 8 Mar 2014 14:34:39 -0500
+Subject: More changes in branch.
+
+---
+ file  | 6 +++++-
+ file2 | 6 ++++++
+ 2 files changed, 11 insertions(+), 1 deletion(-)
+
+diff --git a/file b/file
+index ccc3e7b48da0932cc0f7c4ce7b4fd834c7032fe1..f972a5b9c5b7600ad9a0d34621889ef74c083a9c 100644
+--- a/file
++++ b/file
+@@ -1 +1,5 @@
+-aaaaa
++z
++y
++x
++w
++v
+diff --git a/file2 b/file2
+index e69de29bb2d1d6434b8b29ae775ad8c2e48c5391..ad7f66205e8370a15e2a11084e9cc11e318aa1d5 100644
+--- a/file2
++++ b/file2
+@@ -0,0 +1,6 @@
++0
++9
++8
++7
++6
++5
+-- 
+1.9.1
+

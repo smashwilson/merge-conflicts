@@ -4,15 +4,16 @@ path = require 'path'
 {Subscriber} = require 'emissary'
 
 GitBridge = require './git-bridge'
+MergeState = require './merge-state'
 ConflictMarker = require './conflict-marker'
 {SuccessView, MaybeLaterView, NothingToMergeView} = require './message-views'
 
 module.exports =
 class MergeConflictsView extends View
 
-  Subscriber.includeInto @
+  Subscriber.includeInto this
 
-  @content: (conflicts) ->
+  @content: (state) ->
     @div class: 'merge-conflicts tool-panel panel-bottom padded', =>
       @div class: 'panel-heading', =>
         @text 'Conflicts'
@@ -20,7 +21,7 @@ class MergeConflictsView extends View
         @span class: 'pull-right icon icon-unfold', click: 'restore', 'Show'
       @div outlet: 'body', =>
         @ul class: 'block list-group', outlet: 'pathList', =>
-          for p in conflicts
+          for p in state.conflicts
             @li click: 'navigate', class: 'list-item navigate', =>
               @span class: 'inline-block icon icon-diff-modified status-modified path', p
               @div class: 'pull-right', =>
@@ -30,7 +31,7 @@ class MergeConflictsView extends View
         @div class: 'block pull-right', =>
           @button class: 'btn btn-sm', click: 'quit', 'Quit'
 
-  initialize: (@conflicts) ->
+  initialize: (@state) ->
     @markers = []
     @editorSub = null
 
@@ -66,19 +67,19 @@ class MergeConflictsView extends View
     @finish(MaybeLaterView)
 
   refresh: ->
-    GitBridge.withConflicts (newConflicts) =>
+    @state.reread =>
       # Any files that were present, but aren't there any more, have been
       # resolved.
       for item in @pathList.find('li')
         p = $(item).find('.path').text()
         icon = $(item).find('.staged')
         icon.removeClass 'icon-dash icon-check text-success'
-        if _.contains newConflicts, p
+        if _.contains @state.conflicts, p
           icon.addClass 'icon-dash'
         else
           icon.addClass 'icon-check text-success'
 
-      if newConflicts.length is 0
+      if @state.isEmpty()
         atom.emit 'merge-conflicts:done'
         @finish(SuccessView)
 
@@ -91,7 +92,7 @@ class MergeConflictsView extends View
     @hide 'fast', =>
       MergeConflictsView.instance = null
       @remove()
-    atom.workspaceView.appendToTop new viewClass
+    atom.workspaceView.appendToTop new viewClass(@state)
 
   sideResolver: (side) ->
     (event) ->
@@ -107,24 +108,24 @@ class MergeConflictsView extends View
     return unless atom.project.getRepo()
     return if @instance?
 
-    GitBridge.withConflicts (conflicts) =>
-      if conflicts.length > 0
-        view = new MergeConflictsView(conflicts)
+    MergeState.read (state) =>
+      if not state.isEmpty()
+        view = new MergeConflictsView(state)
         @instance = view
         atom.workspaceView.appendToBottom(view)
 
         @instance.editorSub = atom.workspaceView.eachEditorView (view) =>
           if view.attached and view.getPane()?
-            marker = @markConflictsIn conflicts, view
+            marker = @markConflictsIn state, view
             @instance.markers.push marker if marker?
       else
-        atom.workspaceView.appendToTop new NothingToMergeView
+        atom.workspaceView.appendToTop new NothingToMergeView(state)
 
-  @markConflictsIn: (conflicts, editorView) ->
-    return unless conflicts
+  @markConflictsIn: (state, editorView) ->
+    return if state.isEmpty()
 
     fullPath = editorView.getEditor().getPath()
     repoPath = atom.project.getRepo().relativize fullPath
-    return unless _.contains(conflicts, repoPath)
+    return unless _.contains state.conflicts, repoPath
 
-    new ConflictMarker(editorView)
+    new ConflictMarker(state, editorView)

@@ -1,0 +1,20 @@
+pick 04a3e0388ccaa0722592d849e6777c4c74eeacba file1 mod
+pick 6806d7673c7e5802dc49e7a4aa3a6cd683d72eb0 More changes in branch.
+
+# Rebase 51d48cc..6806d76 onto 51d48cc
+#
+# Commands:
+# p, pick = use commit
+# r, reword = use commit, but edit the commit message
+# e, edit = use commit, but stop for amending
+# s, squash = use commit, but meld into previous commit
+# f, fixup = like "squash", but discard this commit's log message
+# x, exec = run command (the rest of the line) using shell
+#
+# These lines can be re-ordered; they are executed from top to bottom.
+#
+# If you remove a line here THAT COMMIT WILL BE LOST.
+#
+# However, if you remove everything, the rebase will be aborted.
+#
+# Note that empty commits are commented out

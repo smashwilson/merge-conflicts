@@ -1,0 +1,22 @@
+0000000000000000000000000000000000000000 6e3541659dc7f506812b55ce4f6f9554a420464a Ash Wilson <smashwilson@gmail.com> 1393692299 -0500	commit (initial): a
+6e3541659dc7f506812b55ce4f6f9554a420464a 6e3541659dc7f506812b55ce4f6f9554a420464a Ash Wilson <smashwilson@gmail.com> 1393692309 -0500	checkout: moving from master to branch
+6e3541659dc7f506812b55ce4f6f9554a420464a 6e3541659dc7f506812b55ce4f6f9554a420464a Ash Wilson <smashwilson@gmail.com> 1393692316 -0500	checkout: moving from branch to master
+6e3541659dc7f506812b55ce4f6f9554a420464a 6e3541659dc7f506812b55ce4f6f9554a420464a Ash Wilson <smashwilson@gmail.com> 1393692323 -0500	checkout: moving from master to branch
+6e3541659dc7f506812b55ce4f6f9554a420464a 205331815ca02331b81f804b81763ce4fed3d101 Ash Wilson <smashwilson@gmail.com> 1393692327 -0500	commit: aaaa
+205331815ca02331b81f804b81763ce4fed3d101 6e3541659dc7f506812b55ce4f6f9554a420464a Ash Wilson <smashwilson@gmail.com> 1393692335 -0500	checkout: moving from branch to master
+6e3541659dc7f506812b55ce4f6f9554a420464a 30fc72947114999af153eed9dc81729de90edc95 Ash Wilson <smashwilson@gmail.com> 1393692344 -0500	commit: master
+30fc72947114999af153eed9dc81729de90edc95 205331815ca02331b81f804b81763ce4fed3d101 Ash Wilson <smashwilson@gmail.com> 1393694601 -0500	checkout: moving from master to branch
+205331815ca02331b81f804b81763ce4fed3d101 04a3e0388ccaa0722592d849e6777c4c74eeacba Ash Wilson <smashwilson@gmail.com> 1393694611 -0500	commit: file1 mod
+04a3e0388ccaa0722592d849e6777c4c74eeacba 30fc72947114999af153eed9dc81729de90edc95 Ash Wilson <smashwilson@gmail.com> 1393694617 -0500	checkout: moving from branch to master
+30fc72947114999af153eed9dc81729de90edc95 fc37b1879fff0ec01a96bf6792b973a2b1e1ee4d Ash Wilson <smashwilson@gmail.com> 1393694629 -0500	commit: file2 mod
+fc37b1879fff0ec01a96bf6792b973a2b1e1ee4d 79b840d95746654d662782be57ffc9cdc607e458 Ash Wilson <smashwilson@gmail.com> 1394307204 -0500	commit: More changes on the master side.
+79b840d95746654d662782be57ffc9cdc607e458 ab0b0263337e1bac55041d95c805cdb65b8434b4 Ash Wilson <smashwilson@gmail.com> 1394307232 -0500	commit: Changes in file2 as well.
+ab0b0263337e1bac55041d95c805cdb65b8434b4 04a3e0388ccaa0722592d849e6777c4c74eeacba Ash Wilson <smashwilson@gmail.com> 1394307241 -0500	checkout: moving from master to branch
+04a3e0388ccaa0722592d849e6777c4c74eeacba 6806d7673c7e5802dc49e7a4aa3a6cd683d72eb0 Ash Wilson <smashwilson@gmail.com> 1394307279 -0500	commit: More changes in branch.
+6806d7673c7e5802dc49e7a4aa3a6cd683d72eb0 ab0b0263337e1bac55041d95c805cdb65b8434b4 Ash Wilson <smashwilson@gmail.com> 1394307286 -0500	checkout: moving from branch to master
+ab0b0263337e1bac55041d95c805cdb65b8434b4 51d48cc54f3f108ed59c0c4d7470a81a6cb4896a Ash Wilson <smashwilson@gmail.com> 1395272112 -0400	commit: subdir
+51d48cc54f3f108ed59c0c4d7470a81a6cb4896a 6806d7673c7e5802dc49e7a4aa3a6cd683d72eb0 Ash Wilson <smashwilson@gmail.com> 1397570145 -0400	checkout: moving from master to branch
+6806d7673c7e5802dc49e7a4aa3a6cd683d72eb0 6806d7673c7e5802dc49e7a4aa3a6cd683d72eb0 Ash Wilson <smashwilson@gmail.com> 1397570157 -0400	checkout: moving from branch to rebaser
+6806d7673c7e5802dc49e7a4aa3a6cd683d72eb0 51d48cc54f3f108ed59c0c4d7470a81a6cb4896a Ash Wilson <smashwilson@gmail.com> 1397570168 -0400	rebase: checkout master
+51d48cc54f3f108ed59c0c4d7470a81a6cb4896a 6806d7673c7e5802dc49e7a4aa3a6cd683d72eb0 Ash Wilson <smashwilson@gmail.com> 1397571353 -0400	rebase: aborting
+6806d7673c7e5802dc49e7a4aa3a6cd683d72eb0 51d48cc54f3f108ed59c0c4d7470a81a6cb4896a Ash Wilson <smashwilson@gmail.com> 1397571363 -0400	rebase -i (start): checkout master

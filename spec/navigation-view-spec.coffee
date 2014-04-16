@@ -9,7 +9,7 @@ describe 'NavigationView', ->
   beforeEach ->
     editorView = util.openPath("triple-2way-diff.txt")
     editor = editorView.getEditor()
-    conflicts = Conflict.all(editor)
+    conflicts = Conflict.all({}, editor)
     conflict = conflicts[1]
 
     view = new NavigationView(conflict.navigator, editorView)

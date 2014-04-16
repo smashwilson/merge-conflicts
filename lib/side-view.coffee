@@ -2,8 +2,9 @@ CoveringView = require './covering-view'
 
 module.exports =
 class SideView extends CoveringView
+
   @content: (side, editorView) ->
-    @div class: "side #{side.klass()} ui-site-#{side.site()}", =>
+    @div class: "side #{side.klass()} #{side.position} ui-site-#{side.site()}", =>
       @div class: 'controls', =>
         @label class: 'text-highlight', side.ref
         @span class: 'text-subtle', "// #{side.description()}"
