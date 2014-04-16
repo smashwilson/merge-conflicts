@@ -92,7 +92,7 @@ class MergeConflictsView extends View
     @hide 'fast', =>
       MergeConflictsView.instance = null
       @remove()
-    atom.workspaceView.appendToTop new viewClass
+    atom.workspaceView.appendToTop new viewClass(@state)
 
   sideResolver: (side) ->
     (event) ->
@@ -119,7 +119,7 @@ class MergeConflictsView extends View
             marker = @markConflictsIn state, view
             @instance.markers.push marker if marker?
       else
-        atom.workspaceView.appendToTop new NothingToMergeView
+        atom.workspaceView.appendToTop new NothingToMergeView(state)
 
   @markConflictsIn: (state, editorView) ->
     return if state.isEmpty()

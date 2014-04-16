@@ -11,7 +11,7 @@ class MessageView extends View
             @bodyMarkup()
           @div class: 'block text-subtle', 'click to dismiss'
 
-  initialize: ->
+  initialize: (@state) ->
 
   dismiss: ->
     @hide 'fast', => @remove()
@@ -24,8 +24,12 @@ class SuccessView extends MessageView
 
   @bodyMarkup: ->
     @text "That's everything. "
-    @code 'git commit'
-    @text ' at will to finish the merge.'
+    if @state.isRebase
+      @code 'git rebase --continue'
+      @text ' at will to resume rebasing.'
+    else
+      @code 'git commit'
+      @text ' at will to finish the merge.'
 
 class NothingToMergeView extends MessageView
 
@@ -43,7 +47,12 @@ class MaybeLaterView extends MessageView
   @headingClass = 'warning'
 
   @bodyMarkup: ->
-    @text "Careful, you've still got conflict markers left!"
+    @text "Careful, you've still got conflict markers left! "
+    if @state.isRebase
+      @code 'git rebase --abort'
+    else
+      @code 'git merge --abort'
+    @text ' if you just want to give up on this one.'
 
 module.exports =
   SuccessView: SuccessView,
