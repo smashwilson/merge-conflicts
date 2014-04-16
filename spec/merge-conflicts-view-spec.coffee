@@ -21,7 +21,7 @@ describe 'MergeConflictsView', ->
       path.join 'spec', 'fixtures', 'path', fname
     editorView = util.openPath 'triple-2way-diff.txt'
     state = new MergeState conflictPaths, false
-    conflicts = Conflict.all editorView.getEditor()
+    conflicts = Conflict.all state, editorView.getEditor()
 
     view = new MergeConflictsView state
 

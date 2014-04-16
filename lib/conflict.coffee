@@ -9,9 +9,9 @@ CONFLICT_REGEX = /^<{7} (\S+)\n([^]*?)={7}\n([^]*?)>{7} (\S+)\n?/mg
 module.exports =
 class Conflict
 
-  Emitter.includeInto(this)
+  Emitter.includeInto this
 
-  constructor: (@ours, @theirs, @parent, @navigator) ->
+  constructor: (@ours, @theirs, @parent, @navigator, @state) ->
     @ours.conflict = this
     @theirs.conflict = this
     @navigator.conflict = this
@@ -21,11 +21,11 @@ class Conflict
 
   resolveAs: (side) ->
     @resolution = side
-    @emit("conflict:resolved")
+    @emit "conflict:resolved"
 
   scrollTarget: -> @ours.marker.getTailBufferPosition()
 
-  @all: (editor) ->
+  @all: (state, editor) ->
     results = []
     buffer = editor.getBuffer()
     previous = null
@@ -68,7 +68,7 @@ class Conflict
 
       nav = new Navigator(separatorMarker)
 
-      c = new Conflict(ours, theirs, null, nav)
+      c = new Conflict(ours, theirs, null, nav, state)
       results.push c
 
       nav.linkToPrevious previous

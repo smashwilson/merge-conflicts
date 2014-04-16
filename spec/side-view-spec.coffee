@@ -10,7 +10,7 @@ describe 'SideView', ->
 
   beforeEach ->
     editorView = util.openPath("single-2way-diff.txt")
-    conflict = Conflict.all(editorView.getEditor())[0]
+    conflict = Conflict.all({}, editorView.getEditor())[0]
     [ours, theirs] = [conflict.ours, conflict.theirs]
     view = new SideView(ours, editorView)
 

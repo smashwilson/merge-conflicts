@@ -19,7 +19,7 @@ class ConflictMarker
   Subscriber.includeInto this
 
   constructor: (@state, @editorView) ->
-    @conflicts = Conflict.all(@editorView.getEditor())
+    @conflicts = Conflict.all(@state, @editorView.getEditor())
 
     @editorView.addClass 'conflicted' if @conflicts
 

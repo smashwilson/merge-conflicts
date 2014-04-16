@@ -8,7 +8,7 @@ describe "Conflict", ->
 
     beforeEach ->
       editorView = util.openPath('single-2way-diff.txt')
-      conflict = Conflict.all(editorView.getEditor())[0]
+      conflict = Conflict.all({}, editorView.getEditor())[0]
 
     it 'identifies the correct rows', ->
       expect(util.rowRangeFrom conflict.ours.marker).toEqual([1, 2])
@@ -25,7 +25,7 @@ describe "Conflict", ->
 
   it "finds multiple conflict markings", ->
     editorView = util.openPath('multi-2way-diff.txt')
-    cs = Conflict.all(editorView.getEditor())
+    cs = Conflict.all({}, editorView.getEditor())
 
     expect(cs.length).toBe(2)
     expect(util.rowRangeFrom cs[0].ours.marker).toEqual([5, 7])
@@ -39,7 +39,7 @@ describe "Conflict", ->
     beforeEach ->
       editorView = util.openPath('single-2way-diff.txt')
       editor = editorView.getEditor()
-      [conflict] = Conflict.all editor
+      [conflict] = Conflict.all {}, editor
 
     it 'retains a reference to conflict', ->
       expect(conflict.ours.conflict).toBe(conflict)
@@ -76,7 +76,7 @@ describe "Conflict", ->
 
     beforeEach ->
       editorView = util.openPath('triple-2way-diff.txt')
-      conflicts = Conflict.all(editorView.getEditor())
+      conflicts = Conflict.all({}, editorView.getEditor())
       navigator = conflicts[1].navigator
 
     it 'knows its conflict', ->
