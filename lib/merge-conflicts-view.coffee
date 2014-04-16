@@ -79,7 +79,7 @@ class MergeConflictsView extends View
         else
           icon.addClass 'icon-check text-success'
 
-      if @state.conflicts.isEmpty
+      if @state.isEmpty()
         atom.emit 'merge-conflicts:done'
         @finish(SuccessView)
 
@@ -109,7 +109,7 @@ class MergeConflictsView extends View
     return if @instance?
 
     MergeState.read (state) =>
-      if not state.isEmpty
+      if not state.isEmpty()
         view = new MergeConflictsView(state)
         @instance = view
         atom.workspaceView.appendToBottom(view)
@@ -122,10 +122,10 @@ class MergeConflictsView extends View
         atom.workspaceView.appendToTop new NothingToMergeView
 
   @markConflictsIn: (state, editorView) ->
-    return if state.isEmpty
+    return if state.isEmpty()
 
     fullPath = editorView.getEditor().getPath()
     repoPath = atom.project.getRepo().relativize fullPath
     return unless _.contains state.conflicts, repoPath
 
-    new ConflictMarker(editorView)
+    new ConflictMarker(state, editorView)
