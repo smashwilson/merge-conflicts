@@ -4,7 +4,86 @@
 {Side, OurSide, TheirSide} = require './side'
 Navigator = require './navigator'
 
-CONFLICT_REGEX = /^<{7} (\S+)\n([^]*?)={7}\n([^]*?)>{7} (\S+)\n?/mg
+CONFLICT_REGEX = /^<{7} (.+)\n([^]*?)={7}\n([^]*?)>{7} (.+)\n?/mg
+
+INVALID = null
+TOP = 'top'
+MIDDLE = 'middle'
+BOTTOM = 'bottom'
+
+class Marker
+
+  options =
+    persistent: false
+    invalidate: 'never'
+
+  constructor: (@state, @editor) ->
+    @position = INVALID
+
+  start: (@m) ->
+    @startRow = @m.range.start.row
+    @endRow = @m.range.end.row
+
+    @chunks = @m.match
+    @chunks.shift()
+
+    @currentRow = @startRow
+    @position = TOP
+
+  markOurs: -> @_markHunk OurSide
+
+  markSeparator: ->
+    unless @position is MIDDLE
+      throw new Error "Unexpected position for separator: #{@position}"
+    @position = BOTTOM
+
+    sepRowStart = @currentRow
+    sepRowEnd = @_advance 1
+
+    marker = @editor.markBufferRange(
+      [[sepRowStart, 0], [sepRowEnd, 0]], @options
+    )
+
+    new Navigator marker
+
+  markTheirs: -> @_markHunk TheirSide
+
+  _markHunk: (sideKlass) ->
+    sidePosition = @position
+    switch @position
+      when TOP
+        ref = @chunks.shift()
+        text = @chunks.shift()
+        lines = text.split /\n/
+
+        bannerRowStart = @currentRow
+        bannerRowEnd = rowStart = @_advance 1
+        rowEnd = @_advance lines.length - 1
+
+        @position = MIDDLE
+      when BOTTOM
+        text = @chunks.shift()
+        ref = @chunks.shift()
+        lines = text.split /\n/
+
+        rowStart = @currentRow
+        bannerRowStart = rowEnd = @_advance lines.length - 1
+        bannerRowEnd = @_advance 1
+
+        @position = INVALID
+      else
+        throw new Error "Unexpected position for side: #{@position}"
+
+    bannerMarker = @editor.markBufferRange(
+      [[bannerRowStart, 0], [bannerRowEnd, 0]], @options
+    )
+    marker = @editor.markBufferRange(
+      [[rowStart, 0], [rowEnd, 0]], @options
+    )
+
+    new sideKlass(text, ref, marker, bannerMarker, sidePosition)
+
+  _advance: (rowCount) -> @currentRow += rowCount
 
 module.exports =
 class Conflict
@@ -27,50 +106,25 @@ class Conflict
 
   @all: (state, editor) ->
     results = []
-    buffer = editor.getBuffer()
     previous = null
+    marker = new Marker state, editor
 
-    options =
-      persistent: false
-      invalidate: 'never'
+    editor.getBuffer().scan CONFLICT_REGEX, (m) ->
+      marker.start m
 
-    buffer.scan CONFLICT_REGEX, (m) ->
-      [x, ourRef, ourText, theirText, theirRef] = m.match
-      [baseRow, baseCol] = m.range.start.toArray()
-
-      ourLines = ourText.split /\n/
-      ourRowStart = baseRow + 1
-      ourRowEnd = ourRowStart + ourLines.length - 1
-
-      ourBannerMarker = editor.markBufferRange(
-        [[baseRow, 0], [ourRowStart, 0]], options)
-
-      ourMarker = editor.markBufferRange(
-        [[ourRowStart, 0], [ourRowEnd, 0]], options)
-      ourText = editor.getTextInBufferRange ourMarker.getBufferRange()
-
-      ours = new OurSide(ourRef, ourMarker, ourBannerMarker, ourText)
-
-      separatorMarker = editor.markBufferRange(
-        [[ourRowEnd, 0], [ourRowEnd + 1, 0]], options)
-
-      theirLines = theirText.split /\n/
-      theirRowStart = ourRowEnd + 1
-      theirRowEnd = theirRowStart + theirLines.length - 1
-
-      theirMarker = editor.markBufferRange(
-        [[theirRowStart, 0], [theirRowEnd, 0]], options)
-      theirBannerMarker = editor.markBufferRange(
-        [[theirRowEnd, 0], [m.range.end.row, 0]], options)
-      theirText = editor.getTextInBufferRange theirMarker.getBufferRange()
-
-      theirs = new TheirSide(theirRef, theirMarker, theirBannerMarker, theirText)
-
-      nav = new Navigator(separatorMarker)
+      if state.isRebase
+        theirs = marker.markTheirs()
+        nav = marker.markSeparator()
+        ours = marker.markOurs()
+      else
+        ours = marker.markOurs()
+        nav = marker.markSeparator()
+        theirs = marker.markTheirs()
 
       c = new Conflict(ours, theirs, null, nav, state)
       results.push c
 
       nav.linkToPrevious previous
       previous = c
+
     results

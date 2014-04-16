@@ -1,5 +1,5 @@
 class Side
-  constructor: (@ref, @marker, @refBannerMarker, @originalText) ->
+  constructor: (@originalText, @ref, @marker, @refBannerMarker, @position) ->
     @conflict = null
     @isDirty = false
 

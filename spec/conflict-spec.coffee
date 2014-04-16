@@ -23,6 +23,10 @@ describe "Conflict", ->
     it 'finds the separator', ->
       expect(util.rowRangeFrom conflict.navigator.separatorMarker).toEqual([2, 3])
 
+    it 'marks "ours" as the top and "theirs" as the bottom', ->
+      expect(conflict.ours.position).toBe('top')
+      expect(conflict.theirs.position).toBe('bottom')
+
   it "finds multiple conflict markings", ->
     editorView = util.openPath('multi-2way-diff.txt')
     cs = Conflict.all({}, editorView.getEditor())
@@ -47,6 +51,10 @@ describe "Conflict", ->
     it 'recognizes banner lines with commit shortlog messages', ->
       expect(util.rowRangeFrom conflict.theirs.refBannerMarker).toEqual([2, 3])
       expect(util.rowRangeFrom conflict.ours.refBannerMarker).toEqual([6, 7])
+
+    it 'marks "theirs" as the top and "ours" as the bottom', ->
+      expect(conflict.theirs.position).toBe('top')
+      expect(conflict.ours.position).toBe('bottom')
 
   describe 'sides', ->
     [editor, conflict] = []
