@@ -2,16 +2,14 @@
 
 class MessageView extends View
 
-  @content: ->
+  @content: (state) ->
     @div class: 'overlay from-top merge-conflicts-message', =>
       @div class: 'panel', click: 'dismiss', =>
         @div class: "panel-heading text-#{@headingClass}", @headingText
         @div class: 'panel-body', =>
           @div class: 'block', =>
-            @bodyMarkup()
+            @bodyMarkup(state)
           @div class: 'block text-subtle', 'click to dismiss'
-
-  initialize: (@state) ->
 
   dismiss: ->
     @hide 'fast', => @remove()
@@ -22,9 +20,9 @@ class SuccessView extends MessageView
 
   @headingClass = 'success'
 
-  @bodyMarkup: ->
+  @bodyMarkup: (state) ->
     @text "That's everything. "
-    if @state.isRebase
+    if state.isRebase
       @code 'git rebase --continue'
       @text ' at will to resume rebasing.'
     else
@@ -37,7 +35,7 @@ class NothingToMergeView extends MessageView
 
   @headingClass = 'info'
 
-  @bodyMarkup: ->
+  @bodyMarkup: (state) ->
     @text 'No conflicts here!'
 
 class MaybeLaterView extends MessageView
@@ -46,9 +44,9 @@ class MaybeLaterView extends MessageView
 
   @headingClass = 'warning'
 
-  @bodyMarkup: ->
+  @bodyMarkup: (state) ->
     @text "Careful, you've still got conflict markers left! "
-    if @state.isRebase
+    if state.isRebase
       @code 'git rebase --abort'
     else
       @code 'git merge --abort'
