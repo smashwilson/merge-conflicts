@@ -1,5 +1,7 @@
 # Merge Conflicts
 
+[![Build Status](https://travis-ci.org/smashwilson/merge-conflicts.svg?branch=master)](https://travis-ci.org/smashwilson/merge-conflicts)
+
 Resolve your git merge conflicts in Atom!
 
 ![conflict-resolution](https://raw.github.com/smashwilson/merge-conflicts/master/docs/conflict-resolution.gif)
