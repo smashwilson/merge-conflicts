@@ -13,6 +13,8 @@ class ResolverView extends View
         @div class: 'block text-info', =>
           @span outlet: 'actionText', 'Save and stage'
           @text ' this file for commit?'
+      @div class: 'pull-left', =>
+        @button class: 'btn btn-primary', click: 'dismiss', 'Maybe Later'
       @div class: 'pull-right', =>
         @button class: 'btn btn-primary', click: 'resolve', 'Mark Resolved'
 
