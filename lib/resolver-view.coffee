@@ -16,7 +16,7 @@ class ResolverView extends View
       @div class: 'pull-left', =>
         @button class: 'btn btn-primary', click: 'dismiss', 'Maybe Later'
       @div class: 'pull-right', =>
-        @button class: 'btn btn-primary', click: 'resolve', 'Mark Resolved'
+        @button class: 'btn btn-primary', click: 'resolve', 'Stage'
 
   initialize: (@editor) ->
     @refresh()

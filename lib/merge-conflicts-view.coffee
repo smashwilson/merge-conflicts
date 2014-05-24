@@ -5,12 +5,14 @@ path = require 'path'
 
 GitBridge = require './git-bridge'
 MergeState = require './merge-state'
+ResolverView = require './resolver-view'
 ConflictMarker = require './conflict-marker'
 {SuccessView, MaybeLaterView, NothingToMergeView} = require './message-views'
 
 module.exports =
 class MergeConflictsView extends View
 
+  instance: null
   Subscriber.includeInto this
 
   @content: (state) ->
@@ -25,6 +27,7 @@ class MergeConflictsView extends View
             @li click: 'navigate', class: 'list-item navigate', =>
               @span class: 'inline-block icon icon-diff-modified status-modified path', p
               @div class: 'pull-right', =>
+                @button click: 'appendResolver', class: 'btn btn-xs btn-success inline-block-tight bReady', style: 'display: none', 'Stage'
                 @span class: 'inline-block text-subtle', message
                 @progress class: 'inline-block', max: 100, value: 0
                 @span class: 'inline-block icon icon-dash staged'
@@ -43,6 +46,8 @@ class MergeConflictsView extends View
         progress.value = event.resolved
       else
         console.log "Unrecognized conflict path: #{p}"
+      if event.total is event.resolved
+        $(@pathList.find("li:contains('#{p}') .bReady")?[0]).show()
 
     @subscribe atom, 'merge-conflicts:staged', => @refresh()
 
@@ -78,6 +83,7 @@ class MergeConflictsView extends View
           icon.addClass 'icon-dash'
         else
           icon.addClass 'icon-check text-success'
+          $(@pathList.find("li:contains('#{p}') .bReady")?[0]).hide()
 
       if @state.isEmpty()
         atom.emit 'merge-conflicts:done'
@@ -102,7 +108,20 @@ class MergeConflictsView extends View
         atom.emit 'merge-conflicts:resolved', file: full, total: 1, resolved: 1
         atom.workspace.open p
 
-  instance: null
+  editorView: (filePath) ->
+    if filePath
+      for _editorView in atom.workspaceView.getEditorViews()
+        return _editorView if _editorView.getEditor().getPath() is filePath
+    atom.workspaceView.getActiveView()
+
+  editor: (filePath) ->
+    @editorView(filePath).getEditor()
+
+  appendResolver: (event, element) ->
+    repoPath = element.parent()?.parent()?.find(".path").text()
+    filePath = path.join atom.project.getRepo().getWorkingDirectory(), repoPath
+    atom.workspace.open(filePath)
+    @editorView(filePath).append new ResolverView(@editor(filePath))
 
   @detect: ->
     return unless atom.project.getRepo()

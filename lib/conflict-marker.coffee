@@ -43,6 +43,10 @@ class ConflictMarker
       @installEvents()
       @focusConflict @conflicts[0]
     else
+      atom.emit 'merge-conflicts:resolved',
+        file: @editor().getPath(),
+        total: 0, resolved: 0,
+        source: this
       @conflictsResolved()
 
   installEvents: ->
