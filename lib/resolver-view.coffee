@@ -19,6 +19,7 @@ class ResolverView extends View
   initialize: (@editor) ->
     @refresh()
     @editor.getBuffer().on 'saved', => @refresh()
+    @subscribe atom, 'merge-conflicts:quit', (event) => @dismiss()
 
   getModel: -> null
 
@@ -44,3 +45,6 @@ class ResolverView extends View
   resolve: ->
     @editor.save()
     GitBridge.add @relativePath(), => @refresh()
+
+  dismiss: ->
+    @hide 'fast', => @remove()
