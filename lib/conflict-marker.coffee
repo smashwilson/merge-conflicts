@@ -45,7 +45,7 @@ class ConflictMarker
     else
       atom.emit 'merge-conflicts:resolved',
         file: @editor().getPath(),
-        total: 0, resolved: 0,
+        total: 1, resolved: 1,
         source: this
       @conflictsResolved()
 
