@@ -112,18 +112,17 @@ class MergeConflictsView extends View
     if filePath
       for _editorView in atom.workspaceView.getEditorViews()
         return _editorView if _editorView.getEditor().getPath() is filePath
-    atom.workspaceView.getActiveView()
+    return null
 
   editor: (filePath) ->
-    @editorView(filePath).getEditor()
+    @editorView(filePath)?.getEditor()
 
   stageFile: (event, element) ->
-    repoPath = element.parent()?.parent()?.find(".path").text()
-    filePath = path.join atom.project.getRepo().getWorkingDirectory(), repoPath
-    @editor(filePath).save()
-    GitBridge.add repoPath, =>
+    repoPath = element.closest('li').find('.path').text()
+    filePath = atom.project.getRepo().relativize repoPath
+    @editor(filePath)?.save()
+    GitBridge.add repoPath, ->
       atom.emit 'merge-conflicts:staged', file: filePath
-      return
 
   @detect: ->
     return unless atom.project.getRepo()
