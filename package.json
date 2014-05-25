@@ -4,6 +4,9 @@
   "version": "1.1.0",
   "private": true,
   "description": "Resolve git conflicts within Atom",
+  "contributors": [
+    "Maximilian Schüßler <maximilian@mschuessler.org>"
+  ],
   "activationEvents": [
     "merge-conflicts:detect"
   ],
