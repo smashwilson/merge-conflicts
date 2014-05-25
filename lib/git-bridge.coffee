@@ -28,7 +28,11 @@ class GitBridge
 
     stdoutHandler = (chunk) =>
       @_statusCodesFrom chunk, (index, work, p) ->
+        # both modified
         conflicts.push p if index is 'U' and work is 'U'
+
+        # both added
+        conflicts.push p if index is 'A' and work is 'A'
 
     stderrHandler = (line) ->
       console.log("git status error: #{line}")
