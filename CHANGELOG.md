@@ -1,4 +1,11 @@
-## 1.1.1
+## 1.2.0
+
+- Consistent keymap entries on Linux, Mac and Windows.
+- Detect conflicts with Windows-style line endings.
+- Allow the resolver dialog to be dismissed and invoked later.
+- Close the resolver dialog on quitting the merge.
+- Handle "both added" conflicts.
+- Travis CI!
 
 ## 1.1.0
 
