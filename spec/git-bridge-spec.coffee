@@ -14,14 +14,17 @@ describe 'GitBridge', ->
     GitBridge.process = ({command, args, options, stdout, stderr, exit}) ->
       [c, a, o] = [command, args, options]
       stdout('UU lib/file0.rb')
-      stdout('UU lib/file1.rb')
+      stdout('AA lib/file1.rb')
       stdout('M  lib/file2.rb')
       exit(0)
 
     conflicts = []
     GitBridge.withConflicts (cs) -> conflicts = cs
 
-    expect(conflicts).toEqual(['lib/file0.rb', 'lib/file1.rb'])
+    expect(conflicts).toEqual([
+      { path: 'lib/file0.rb', message: 'both modified' }
+      { path: 'lib/file1.rb', message: 'both added' }
+    ])
     expect(c).toBe('/usr/bin/git')
     expect(a).toEqual(['status', '--porcelain'])
     expect(o).toEqual({ cwd: repoBase() })

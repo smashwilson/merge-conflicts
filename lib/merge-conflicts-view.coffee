@@ -21,11 +21,11 @@ class MergeConflictsView extends View
         @span class: 'pull-right icon icon-unfold', click: 'restore', 'Show'
       @div outlet: 'body', =>
         @ul class: 'block list-group', outlet: 'pathList', =>
-          for p in state.conflicts
+          for {path, message} in state.conflicts
             @li click: 'navigate', class: 'list-item navigate', =>
-              @span class: 'inline-block icon icon-diff-modified status-modified path', p
+              @span class: 'inline-block icon icon-diff-modified status-modified path', path
               @div class: 'pull-right', =>
-                @span class: 'inline-block text-subtle', "modified by both"
+                @span class: 'inline-block text-subtle', message
                 @progress class: 'inline-block', max: 100, value: 0
                 @span class: 'inline-block icon icon-dash staged'
         @div class: 'block pull-right', =>
@@ -74,7 +74,7 @@ class MergeConflictsView extends View
         p = $(item).find('.path').text()
         icon = $(item).find('.staged')
         icon.removeClass 'icon-dash icon-check text-success'
-        if _.contains @state.conflicts, p
+        if _.contains @state.conflictPaths(), p
           icon.addClass 'icon-dash'
         else
           icon.addClass 'icon-check text-success'
@@ -126,6 +126,6 @@ class MergeConflictsView extends View
 
     fullPath = editorView.getEditor().getPath()
     repoPath = atom.project.getRepo().relativize fullPath
-    return unless _.contains state.conflicts, repoPath
+    return unless _.contains state.conflictPaths(), repoPath
 
     new ConflictMarker(state, editorView)
