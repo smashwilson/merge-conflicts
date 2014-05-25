@@ -4,7 +4,7 @@
 {Side, OurSide, TheirSide} = require './side'
 Navigator = require './navigator'
 
-CONFLICT_REGEX = /^<{7} (.+)\r?\n([^]*?)={7}\r?\n([^]*?)>{7} (.+)\r?\n?/mg
+CONFLICT_REGEX = /^<{7} (.+)\r?\n([^]*?)={7}\r?\n([^]*?)>{7} (.+)(?:\r?\n)?/mg
 
 INVALID = null
 TOP = 'top'
