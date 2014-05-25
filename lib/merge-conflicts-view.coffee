@@ -27,7 +27,7 @@ class MergeConflictsView extends View
             @li click: 'navigate', class: 'list-item navigate', =>
               @span class: 'inline-block icon icon-diff-modified status-modified path', p
               @div class: 'pull-right', =>
-                @button click: 'appendResolver', class: 'btn btn-xs btn-success inline-block-tight bReady', style: 'display: none', 'Stage'
+                @button click: 'stageFile', class: 'btn btn-xs btn-success inline-block-tight bReady', style: 'display: none', 'Stage'
                 @span class: 'inline-block text-subtle', message
                 @progress class: 'inline-block', max: 100, value: 0
                 @span class: 'inline-block icon icon-dash staged'
@@ -117,11 +117,13 @@ class MergeConflictsView extends View
   editor: (filePath) ->
     @editorView(filePath).getEditor()
 
-  appendResolver: (event, element) ->
+  stageFile: (event, element) ->
     repoPath = element.parent()?.parent()?.find(".path").text()
     filePath = path.join atom.project.getRepo().getWorkingDirectory(), repoPath
-    atom.workspace.open(filePath)
-    @editorView(filePath).append new ResolverView(@editor(filePath))
+    @editor(filePath).save()
+    GitBridge.add repoPath, =>
+      atom.emit 'merge-conflicts:staged', file: filePath
+      return
 
   @detect: ->
     return unless atom.project.getRepo()
