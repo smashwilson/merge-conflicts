@@ -102,7 +102,7 @@ class MergeConflictsView extends View
 
   sideResolver: (side) ->
     (event) ->
-      p = $(event.target).find('.path').text()
+      p = $(event.target).closest('li').find('.path').text()
       GitBridge.checkoutSide side, p, ->
         full = path.join atom.project.path, p
         atom.emit 'merge-conflicts:resolved', file: full, total: 1, resolved: 1
