@@ -5,6 +5,8 @@ class MergeState
 
   constructor: (@conflicts, @isRebase) ->
 
+  conflictPaths: -> c.path for c in @conflicts
+
   reread: (callback) ->
     GitBridge.withConflicts (@conflicts) =>
       callback(this)
