@@ -27,7 +27,7 @@ class MergeConflictsView extends View
             @li click: 'navigate', class: 'list-item navigate', =>
               @span class: 'inline-block icon icon-diff-modified status-modified path', p
               @div class: 'pull-right', =>
-                @button click: 'stageFile', class: 'btn btn-xs btn-success inline-block-tight bReady', style: 'display: none', 'Stage'
+                @button click: 'stageFile', class: 'btn btn-xs btn-success inline-block-tight stage-ready', style: 'display: none', 'Stage'
                 @span class: 'inline-block text-subtle', message
                 @progress class: 'inline-block', max: 100, value: 0
                 @span class: 'inline-block icon icon-dash staged'
@@ -47,7 +47,7 @@ class MergeConflictsView extends View
       else
         console.log "Unrecognized conflict path: #{p}"
       if event.total is event.resolved
-        $(@pathList.find("li:contains('#{p}') .bReady")?[0]).show()
+        @pathList.find("li:contains('#{p}') .stage-ready").eq(0).show()
 
     @subscribe atom, 'merge-conflicts:staged', => @refresh()
 
@@ -83,7 +83,7 @@ class MergeConflictsView extends View
           icon.addClass 'icon-dash'
         else
           icon.addClass 'icon-check text-success'
-          $(@pathList.find("li:contains('#{p}') .bReady")?[0]).hide()
+          @pathList.find("li:contains('#{p}') .stage-ready").eq(0).hide()
 
       if @state.isEmpty()
         atom.emit 'merge-conflicts:done'
