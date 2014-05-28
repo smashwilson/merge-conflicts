@@ -6,6 +6,7 @@ Conflict = require './conflict'
 SideView = require './side-view'
 NavigationView = require './navigation-view'
 ResolverView = require './resolver-view'
+{EditorAdapter} = require './editor-adapter'
 
 CONFLICT_CLASSES = "conflict-line resolved ours theirs parent dirty"
 OUR_CLASSES = "conflict-line ours"
@@ -20,6 +21,7 @@ class ConflictMarker
 
   constructor: (@state, @editorView) ->
     @conflicts = Conflict.all(@state, @editorView.getEditor())
+    @adapter = EditorAdapter.adapt(@editorView)
 
     @editorView.addClass 'conflicted' if @conflicts
 
@@ -78,7 +80,7 @@ class ConflictMarker
     @editorView.append new ResolverView(@editor())
 
   remark: ->
-    @editorView.renderedLines.children().removeClass(CONFLICT_CLASSES)
+    @adapter.linesElement().children().removeClass(CONFLICT_CLASSES)
     @withConflictSideLines (lines, classes) -> lines.addClass classes
 
   acceptCurrent: ->
