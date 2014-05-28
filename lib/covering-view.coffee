@@ -1,10 +1,14 @@
-{View, $} = require 'atom'
+{EditorView, View, $} = require 'atom'
 _ = require 'underscore-plus'
+{EditorAdapter} = require './editor-adapter'
+
 
 class CoveringView extends View
 
   initialize: (@editorView) ->
-    @appendTo @editorView.overlayer
+    @adapter = EditorAdapter.adapt(@editorView)
+
+    @adapter.append(this)
     @reposition()
 
     @cover().on "changed", => @reposition()
@@ -21,7 +25,7 @@ class CoveringView extends View
 
   reposition: ->
     marker = @cover()
-    anchor = @editorView.renderedLines.offset()
+    anchor = @adapter.linesElement().offset()
     ref = @offsetForMarker marker
 
     @offset top: ref.top + anchor.top
