@@ -1,7 +1,6 @@
 {View, $} = require 'atom'
 _ = require 'underscore-plus'
 
-module.exports =
 class CoveringView extends View
 
   initialize: (@editorView) ->
@@ -48,3 +47,6 @@ class CoveringView extends View
     for e in bindings when e.command is eventName
       original = element.text()
       element.text(_.humanizeKeystroke(e.keystroke) + " #{original}")
+
+module.exports =
+  CoveringView: CoveringView
