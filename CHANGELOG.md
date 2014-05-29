@@ -1,6 +1,7 @@
 ## 1.2.2
 
 - Work seamlessly across React and Classic editors.
+- Show a friendlier error if git isn't found.
 
 ## 1.2.1
 
