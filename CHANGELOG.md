@@ -1,3 +1,7 @@
+## 1.2.2
+
+- Work seamlessly across React and Classic editors.
+
 ## 1.2.1
 
 - Fix resolution context menu items being invoked from a child element.
