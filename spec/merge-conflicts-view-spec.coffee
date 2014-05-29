@@ -57,6 +57,7 @@ describe 'MergeConflictsView', ->
       GitBridge.process = ({stdout, exit}) ->
         stdout("UU #{repoPath 'file2.txt'}")
         exit(0)
+        { process: { on: (err) -> } }
 
       atom.emit 'merge-conflicts:staged', file: fullPath('file1.txt')
       expect(isMarkedWith 'file1.txt', 'check').toBe(true)

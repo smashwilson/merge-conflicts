@@ -28,7 +28,9 @@ class ResolverView extends View
   relativePath: -> atom.project.getRepo().relativize @editor.getUri()
 
   refresh: ->
-    GitBridge.isStaged @relativePath(), (staged) =>
+    GitBridge.isStaged @relativePath(), (err, staged) =>
+      throw err if err?
+
       modified = @editor.isModified()
 
       needsSaved = modified
@@ -46,7 +48,10 @@ class ResolverView extends View
 
   resolve: ->
     @editor.save()
-    GitBridge.add @relativePath(), => @refresh()
+    GitBridge.add @relativePath(), (err) =>
+      throw err if err?
+
+      @refresh()
 
   dismiss: ->
     @hide 'fast', => @remove()

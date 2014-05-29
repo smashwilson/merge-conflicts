@@ -72,7 +72,9 @@ class MergeConflictsView extends View
     @finish(MaybeLaterView)
 
   refresh: ->
-    @state.reread =>
+    @state.reread (err, state) =>
+      throw err if err?
+
       # Any files that were present, but aren't there any more, have been
       # resolved.
       for item in @pathList.find('li')
@@ -103,7 +105,8 @@ class MergeConflictsView extends View
   sideResolver: (side) ->
     (event) ->
       p = $(event.target).closest('li').find('.path').text()
-      GitBridge.checkoutSide side, p, ->
+      GitBridge.checkoutSide side, p, (err) ->
+        throw err if err?
         full = path.join atom.project.path, p
         atom.emit 'merge-conflicts:resolved', file: full, total: 1, resolved: 1
         atom.workspace.open p
@@ -121,14 +124,17 @@ class MergeConflictsView extends View
     repoPath = element.closest('li').find('.path').text()
     filePath = path.join atom.project.getRepo().getWorkingDirectory(), repoPath
     @editor(filePath)?.save()
-    GitBridge.add repoPath, ->
+    GitBridge.add repoPath, (err) ->
+      throw err if err?
       atom.emit 'merge-conflicts:staged', file: filePath
 
   @detect: ->
     return unless atom.project.getRepo()
     return if @instance?
 
-    MergeState.read (state) =>
+    MergeState.read (err, state) =>
+      throw err if err?
+
       if not state.isEmpty()
         view = new MergeConflictsView(state)
         @instance = view
