@@ -1,9 +1,10 @@
-{EditorView} = require 'atom'
+{EditorView, $} = require 'atom'
 _ = require 'underscore-plus'
 
 class EditorAdapter
 
   constructor: (@view) ->
+    @editor = @view.getEditor()
 
   append: (child) ->
 
@@ -26,9 +27,9 @@ class ClassicAdapter extends EditorAdapter
 
   linesForMarker: (marker) ->
     fromBuffer = marker.getTailBufferPosition()
-    fromScreen = @view.getEditor().screenPositionForBufferPosition fromBuffer
+    fromScreen = @editor.screenPositionForBufferPosition fromBuffer
     toBuffer = marker.getHeadBufferPosition()
-    toScreen = @view.getEditor().screenPositionForBufferPosition toBuffer
+    toScreen = @editor.screenPositionForBufferPosition toBuffer
 
     low = @view.getFirstVisibleScreenRow()
     high = @view.getLastVisibleScreenRow()
@@ -47,9 +48,9 @@ class ReactAdapter extends EditorAdapter
 
   linesForMarker: (marker) ->
     fromBuffer = marker.getTailBufferPosition()
-    fromScreen = @editor().screenPositionForBufferPosition fromBuffer
+    fromScreen = @editor.screenPositionForBufferPosition fromBuffer
     toBuffer = marker.getHeadBufferPosition()
-    toScreen = @editor().screenPositionForBufferPosition toBuffer
+    toScreen = @editor.screenPositionForBufferPosition toBuffer
 
     result = $()
     for row in _.range(fromScreen.row, toScreen.row)

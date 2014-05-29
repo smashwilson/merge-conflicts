@@ -184,20 +184,7 @@ class ConflictMarker
 
   editor: -> @editorView.getEditor()
 
-  linesForMarker: (marker) ->
-    fromBuffer = marker.getTailBufferPosition()
-    fromScreen = @editor().screenPositionForBufferPosition fromBuffer
-    toBuffer = marker.getHeadBufferPosition()
-    toScreen = @editor().screenPositionForBufferPosition toBuffer
-
-    low = @editorView.getFirstVisibleScreenRow()
-    high = @editorView.getLastVisibleScreenRow()
-
-    result = $()
-    for row in _.range(fromScreen.row, toScreen.row)
-      if low <= row and row <= high
-        result = result.add @editorView.lineElementForScreenRow row
-    result
+  linesForMarker: (marker) -> @adapter.linesForMarker(marker)
 
   combineSides: (first, second) ->
     text = @editor().getTextInBufferRange second.marker.getBufferRange()
