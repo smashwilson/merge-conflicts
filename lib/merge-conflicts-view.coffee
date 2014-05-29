@@ -8,6 +8,7 @@ MergeState = require './merge-state'
 ResolverView = require './resolver-view'
 ConflictMarker = require './conflict-marker'
 {SuccessView, MaybeLaterView, NothingToMergeView} = require './message-views'
+handleErr = require './error-view'
 
 module.exports =
 class MergeConflictsView extends View
@@ -133,7 +134,7 @@ class MergeConflictsView extends View
     return if @instance?
 
     MergeState.read (err, state) =>
-      throw err if err?
+      return if handleErr(err)
 
       if not state.isEmpty()
         view = new MergeConflictsView(state)

@@ -4,6 +4,9 @@ path = require 'path'
 
 class GitNotFoundError extends Error
 
+  constructor: (message) ->
+    super(message)
+
 class GitBridge
 
   # Indirection for Mockability (tm)
@@ -26,6 +29,7 @@ class GitBridge
 
   @withConflicts: (handler) ->
     conflicts = []
+    errMessage = []
 
     stdoutHandler = (chunk) =>
       @_statusCodesFrom chunk, (index, work, p) ->
@@ -36,13 +40,13 @@ class GitBridge
           conflicts.push path: p, message: 'both added'
 
     stderrHandler = (line) ->
-      console.log("git status error: #{line}")
+      errMessage.push line
 
     exitHandler = (code) ->
       if code is 0
         handler(null, conflicts)
       else
-        handler(new Error("abnormal git exit: #{code}"), null)
+        handler(new Error("abnormal git exit: #{code}\n" + errMessage.join("\n")), null)
 
     proc = @process({
       command: @_gitCommand(),
@@ -54,7 +58,7 @@ class GitBridge
     })
 
     proc.process.on 'error', (err) ->
-      handler(new GitNotFoundError, null)
+      handler(new GitNotFoundError(errMessage.join("\n")), null)
 
   @isStaged: (filepath, handler) ->
     staged = true
