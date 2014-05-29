@@ -1,5 +1,6 @@
 {View} = require 'atom'
 {GitBridge} = require './git-bridge'
+handleErr = require './error-view'
 
 module.exports =
 class ResolverView extends View
@@ -29,7 +30,7 @@ class ResolverView extends View
 
   refresh: ->
     GitBridge.isStaged @relativePath(), (err, staged) =>
-      throw err if err?
+      return if handleErr(err)
 
       modified = @editor.isModified()
 
@@ -49,7 +50,7 @@ class ResolverView extends View
   resolve: ->
     @editor.save()
     GitBridge.add @relativePath(), (err) =>
-      throw err if err?
+      return if handleErr(err)
 
       @refresh()
 
