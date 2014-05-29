@@ -3,7 +3,7 @@ _ = require 'underscore-plus'
 path = require 'path'
 {Subscriber} = require 'emissary'
 
-GitBridge = require './git-bridge'
+{GitBridge} = require './git-bridge'
 MergeState = require './merge-state'
 ResolverView = require './resolver-view'
 ConflictMarker = require './conflict-marker'

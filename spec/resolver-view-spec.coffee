@@ -1,5 +1,5 @@
 ResolverView = require '../lib/resolver-view'
-GitBridge = require '../lib/git-bridge'
+{GitBridge} = require '../lib/git-bridge'
 
 describe 'ResolverView', ->
   [view, fakeEditor] = []

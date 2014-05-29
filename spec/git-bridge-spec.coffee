@@ -1,4 +1,4 @@
-GitBridge = require '../lib/git-bridge'
+{GitBridge} = require '../lib/git-bridge'
 {BufferedProcess} = require 'atom'
 path = require 'path'
 

@@ -1,5 +1,5 @@
 {View} = require 'atom'
-GitBridge = require './git-bridge'
+{GitBridge} = require './git-bridge'
 
 module.exports =
 class ResolverView extends View

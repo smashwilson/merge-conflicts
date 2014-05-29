@@ -1,4 +1,4 @@
-GitBridge = require './git-bridge'
+{GitBridge} = require './git-bridge'
 
 module.exports =
 class MergeState

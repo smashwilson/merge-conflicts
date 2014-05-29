@@ -4,7 +4,6 @@ path = require 'path'
 
 class GitNotFoundError extends Error
 
-module.exports =
 class GitBridge
 
   # Indirection for Mockability (tm)
@@ -127,3 +126,7 @@ class GitBridge
     irebaseDir = path.join root, 'rebase-merge'
     irebaseStat = fs.statSyncNoException(irebaseDir)
     irebaseStat && irebaseStat.isDirectory()
+
+module.exports =
+  GitBridge: GitBridge
+  GitNotFoundError: GitNotFoundError
