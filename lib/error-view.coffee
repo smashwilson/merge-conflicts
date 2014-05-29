@@ -4,17 +4,19 @@
 class GitNotFoundErrorView extends View
 
   @content: (err) ->
-    @div class: 'overlay from-top padded merge-conflict-error', =>
-      @div class: 'block error-message', =>
-        @code 'git'
-        @text "can't be found at "
-        @code atom.config.get 'merge-conflicts.gitPath'
-        @text '!'
-      @div class: 'block',
-        'Please fix the path in your settings.'
-      @div class: 'block', =>
-        @button class: 'btn btn-primary inline-block-tight', click: 'openSettings', 'Open Settings'
-        @button class: 'btn inline-block-tight', click: 'notRightNow', 'Not Right Now'
+    @div class: 'overlay from-top padded merge-conflict-error merge-conflicts-message', =>
+      @div class: 'panel', =>
+        @div class: "panel-heading text-error", =>
+          @code 'git'
+          @text "can't be found at "
+          @code atom.config.get 'merge-conflicts.gitPath'
+          @text '!'
+        @div class: 'panel-body', =>
+          @div class: 'block',
+            'Please fix the path in your settings.'
+          @div class: 'block', =>
+            @button class: 'btn btn-error inline-block-tight', click: 'openSettings', 'Open Settings'
+            @button class: 'btn inline-block-tight', click: 'notRightNow', 'Not Right Now'
 
   openSettings: ->
     atom.workspace.open 'atom://config'
