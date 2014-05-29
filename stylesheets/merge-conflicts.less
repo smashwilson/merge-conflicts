@@ -52,8 +52,17 @@
   .stage .text-success { display: none; }
 }
 
+// Temporary React editor workaround.
+.panes .pane .item-views > .react-wrapper > .overlay.resolver {
+  left: 50%;
+  padding: 10px;
+  bottom: auto;
+}
+
 .editor.conflicted {
   .conflict-line {
+    width: 100%;
+
     &.ours {
       background: mix(@ui-site-color-1, @base-background-color);
     }
