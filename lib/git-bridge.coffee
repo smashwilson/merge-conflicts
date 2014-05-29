@@ -2,7 +2,11 @@
 fs = require 'fs'
 path = require 'path'
 
-module.exports =
+class GitNotFoundError extends Error
+
+  constructor: (message) ->
+    super(message)
+
 class GitBridge
 
   # Indirection for Mockability (tm)
@@ -25,6 +29,7 @@ class GitBridge
 
   @withConflicts: (handler) ->
     conflicts = []
+    errMessage = []
 
     stdoutHandler = (chunk) =>
       @_statusCodesFrom chunk, (index, work, p) ->
@@ -35,13 +40,15 @@ class GitBridge
           conflicts.push path: p, message: 'both added'
 
     stderrHandler = (line) ->
-      console.log("git status error: #{line}")
+      errMessage.push line
 
     exitHandler = (code) ->
-      throw new Error("git status exit: #{code}") unless code is 0
-      handler(conflicts)
+      if code is 0
+        handler(null, conflicts)
+      else
+        handler(new Error("abnormal git exit: #{code}\n" + errMessage.join("\n")), null)
 
-    @process({
+    proc = @process({
       command: @_gitCommand(),
       args: ['status', '--porcelain'],
       options: { cwd: @_repoWorkDir() },
@@ -49,6 +56,9 @@ class GitBridge
       stderr: stderrHandler,
       exit: exitHandler
     })
+
+    proc.process.on 'error', (err) ->
+      handler(new GitNotFoundError(errMessage.join("\n")), null)
 
   @isStaged: (filepath, handler) ->
     staged = true
@@ -61,10 +71,12 @@ class GitBridge
       console.log("git status error: #{chunk}")
 
     exitHandler = (code) ->
-      throw Error("git status exit: #{code}") unless code is 0
-      handler(staged)
+      if code is 0
+        handler(null, staged)
+      else
+        handler(new Error("git status exit: #{code}"), null)
 
-    @process({
+    proc = @process({
       command: @_gitCommand(),
       args: ['status', '--porcelain', filepath],
       options: { cwd: @_repoWorkDir() },
@@ -73,17 +85,25 @@ class GitBridge
       exit: exitHandler
     })
 
+    proc.process.on 'error', (err) ->
+      handler(new GitNotFoundError, null)
+
   @checkoutSide: (sideName, filepath, callback) ->
-    @process({
+    proc = @process({
       command: @_gitCommand(),
       args: ['checkout', "--#{sideName}", filepath],
       options: { cwd: @_repoWorkDir() },
       stdout: (line) -> console.log line
       stderr: (line) -> console.log line
       exit: (code) ->
-        throw Error("git checkout exit: #{code}") unless code is 0
-        callback()
+        if code is 0
+          callback(null)
+        else
+          callback(new Error("git checkout exit: #{code}"))
     })
+
+    proc.process.on 'error', (err) ->
+      callback(new GitNotFoundError)
 
   @add: (filepath, callback) ->
     @process({
@@ -96,7 +116,7 @@ class GitBridge
         if code is 0
           callback()
         else
-          throw Error("git add failed: exit code #{code}")
+          callback(new Error("git add failed: exit code #{code}"))
     })
 
   @isRebasing: ->
@@ -110,3 +130,7 @@ class GitBridge
     irebaseDir = path.join root, 'rebase-merge'
     irebaseStat = fs.statSyncNoException(irebaseDir)
     irebaseStat && irebaseStat.isDirectory()
+
+module.exports =
+  GitBridge: GitBridge
+  GitNotFoundError: GitNotFoundError

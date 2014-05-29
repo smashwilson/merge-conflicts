@@ -1,4 +1,4 @@
-GitBridge = require '../lib/git-bridge'
+{GitBridge} = require '../lib/git-bridge'
 {BufferedProcess} = require 'atom'
 path = require 'path'
 
@@ -17,9 +17,12 @@ describe 'GitBridge', ->
       stdout('AA lib/file1.rb')
       stdout('M  lib/file2.rb')
       exit(0)
+      { process: { on: (callback) -> } }
 
     conflicts = []
-    GitBridge.withConflicts (cs) -> conflicts = cs
+    GitBridge.withConflicts (err, cs) ->
+      throw err if err
+      conflicts = cs
 
     expect(conflicts).toEqual([
       { path: 'lib/file0.rb', message: 'both modified' }
@@ -35,8 +38,12 @@ describe 'GitBridge', ->
       GitBridge.process = ({stdout, exit}) ->
         stdout("#{status} lib/file2.txt")
         exit(0)
+        { process: { on: (callback) -> } }
+
       staged = null
-      GitBridge.isStaged checkPath, (b) -> staged = b
+      GitBridge.isStaged checkPath, (err, b) ->
+        throw err if err
+        staged = b
       staged
 
     it 'is true if already resolved', ->
@@ -56,9 +63,12 @@ describe 'GitBridge', ->
     GitBridge.process = ({command, args, options, exit}) ->
       [c, a, o] = [command, args, options]
       exit(0)
+      { process: { on: (callback) -> } }
 
     called = false
-    GitBridge.checkoutSide 'ours', 'lib/file1.txt', -> called = true
+    GitBridge.checkoutSide 'ours', 'lib/file1.txt', (err) ->
+      throw err if err
+      called = true
 
     expect(called).toBe(true)
     expect(c).toBe('/usr/bin/git')
@@ -72,7 +82,9 @@ describe 'GitBridge', ->
       exit(0)
 
     called = false
-    GitBridge.add 'lib/file1.txt', -> called = true
+    GitBridge.add 'lib/file1.txt', (err) ->
+      throw err if err
+      called = true
 
     expect(called).toBe(true)
     expect(c).toBe('/usr/bin/git')

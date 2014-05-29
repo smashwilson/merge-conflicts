@@ -1,5 +1,5 @@
 ResolverView = require '../lib/resolver-view'
-GitBridge = require '../lib/git-bridge'
+{GitBridge} = require '../lib/git-bridge'
 
 describe 'ResolverView', ->
   [view, fakeEditor] = []
@@ -17,6 +17,7 @@ describe 'ResolverView', ->
     GitBridge.process = ({stdout, exit}) ->
       stdout('UU lib/file1.txt')
       exit(0)
+      { process: { on: (err) -> } }
 
   it 'begins needing both saving and staging', ->
     view.refresh()
@@ -36,6 +37,7 @@ describe 'ResolverView', ->
       if 'status' in args
         stdout('M  lib/file1.txt')
         exit(0)
+      { process: { on: (err) -> } }
 
     spyOn(fakeEditor, 'save')
 

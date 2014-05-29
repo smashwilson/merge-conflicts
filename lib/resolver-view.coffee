@@ -1,5 +1,6 @@
 {View} = require 'atom'
-GitBridge = require './git-bridge'
+{GitBridge} = require './git-bridge'
+handleErr = require './error-view'
 
 module.exports =
 class ResolverView extends View
@@ -28,7 +29,9 @@ class ResolverView extends View
   relativePath: -> atom.project.getRepo().relativize @editor.getUri()
 
   refresh: ->
-    GitBridge.isStaged @relativePath(), (staged) =>
+    GitBridge.isStaged @relativePath(), (err, staged) =>
+      return if handleErr(err)
+
       modified = @editor.isModified()
 
       needsSaved = modified
@@ -46,7 +49,10 @@ class ResolverView extends View
 
   resolve: ->
     @editor.save()
-    GitBridge.add @relativePath(), => @refresh()
+    GitBridge.add @relativePath(), (err) =>
+      return if handleErr(err)
+
+      @refresh()
 
   dismiss: ->
     @hide 'fast', => @remove()

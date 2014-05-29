@@ -1,5 +1,5 @@
 ConflictMarker = require '../lib/conflict-marker'
-GitBridge = require '../lib/git-bridge'
+{GitBridge} = require '../lib/git-bridge'
 util = require './util'
 
 describe 'ConflictMarker', ->
