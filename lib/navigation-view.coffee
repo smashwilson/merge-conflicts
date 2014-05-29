@@ -1,4 +1,4 @@
-CoveringView = require './covering-view'
+{CoveringView} = require './covering-view'
 
 module.exports =
 class NavigationView extends CoveringView
