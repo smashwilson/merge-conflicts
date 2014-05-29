@@ -2,6 +2,8 @@
 fs = require 'fs'
 path = require 'path'
 
+class GitNotFoundError extends Error
+
 module.exports =
 class GitBridge
 
@@ -38,10 +40,12 @@ class GitBridge
       console.log("git status error: #{line}")
 
     exitHandler = (code) ->
-      throw new Error("git status exit: #{code}") unless code is 0
-      handler(conflicts)
+      if code is 0
+        handler(null, conflicts)
+      else
+        handler(new Error("abnormal git exit: #{code}"), null)
 
-    @process({
+    proc = @process({
       command: @_gitCommand(),
       args: ['status', '--porcelain'],
       options: { cwd: @_repoWorkDir() },
@@ -49,6 +53,9 @@ class GitBridge
       stderr: stderrHandler,
       exit: exitHandler
     })
+
+    proc.process.on 'error', (err) ->
+      handler(new GitNotFoundError, null)
 
   @isStaged: (filepath, handler) ->
     staged = true
@@ -61,10 +68,12 @@ class GitBridge
       console.log("git status error: #{chunk}")
 
     exitHandler = (code) ->
-      throw Error("git status exit: #{code}") unless code is 0
-      handler(staged)
+      if code is 0
+        handler(null, staged)
+      else
+        handler(new Error("git status exit: #{code}"), null)
 
-    @process({
+    proc = @process({
       command: @_gitCommand(),
       args: ['status', '--porcelain', filepath],
       options: { cwd: @_repoWorkDir() },
@@ -73,17 +82,25 @@ class GitBridge
       exit: exitHandler
     })
 
+    proc.process.on 'error', (err) ->
+      handler(new GitNotFoundError, null)
+
   @checkoutSide: (sideName, filepath, callback) ->
-    @process({
+    proc = @process({
       command: @_gitCommand(),
       args: ['checkout', "--#{sideName}", filepath],
       options: { cwd: @_repoWorkDir() },
       stdout: (line) -> console.log line
       stderr: (line) -> console.log line
       exit: (code) ->
-        throw Error("git checkout exit: #{code}") unless code is 0
-        callback()
+        if code is 0
+          callback(null)
+        else
+          callback(new Error("git checkout exit: #{code}"))
     })
+
+    proc.process.on 'error', (err) ->
+      callback(new GitNotFoundError)
 
   @add: (filepath, callback) ->
     @process({
@@ -96,7 +113,7 @@ class GitBridge
         if code is 0
           callback()
         else
-          throw Error("git add failed: exit code #{code}")
+          callback(new Error("git add failed: exit code #{code}"))
     })
 
   @isRebasing: ->
