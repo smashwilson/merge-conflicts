@@ -6,7 +6,7 @@ class GitNotFoundErrorView extends View
   @content: (err) ->
     @div class: 'overlay from-top padded merge-conflict-error merge-conflicts-message', =>
       @div class: 'panel', =>
-        @div class: "panel-heading text-error", =>
+        @div class: "panel-heading", =>
           @code 'git'
           @text "can't be found at "
           @code atom.config.get 'merge-conflicts.gitPath'
