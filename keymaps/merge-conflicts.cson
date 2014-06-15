@@ -8,9 +8,7 @@
 # For more detailed documentation see
 # https://atom.io/docs/latest/advanced/keymaps
 
-# Mac OS
-
-'.platform-darwin .editor.conflicted':
+'.editor.conflicted':
   'cmd-m down': 'merge-conflicts:next-unresolved'
   'cmd-m up': 'merge-conflicts:previous-unresolved'
   'cmd-m enter': 'merge-conflicts:accept-current'
@@ -18,31 +16,5 @@
   'cmd-m 1': 'merge-conflicts:accept-ours'
   'cmd-m 2': 'merge-conflicts:accept-theirs'
 
-'.platform-darwin .workspace':
+'.workspace':
   'cmd-m d': 'merge-conflicts:detect'
-
-# Linux
-
-'.platform-linux .editor.conflicted':
-  'ctrl-m down': 'merge-conflicts:next-unresolved'
-  'ctrl-m up': 'merge-conflicts:previous-unresolved'
-  'ctrl-m enter': 'merge-conflicts:accept-current'
-  'ctrl-m r': 'merge-conflicts:revert-current'
-  'ctrl-m 1': 'merge-conflicts:accept-ours'
-  'ctrl-m 2': 'merge-conflicts:accept-theirs'
-
-'.platform-linux .workspace':
-  'ctrl-m d': 'merge-conflicts:detect'
-
-# Win32
-
-'.platform-win32 .editor.conflicted':
-  'ctrl-m down': 'merge-conflicts:next-unresolved'
-  'ctrl-m up': 'merge-conflicts:previous-unresolved'
-  'ctrl-m enter': 'merge-conflicts:accept-current'
-  'ctrl-m r': 'merge-conflicts:revert-current'
-  'ctrl-m 1': 'merge-conflicts:accept-ours'
-  'ctrl-m 2': 'merge-conflicts:accept-theirs'
-
-'.platform-win32 .workspace':
-  'ctrl-m d': 'merge-conflicts:detect'
