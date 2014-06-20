@@ -32,7 +32,7 @@ describe 'ConflictMarker', ->
     expect(editorView.hasClass 'conflicted').toBe(true)
 
   it 'removes any old classes', ->
-    line = editorView.renderedLines.eq(2)
+    line = editorView.find('.line').eq(2)
     line.addClass "ours"
     m.remark()
     expect(line.hasClass 'ours').toBe(false)
