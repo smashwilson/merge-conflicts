@@ -9,12 +9,12 @@
 # https://atom.io/docs/latest/advanced/keymaps
 
 '.editor.conflicted':
-  'cmd-m down': 'merge-conflicts:next-unresolved'
-  'cmd-m up': 'merge-conflicts:previous-unresolved'
-  'cmd-m enter': 'merge-conflicts:accept-current'
-  'cmd-m r': 'merge-conflicts:revert-current'
-  'cmd-m 1': 'merge-conflicts:accept-ours'
-  'cmd-m 2': 'merge-conflicts:accept-theirs'
+  'ctrl-m down': 'merge-conflicts:next-unresolved'
+  'ctrl-m up': 'merge-conflicts:previous-unresolved'
+  'ctrl-m enter': 'merge-conflicts:accept-current'
+  'ctrl-m r': 'merge-conflicts:revert-current'
+  'ctrl-m 1': 'merge-conflicts:accept-ours'
+  'ctrl-m 2': 'merge-conflicts:accept-theirs'
 
 '.workspace':
-  'cmd-m d': 'merge-conflicts:detect'
+  'ctrl-m d': 'merge-conflicts:detect'
