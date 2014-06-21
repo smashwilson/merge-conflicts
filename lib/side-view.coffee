@@ -37,9 +37,8 @@ class SideView extends CoveringView
       @side.originalText
 
   detectDirty: ->
-    wasDirty = @side.isDirty
     currentText = @editor().getTextInBufferRange @side.marker.getBufferRange()
     @side.isDirty = currentText isnt @side.originalText
 
-    @addClass 'dirty' if @side.isDirty and not wasDirty
-    @removeClass 'dirty' if not @side.isDirty and wasDirty
+    @removeClass 'dirty'
+    @addClass 'dirty' if @side.isDirty
