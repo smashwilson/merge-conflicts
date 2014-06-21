@@ -82,7 +82,7 @@ class ConflictMarker
     v.detectDirty() for v in @coveringViews
 
   remark: ->
-    @adapter.linesElement().children().removeClass(CONFLICT_CLASSES)
+    @adapter.linesElement().children('.line').removeClass(CONFLICT_CLASSES)
     @withConflictSideLines (lines, classes) -> lines.addClass classes
 
   acceptCurrent: ->
