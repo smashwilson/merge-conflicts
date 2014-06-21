@@ -24,14 +24,6 @@ class SideView extends CoveringView
       @deleteMarker @side.marker unless @side.wasChosen()
       @remove()
 
-    @side.marker.on 'changed', (event) =>
-      marker = @side.marker
-
-      tailSame = event.oldTailBufferPosition.isEqual marker.getTailBufferPosition()
-      headDifferent = not event.oldHeadBufferPosition.isEqual marker.getHeadBufferPosition()
-
-      @detectDirty() if tailSame and headDifferent
-
   cover: -> @side.refBannerMarker
 
   conflict: -> @side.conflict
