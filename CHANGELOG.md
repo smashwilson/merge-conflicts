@@ -1,3 +1,12 @@
+## 1.2.3
+
+- Fix a regression in detecting dirty conflict hunks.
+- Highlight the cursor line within conflict hunks.
+- `Resolve: Ours Then Theirs` and `Resolve: Theirs Then Ours` work properly when rebasing.
+- Correct React editor style to accomodate markup changes.
+- Use `Ctrl-M` keybindings across all platforms.
+- Cosmetic change to the error view.
+
 ## 1.2.2
 
 - Work seamlessly across React and Classic editors.
