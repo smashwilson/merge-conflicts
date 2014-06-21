@@ -24,14 +24,6 @@ class SideView extends CoveringView
       @deleteMarker @side.marker unless @side.wasChosen()
       @remove()
 
-    @side.marker.on 'changed', (event) =>
-      marker = @side.marker
-
-      tailSame = event.oldTailBufferPosition.isEqual marker.getTailBufferPosition()
-      headDifferent = not event.oldHeadBufferPosition.isEqual marker.getHeadBufferPosition()
-
-      @detectDirty() if tailSame and headDifferent
-
   cover: -> @side.refBannerMarker
 
   conflict: -> @side.conflict
@@ -45,9 +37,8 @@ class SideView extends CoveringView
       @side.originalText
 
   detectDirty: ->
-    wasDirty = @side.isDirty
     currentText = @editor().getTextInBufferRange @side.marker.getBufferRange()
     @side.isDirty = currentText isnt @side.originalText
 
-    @addClass 'dirty' if @side.isDirty and not wasDirty
-    @removeClass 'dirty' if not @side.isDirty and wasDirty
+    @removeClass 'dirty'
+    @addClass 'dirty' if @side.isDirty
