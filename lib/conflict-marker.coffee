@@ -104,17 +104,11 @@ class ConflictMarker
 
   acceptOursThenTheirs: ->
     for side in @active()
-      point = @combineSides side.conflict.ours, side.conflict.theirs
-      m = side.conflict.navigator.separatorMarker
-      m.setTailBufferPosition point
-      side.conflict.ours.resolve()
+      @combineSides side.conflict.ours, side.conflict.theirs
 
   acceptTheirsThenOurs: ->
     for side in @active()
-      point = @combineSides side.conflict.theirs, side.conflict.ours
-      m = side.conflict.theirs.refBannerMarker
-      m.setTailBufferPosition point
-      side.conflict.theirs.resolve()
+      @combineSides side.conflict.theirs, side.conflict.ours
 
   nextUnresolved: ->
     final = _.last @active()
@@ -191,7 +185,8 @@ class ConflictMarker
     e = first.marker.getBufferRange().end
     insertPoint = @editor().setTextInBufferRange([e, e], text).end
     first.marker.setHeadBufferPosition insertPoint
-    insertPoint
+    first.followingMarker.setTailBufferPosition insertPoint
+    first.resolve()
 
   withConflictSideLines: (callback) ->
     for c in @conflicts

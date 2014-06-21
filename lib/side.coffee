@@ -2,6 +2,7 @@ class Side
   constructor: (@originalText, @ref, @marker, @refBannerMarker, @position) ->
     @conflict = null
     @isDirty = false
+    @followingMarker = null
 
   resolve: -> @conflict.resolveAs this
 
