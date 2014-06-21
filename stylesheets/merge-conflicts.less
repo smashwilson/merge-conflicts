@@ -4,6 +4,14 @@
 // for a full listing of what's available.
 @import "ui-variables";
 
+@ours-line-color: mix(@ui-site-color-1, @base-background-color);
+@ours-current-color: darken(@ours-line-color, 10%);
+@theirs-line-color: mix(@ui-site-color-2, @base-background-color);
+@theirs-current-color: darken(@theirs-line-color, 10%);
+@dirty-line-color: darken(@ui-site-color-5, 40%);
+@dirty-current-color: darken(@ui-site-color-5, 30%);
+@resolved-line-color: @background-color-highlight;
+
 .merge-conflicts {
   .navigate {
     cursor: pointer;
@@ -64,19 +72,22 @@
     width: 100%;
 
     &.ours {
-      background: mix(@ui-site-color-1, @base-background-color);
+      background: @ours-line-color;
+      &.cursor-line { background: @ours-current-color; }
     }
 
     &.theirs {
-      background: mix(@ui-site-color-2, @base-background-color);
+      background: @theirs-line-color;
+      &.cursor-line { background: @theirs-current-color; }
     }
 
     &.resolved {
-      background: @background-color-highlight;
+      background: @resolved-line-color;
     }
 
     &.dirty {
-      background: darken(@ui-site-color-5, 40%);
+      background: @dirty-line-color;
+      &.cursor-line { background: @dirty-current-color; }
     }
   }
 
