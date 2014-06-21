@@ -21,6 +21,9 @@ class CoveringView extends View
 
   isDirty: -> false
 
+  # Override to determine if the content of this Side has been modified.
+  detectDirty: -> null
+
   getModel: -> null
 
   reposition: ->

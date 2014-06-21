@@ -52,7 +52,9 @@ class ConflictMarker
       @conflictsResolved()
 
   installEvents: ->
-    @editorView.on 'editor:display-updated', => @remark()
+    @subscribe @editor(), 'contents-modified', => @detectDirty()
+    @subscribe @editorView, 'editor:display-updated', => @remark()
+    @subscribe @editorView, 'editor:will-be-removed', => @cleanup()
 
     @editorView.command 'merge-conflicts:accept-current', => @acceptCurrent()
     @editorView.command 'merge-conflicts:accept-ours', => @acceptOurs()
@@ -67,9 +69,6 @@ class ConflictMarker
       if file is @editor().getPath() and total is resolved
         @conflictsResolved()
 
-    @subscribe @editorView, 'editor:will-be-removed', =>
-      @cleanup()
-
   cleanup: ->
     @unsubscribe()
     v.remove() for v in @coveringViews
@@ -78,6 +77,9 @@ class ConflictMarker
   conflictsResolved: ->
     @cleanup()
     @editorView.append new ResolverView(@editor())
+
+  detectDirty: ->
+    v.detectDirty() for v in @coveringViews
 
   remark: ->
     @adapter.linesElement().children().removeClass(CONFLICT_CLASSES)
