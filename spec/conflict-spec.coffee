@@ -27,6 +27,10 @@ describe "Conflict", ->
       expect(conflict.ours.position).toBe('top')
       expect(conflict.theirs.position).toBe('bottom')
 
+    it 'links each side to the following marker', ->
+      expect(conflict.ours.followingMarker).toBe(conflict.navigator.separatorMarker)
+      expect(conflict.theirs.followingMarker).toBe(conflict.theirs.refBannerMarker)
+
   it "finds multiple conflict markings", ->
     editorView = util.openPath('multi-2way-diff.txt')
     cs = Conflict.all({}, editorView.getEditor())
@@ -55,6 +59,10 @@ describe "Conflict", ->
     it 'marks "theirs" as the top and "ours" as the bottom', ->
       expect(conflict.theirs.position).toBe('top')
       expect(conflict.ours.position).toBe('bottom')
+
+    it 'links each side to the following marker', ->
+      expect(conflict.theirs.followingMarker).toBe(conflict.navigator.separatorMarker)
+      expect(conflict.ours.followingMarker).toBe(conflict.ours.refBannerMarker)
 
   describe 'sides', ->
     [editor, conflict] = []

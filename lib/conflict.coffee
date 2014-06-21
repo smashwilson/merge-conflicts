@@ -29,6 +29,10 @@ class Marker
 
     @currentRow = @startRow
     @position = TOP
+    @previousSide = null
+
+  finish: ->
+    @previousSide.followingMarker = @previousSide.refBannerMarker
 
   markOurs: -> @_markHunk OurSide
 
@@ -43,6 +47,9 @@ class Marker
     marker = @editor.markBufferRange(
       [[sepRowStart, 0], [sepRowEnd, 0]], @options
     )
+
+    # @previousSide should always be populated because @position is MIDDLE.
+    @previousSide.followingMarker = marker
 
     new Navigator marker
 
@@ -81,7 +88,9 @@ class Marker
       [[rowStart, 0], [rowEnd, 0]], @options
     )
 
-    new sideKlass(text, ref, marker, bannerMarker, sidePosition)
+    side = new sideKlass(text, ref, marker, bannerMarker, sidePosition)
+    @previousSide = side
+    side
 
   _advance: (rowCount) -> @currentRow += rowCount
 
@@ -120,6 +129,8 @@ class Conflict
         ours = marker.markOurs()
         nav = marker.markSeparator()
         theirs = marker.markTheirs()
+
+      marker.finish()
 
       c = new Conflict(ours, theirs, null, nav, state)
       results.push c
