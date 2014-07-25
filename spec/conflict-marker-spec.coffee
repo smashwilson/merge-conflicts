@@ -33,25 +33,17 @@ describe 'ConflictMarker', ->
     it 'adds the conflicted class', ->
       expect(editorView.hasClass 'conflicted').toBe(true)
 
-    it 'removes any old classes', ->
-      line = editorView.find('.line').eq(2)
-      line.addClass "ours"
-      m.remark()
-      expect(line.hasClass 'ours').toBe(false)
-
     it 'locates the correct lines', ->
       lines = m.linesForMarker m.conflicts[1].ours.marker
       expect(lines.text()).toBe("My middle changes")
 
     it 'applies the "ours" class to our sides of conflicts', ->
       lines = m.linesForMarker m.conflicts[0].ours.marker
-      expect(lines.hasClass 'conflict-line').toBe(true)
-      expect(lines.hasClass 'ours').toBe(true)
+      expect(lines.hasClass 'conflict-ours').toBe(true)
 
     it 'applies the "theirs" class to their sides of conflicts', ->
       lines = m.linesForMarker m.conflicts[0].theirs.marker
-      expect(lines.hasClass 'conflict-line').toBe(true)
-      expect(lines.hasClass 'theirs').toBe(true)
+      expect(lines.hasClass 'conflict-theirs').toBe(true)
 
     it 'applies the "dirty" class to modified sides', ->
       editor = editorView.getEditor()
@@ -61,15 +53,14 @@ describe 'ConflictMarker', ->
 
       m.remark()
       lines = m.linesForMarker m.conflicts[1].ours.marker
-      expect(lines.hasClass 'dirty').toBe(true)
-      expect(lines.hasClass 'ours').toBe(false)
+      expect(lines.hasClass 'conflict-dirty').toBe(true)
+      expect(lines.hasClass 'conflict-ours').toBe(false)
 
     it 'applies the "resolved" class to resolved conflicts', ->
       m.conflicts[1].ours.resolve()
       m.remark()
       lines = m.linesForMarker m.conflicts[1].ours.marker
-      expect(lines.hasClass 'conflict-line').toBe(true)
-      expect(lines.hasClass 'resolved').toBe(true)
+      expect(lines.hasClass 'conflict-resolved').toBe(true)
 
     it 'broadcasts the "merge-conflicts:resolved" event', ->
       event = null
@@ -168,10 +159,6 @@ describe 'ConflictMarker', ->
       it 'removes all of the CoveringViews', ->
         expect(editorView.find('.overlayer .side').length).toBe(0)
         expect(editorView.find('.overlayer .navigation').length).toBe(0)
-
-      it 'removes all line classes', ->
-        for klass in ['ours', 'theirs', 'parent', 'dirty']
-          expect(editorView.find(".lines .#{klass}").length).toBe(0)
 
       it 'removes the .conflicted class', ->
         expect(editorView.hasClass 'conflicted').toBe(false)
