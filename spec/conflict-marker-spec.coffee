@@ -51,16 +51,9 @@ describe 'ConflictMarker', ->
       editor.insertText "Make conflict 1 dirty"
       detectDirty()
 
-      m.remark()
       lines = m.linesForMarker m.conflicts[1].ours.marker
       expect(lines.hasClass 'conflict-dirty').toBe(true)
       expect(lines.hasClass 'conflict-ours').toBe(false)
-
-    it 'applies the "resolved" class to resolved conflicts', ->
-      m.conflicts[1].ours.resolve()
-      m.remark()
-      lines = m.linesForMarker m.conflicts[1].ours.marker
-      expect(lines.hasClass 'conflict-resolved').toBe(true)
 
     it 'broadcasts the "merge-conflicts:resolved" event', ->
       event = null
