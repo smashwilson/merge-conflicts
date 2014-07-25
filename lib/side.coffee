@@ -8,6 +8,15 @@ class Side
 
   wasChosen: -> @conflict.resolution is this
 
+  lineClass: ->
+    if @wasChosen()
+      'conflict-resolved'
+    else if @isDirty
+      'conflict-dirty'
+    else
+      "conflict-#{@klass()}"
+
+
 class OurSide extends Side
 
   site: -> 1
