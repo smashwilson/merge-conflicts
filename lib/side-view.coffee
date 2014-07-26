@@ -41,6 +41,12 @@ class SideView extends CoveringView
 
   isDirty: -> @side.isDirty
 
+  includesCursor: (cursor) ->
+    m = @side.marker
+    [h, t] = [m.getHeadPosition(), m.getTailPosition()]
+    p = cursor.getBufferPosition()
+    h.isLessThanOrEqual(p) and t.isGreaterThanOrEqual(p)
+
   useMe: ->
     @side.resolve()
     @decorate()

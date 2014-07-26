@@ -41,6 +41,8 @@ class CoveringView extends View
 
   buffer: -> @editor().getBuffer()
 
+  includesCursor: (cursor) -> false
+
   offsetForMarker: (marker) ->
     position = marker.getTailBufferPosition()
     @editorView.pixelPositionForBufferPosition position

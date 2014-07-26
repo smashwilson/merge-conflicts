@@ -77,7 +77,15 @@ class ConflictMarker
     @editorView.append new ResolverView(@editor())
 
   detectDirty: ->
-    v.detectDirty() for v in @coveringViews
+    sideViews = (v for v in @coveringViews when v.side?)
+
+    # Only detect dirty regions within CoveringViews that have a cursor within them.
+    potentials = []
+    for c in @editor().getCursors()
+      for v in @coveringViews
+        potentials.push(v) if v.includesCursor(c)
+
+    v.detectDirty() for v in _.uniq(potentials)
 
   acceptCurrent: ->
     sides = @active()
