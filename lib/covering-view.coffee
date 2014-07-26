@@ -24,6 +24,9 @@ class CoveringView extends View
   # Override to determine if the content of this Side has been modified.
   detectDirty: -> null
 
+  # Override to apply a decoration to a marker as appropriate.
+  decorate: -> null
+
   getModel: -> null
 
   reposition: ->
@@ -37,6 +40,8 @@ class CoveringView extends View
   editor: -> @editorView.getEditor()
 
   buffer: -> @editor().getBuffer()
+
+  includesCursor: (cursor) -> false
 
   offsetForMarker: (marker) ->
     position = marker.getTailBufferPosition()

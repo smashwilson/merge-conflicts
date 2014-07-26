@@ -8,12 +8,6 @@ NavigationView = require './navigation-view'
 ResolverView = require './resolver-view'
 {EditorAdapter} = require './editor-adapter'
 
-CONFLICT_CLASSES = "conflict-line resolved ours theirs parent dirty"
-OUR_CLASSES = "conflict-line ours"
-THEIR_CLASSES = "conflict-line theirs"
-RESOLVED_CLASSES = "conflict-line resolved"
-DIRTY_CLASSES = "conflict-line dirty"
-
 module.exports =
 class ConflictMarker
 
@@ -41,7 +35,7 @@ class ConflictMarker
           source: this
 
     if @conflicts.length > 0
-      @remark()
+      cv.decorate() for cv in @coveringViews
       @installEvents()
       @focusConflict @conflicts[0]
     else
@@ -53,7 +47,6 @@ class ConflictMarker
 
   installEvents: ->
     @subscribe @editor(), 'contents-modified', => @detectDirty()
-    @subscribe @editorView, 'editor:display-updated', => @remark()
     @subscribe @editorView, 'editor:will-be-removed', => @cleanup()
 
     @editorView.command 'merge-conflicts:accept-current', => @acceptCurrent()
@@ -79,12 +72,13 @@ class ConflictMarker
     @editorView.append new ResolverView(@editor())
 
   detectDirty: ->
-    v.detectDirty() for v in @coveringViews
-    @remark()
+    # Only detect dirty regions within CoveringViews that have a cursor within them.
+    potentials = []
+    for c in @editor().getCursors()
+      for v in @coveringViews
+        potentials.push(v) if v.includesCursor(c)
 
-  remark: ->
-    @adapter.linesElement().children('.line').removeClass(CONFLICT_CLASSES)
-    @withConflictSideLines (lines, classes) -> lines.addClass classes
+    v.detectDirty() for v in _.uniq(potentials)
 
   acceptCurrent: ->
     sides = @active()
@@ -190,22 +184,6 @@ class ConflictMarker
     first.marker.setHeadBufferPosition insertPoint
     first.followingMarker.setTailBufferPosition insertPoint
     first.resolve()
-
-  withConflictSideLines: (callback) ->
-    for c in @conflicts
-      if c.isResolved()
-        callback(@linesForMarker(c.resolution.marker), RESOLVED_CLASSES)
-        continue
-
-      if c.ours.isDirty
-        callback(@linesForMarker(c.ours.marker), DIRTY_CLASSES)
-      else
-        callback(@linesForMarker(c.ours.marker), OUR_CLASSES)
-
-      if c.theirs.isDirty
-        callback(@linesForMarker(c.theirs.marker), DIRTY_CLASSES)
-      else
-        callback(@linesForMarker(c.theirs.marker), THEIR_CLASSES)
 
   focusConflict: (conflict) ->
     st = conflict.ours.marker.getBufferRange().start

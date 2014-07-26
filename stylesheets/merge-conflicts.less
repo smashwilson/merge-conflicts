@@ -67,28 +67,26 @@
   bottom: auto;
 }
 
+.editor {
+  .conflict-resolved {
+    background: @resolved-line-color;
+  }
+}
+
 .editor.conflicted {
-  .conflict-line {
-    width: 100%;
+  .conflict-ours {
+    background: @ours-line-color;
+    &.cursor-line { background: @ours-current-color; }
+  }
 
-    &.ours {
-      background: @ours-line-color;
-      &.cursor-line { background: @ours-current-color; }
-    }
+  .conflict-theirs {
+    background: @theirs-line-color;
+    &.cursor-line { background: @theirs-current-color; }
+  }
 
-    &.theirs {
-      background: @theirs-line-color;
-      &.cursor-line { background: @theirs-current-color; }
-    }
-
-    &.resolved {
-      background: @resolved-line-color;
-    }
-
-    &.dirty {
-      background: @dirty-line-color;
-      &.cursor-line { background: @dirty-current-color; }
-    }
+  .conflict-dirty {
+    background: @dirty-line-color;
+    &.cursor-line { background: @dirty-current-color; }
   }
 
   .side {
