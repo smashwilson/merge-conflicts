@@ -43,9 +43,9 @@ class SideView extends CoveringView
 
   includesCursor: (cursor) ->
     m = @side.marker
-    [h, t] = [m.getHeadPosition(), m.getTailPosition()]
+    [h, t] = [m.getHeadBufferPosition(), m.getTailBufferPosition()]
     p = cursor.getBufferPosition()
-    h.isLessThanOrEqual(p) and t.isGreaterThanOrEqual(p)
+    t.isLessThanOrEqual(p) and h.isGreaterThanOrEqual(p)
 
   useMe: ->
     @side.resolve()
