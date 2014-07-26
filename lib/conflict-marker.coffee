@@ -8,11 +8,6 @@ NavigationView = require './navigation-view'
 ResolverView = require './resolver-view'
 {EditorAdapter} = require './editor-adapter'
 
-OUR_CLASSES = "conflict-line ours"
-THEIR_CLASSES = "conflict-line theirs"
-RESOLVED_CLASSES = "conflict-line resolved"
-DIRTY_CLASSES = "conflict-line dirty"
-
 module.exports =
 class ConflictMarker
 
