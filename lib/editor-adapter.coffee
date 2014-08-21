@@ -1,4 +1,4 @@
-{EditorView, $} = require 'atom'
+{$} = require 'atom'
 _ = require 'underscore-plus'
 
 class EditorAdapter
@@ -13,10 +13,10 @@ class EditorAdapter
   linesForMarker: (marker) ->
 
   @adapt: (view) ->
-    if view instanceof EditorView
-      new ClassicAdapter(view)
-    else
+    if view.hasClass 'react'
       new ReactAdapter(view)
+    else
+      new ClassicAdapter(view)
 
 
 class ClassicAdapter extends EditorAdapter
