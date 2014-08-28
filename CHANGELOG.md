@@ -1,3 +1,7 @@
+## 1.2.6
+
+- Remove deprecated calls to `keyBindingsMatchingElement` and `keystroke`.
+
 ## 1.2.5
 
 - Use CSS to distinguish EditorViews instead of `instanceof`.
