@@ -61,7 +61,7 @@ class CoveringView extends View
 
     for e in bindings
       original = element.text()
-      element.text(_.humanizeKeystroke(e.keystroke) + " #{original}")
+      element.text(_.humanizeKeystroke(e.keystrokes) + " #{original}")
 
 module.exports =
   CoveringView: CoveringView
