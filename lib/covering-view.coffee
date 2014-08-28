@@ -55,8 +55,11 @@ class CoveringView extends View
     @editor().setCursorBufferPosition positionOrNull if positionOrNull?
 
   prependKeystroke: (eventName, element) ->
-    bindings = atom.keymap.keyBindingsMatchingElement @editorView
-    for e in bindings when e.command is eventName
+    bindings = atom.keymap.findKeyBindings
+      target: @editorView[0]
+      command: eventName
+
+    for e in bindings
       original = element.text()
       element.text(_.humanizeKeystroke(e.keystroke) + " #{original}")
 
