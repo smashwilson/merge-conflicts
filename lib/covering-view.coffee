@@ -30,6 +30,10 @@ class CoveringView extends View
   getModel: -> null
 
   reposition: ->
+    # FIXME this is a workaround for an EditorView bug.
+    # https://github.com/atom/atom/pull/3517
+    @editorView.component.checkForVisibilityChange()
+
     marker = @cover()
     anchor = @editorView.offset()
     ref = @offsetForMarker marker
