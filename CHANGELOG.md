@@ -1,3 +1,7 @@
+## 1.2.7
+
+- Adapt to upstream `EditorView` changes.
+
 ## 1.2.6
 
 - Remove deprecated calls to `keyBindingsMatchingElement` and `keystroke`.
