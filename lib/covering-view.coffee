@@ -37,7 +37,7 @@ class CoveringView extends View
     @offset top: ref.top + anchor.top
     @height @editorView.lineHeight
 
-  editor: -> @editorView.getEditor()
+  editor: -> @editorView.getModel()
 
   buffer: -> @editor().getBuffer()
 
@@ -45,7 +45,7 @@ class CoveringView extends View
 
   offsetForMarker: (marker) ->
     position = marker.getTailBufferPosition()
-    @editorView.pixelPositionForBufferPosition position
+    @editor().pixelPositionForBufferPosition position
 
   deleteMarker: (marker) ->
     @buffer().delete marker.getBufferRange()
