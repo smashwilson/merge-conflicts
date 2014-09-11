@@ -31,7 +31,7 @@ class CoveringView extends View
 
   reposition: ->
     marker = @cover()
-    anchor = @adapter.linesElement().offset()
+    anchor = @editorView.offset()
     ref = @offsetForMarker marker
 
     @offset top: ref.top + anchor.top
