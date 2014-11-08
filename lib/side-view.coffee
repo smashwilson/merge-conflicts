@@ -15,11 +15,11 @@ class SideView extends CoveringView
   initialize: (@side, editorView) ->
     super editorView
 
+    @decoration = null
+
     @detectDirty()
     @prependKeystroke @side.eventName(), @useMeBtn
     @prependKeystroke 'merge-conflicts:revert-current', @revertBtn
-
-    @decoration = null
 
     @side.conflict.on 'conflict:resolved', =>
       @deleteMarker @side.refBannerMarker
@@ -32,10 +32,8 @@ class SideView extends CoveringView
     args =
       type: 'line'
       class: @side.lineClass()
-    if @decoration?
-      @decoration.update(args)
-    else
-      @decoration = @editor().decorateMarker(@side.marker, args)
+    @decoration.destroy() if @decoration?
+    @decoration = @editor().decorateMarker(@side.marker, args)
 
   conflict: -> @side.conflict
 
@@ -64,3 +62,5 @@ class SideView extends CoveringView
 
     @removeClass 'dirty'
     @addClass 'dirty' if @side.isDirty
+
+  toString: -> "{SideView of: #{@side}}"

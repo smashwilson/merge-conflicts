@@ -16,6 +16,14 @@ class Side
     else
       "conflict-#{@klass()}"
 
+  toString: ->
+    text = @originalText.replace(/[\n\r]/, ' ')
+    if text.length > 20
+      text = text[0..17] + "..."
+    dirtyMark = if @isDirty then ' dirty' else ''
+    chosenMark = if @wasChosen() then ' chosen' else ''
+    "[#{@klass()}: #{text} :#{dirtyMark}#{chosenMark}]"
+
 
 class OurSide extends Side
 

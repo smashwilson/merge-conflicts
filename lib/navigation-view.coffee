@@ -26,3 +26,5 @@ class NavigationView extends CoveringView
   down: -> @scrollTo @navigator.nextUnresolved()?.scrollTarget()
 
   conflict: -> @navigator.conflict
+
+  toString: -> "{NavView of: #{@conflict()}}"

@@ -37,8 +37,9 @@ class CoveringView extends View
     marker = @cover()
     anchor = @editorView.offset()
     ref = @offsetForMarker marker
+    scrollTop = @editor().getScrollTop()
 
-    @offset top: ref.top + anchor.top
+    @offset top: ref.top + anchor.top - scrollTop
     @height @editorView.lineHeight
 
   editor: -> @editorView.getModel()
