@@ -12,37 +12,13 @@ class EditorAdapter
 
   linesForMarker: (marker) ->
 
-  @adapt: (view) ->
-    if view.hasClass 'react'
-      new ReactAdapter(view)
-    else
-      new ClassicAdapter(view)
-
-
-class ClassicAdapter extends EditorAdapter
-
-  append: (child) -> child.appendTo @view.overlayer
-
-  linesElement: -> @view.renderedLines
-
-  linesForMarker: (marker) ->
-    fromBuffer = marker.getTailBufferPosition()
-    fromScreen = @editor.screenPositionForBufferPosition fromBuffer
-    toBuffer = marker.getHeadBufferPosition()
-    toScreen = @editor.screenPositionForBufferPosition toBuffer
-
-    low = @view.getFirstVisibleScreenRow()
-    high = @view.getLastVisibleScreenRow()
-
-    result = $()
-    for row in _.range(fromScreen.row, toScreen.row)
-      if low <= row and row <= high
-        result = result.add @view.lineElementForScreenRow row
-    result
+  @adapt: (view) -> new ReactAdapter(view)
 
 class ReactAdapter extends EditorAdapter
 
-  append: (child) -> @view.appendToLinesView(child)
+  append: (child) ->
+    @view.appendToLinesView child
+    child.css('z-index', 2)
 
   linesElement: -> @view.find('.lines')
 
