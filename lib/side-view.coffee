@@ -64,3 +64,5 @@ class SideView extends CoveringView
 
     @removeClass 'dirty'
     @addClass 'dirty' if @side.isDirty
+
+  toString: -> "{SideView of: #{@side}}"

@@ -113,6 +113,8 @@ class Conflict
 
   scrollTarget: -> @ours.marker.getTailBufferPosition()
 
+  toString: -> "[conflict: #{@ours} #{@theirs}]"
+
   @all: (state, editor) ->
     results = []
     previous = null
