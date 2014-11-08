@@ -1,3 +1,8 @@
+## 1.2.8
+
+- Correctly reposition `SideViews` when the editor is scrolled. [#87](https://github.com/smashwilson/merge-conflicts/pull/87)
+- Render `SideView` controls over the text instead of behind it. [#85](https://github.com/smashwilson/merge-conflicts/pull/87)
+
 ## 1.2.7
 
 - Adapt to upstream `EditorView` changes.
