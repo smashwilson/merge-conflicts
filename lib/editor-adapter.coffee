@@ -16,7 +16,9 @@ class EditorAdapter
 
 class ReactAdapter extends EditorAdapter
 
-  append: (child) -> @view.appendToLinesView(child)
+  append: (child) ->
+    @view.appendToLinesView child
+    child.css('z-index', 2)
 
   linesElement: -> @view.find('.lines')
 
