@@ -11,11 +11,18 @@ describe 'ConflictMarker', ->
     for sv in m.coveringViews
       sv.detectDirty() if 'detectDirty' of sv
 
+  beforeEach ->
+    done = false
+
+    GitBridge.locateGitAnd (err) ->
+      throw err if err?
+      done = true
+
+    waitsFor -> done
+
   describe 'with a merge conflict', ->
 
     beforeEach ->
-      GitBridge._gitCommand = -> 'git'
-
       editorView = util.openPath("triple-2way-diff.txt")
       editorView.getFirstVisibleScreenRow = -> 0
       editorView.getLastVisibleScreenRow = -> 999
@@ -163,8 +170,6 @@ describe 'ConflictMarker', ->
     [active] = []
 
     beforeEach ->
-      GitBridge._gitCommand = -> 'git'
-
       editorView = util.openPath("rebase-2way-diff.txt")
       editorView.getFirstVisibleScreenRow = -> 0
       editorView.getLastVisibleScreenRow = -> 999

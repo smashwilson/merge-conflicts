@@ -1,5 +1,6 @@
 ## 1.2.8
 
+- Search for `git` on your PATH or in common install locations if no specific path is provided. [#88](https://github.com/smashwilson/merge-conflicts/pull/88)
 - Correctly reposition `SideViews` when the editor is scrolled. [#87](https://github.com/smashwilson/merge-conflicts/pull/87)
 - Render `SideView` controls over the text instead of behind it. [#85](https://github.com/smashwilson/merge-conflicts/pull/87)
 
