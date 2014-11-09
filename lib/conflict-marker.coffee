@@ -46,8 +46,8 @@ class ConflictMarker
       @conflictsResolved()
 
   installEvents: ->
-    @subscribe @editor(), 'contents-modified', => @detectDirty()
-    @subscribe @editorView, 'editor:will-be-removed', => @cleanup()
+    @editor().onDidStopChanging => @detectDirty()
+    @editor().onDidDestroy => @cleanup()
 
     @editorView.command 'merge-conflicts:accept-current', => @acceptCurrent()
     @editorView.command 'merge-conflicts:accept-ours', => @acceptOurs()
