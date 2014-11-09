@@ -1,4 +1,4 @@
-{EditorView, View, $} = require 'atom'
+{View, $} = require 'atom'
 _ = require 'underscore-plus'
 {EditorAdapter} = require './editor-adapter'
 
@@ -30,7 +30,7 @@ class CoveringView extends View
   getModel: -> null
 
   reposition: ->
-    # FIXME this is a workaround for an EditorView bug.
+    # FIXME this is a workaround for a TextEditorView bug.
     # https://github.com/atom/atom/pull/3517
     @editorView.component.checkForVisibilityChange()
 
