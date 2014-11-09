@@ -187,5 +187,5 @@ class ConflictMarker
 
   focusConflict: (conflict) ->
     st = conflict.ours.marker.getBufferRange().start
-    @editorView.scrollToBufferPosition st, center: true
+    @editor().scrollToBufferPosition st, center: true
     @editor().setCursorBufferPosition st, autoscroll: false
