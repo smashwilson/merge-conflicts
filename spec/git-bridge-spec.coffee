@@ -7,7 +7,14 @@ describe 'GitBridge', ->
   repoBase = -> atom.project.getRepo().getWorkingDirectory()
 
   beforeEach ->
-    GitBridge._gitCommand = -> '/usr/bin/git'
+    done = false
+    atom.config.set('merge-conflicts.gitPath', '/usr/bin/git')
+
+    GitBridge.locateGitAnd (err) ->
+      throw err if err?
+      done = true
+
+    waitsFor -> done
 
   it 'checks git status for merge conflicts', ->
     [c, a, o] = []
