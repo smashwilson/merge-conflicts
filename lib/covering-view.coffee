@@ -11,7 +11,7 @@ class CoveringView extends View
     @adapter.append(this)
     @reposition()
 
-    @cover().on "changed", => @reposition()
+    @cover().onDidChange => @reposition()
 
   # Override to specify the marker of the first line that should be covered.
   cover: -> null
