@@ -19,11 +19,12 @@ describe 'MergeConflictsView', ->
   beforeEach ->
     conflicts = _.map ['file1.txt', 'file2.txt'], (fname) ->
       { path: path.join('spec', 'fixtures', 'path', fname), message: 'both modified' }
-    editorView = util.openPath 'triple-2way-diff.txt'
-    state = new MergeState conflicts, false
-    conflicts = Conflict.all state, editorView.getEditor()
 
-    view = new MergeConflictsView state
+    util.openPath 'triple-2way-diff.txt', (editorView) ->
+      state = new MergeState conflicts, false
+      conflicts = Conflict.all state, editorView.getEditor()
+
+      view = new MergeConflictsView state
 
   describe 'conflict resolution progress', ->
     progressFor = (filename) ->

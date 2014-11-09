@@ -23,15 +23,16 @@ describe 'ConflictMarker', ->
   describe 'with a merge conflict', ->
 
     beforeEach ->
-      editorView = util.openPath("triple-2way-diff.txt")
-      editorView.getFirstVisibleScreenRow = -> 0
-      editorView.getLastVisibleScreenRow = -> 999
+      util.openPath "triple-2way-diff.txt", (v) ->
+        editorView = v
+        editorView.getFirstVisibleScreenRow = -> 0
+        editorView.getLastVisibleScreenRow = -> 999
 
-      editor = editorView.getEditor()
-      state =
-        isRebase: false
+        editor = editorView.getEditor()
+        state =
+          isRebase: false
 
-      m = new ConflictMarker(state, editorView)
+        m = new ConflictMarker(state, editorView)
 
     it 'attaches two SideViews and a NavigationView for each conflict', ->
       expect(editorView.find('.side').length).toBe(6)
@@ -170,18 +171,19 @@ describe 'ConflictMarker', ->
     [active] = []
 
     beforeEach ->
-      editorView = util.openPath("rebase-2way-diff.txt")
-      editorView.getFirstVisibleScreenRow = -> 0
-      editorView.getLastVisibleScreenRow = -> 999
+      util.openPath "rebase-2way-diff.txt", (v) ->
+        editorView = v
+        editorView.getFirstVisibleScreenRow = -> 0
+        editorView.getLastVisibleScreenRow = -> 999
 
-      editor = editorView.getEditor()
-      state =
-        isRebase: true
+        editor = editorView.getEditor()
+        state =
+          isRebase: true
 
-      m = new ConflictMarker(state, editorView)
+        m = new ConflictMarker(state, editorView)
 
-      editor.setCursorBufferPosition [3, 14]
-      active = m.conflicts[0]
+        editor.setCursorBufferPosition [3, 14]
+        active = m.conflicts[0]
 
     it 'accepts theirs-then-ours on merge-conflicts:theirs-then-ours', ->
       editorView.trigger 'merge-conflicts:theirs-then-ours'

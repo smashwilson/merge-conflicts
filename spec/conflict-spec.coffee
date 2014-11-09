@@ -7,8 +7,8 @@ describe "Conflict", ->
     [conflict] = []
 
     beforeEach ->
-      editorView = util.openPath('single-2way-diff.txt')
-      conflict = Conflict.all({ isRebase: false }, editorView.getEditor())[0]
+      util.openPath 'single-2way-diff.txt', (editorView) ->
+        conflict = Conflict.all({ isRebase: false }, editorView.getEditor())[0]
 
     it 'identifies the correct rows', ->
       expect(util.rowRangeFrom conflict.ours.marker).toEqual([1, 2])
@@ -32,21 +32,21 @@ describe "Conflict", ->
       expect(conflict.theirs.followingMarker).toBe(conflict.theirs.refBannerMarker)
 
   it "finds multiple conflict markings", ->
-    editorView = util.openPath('multi-2way-diff.txt')
-    cs = Conflict.all({}, editorView.getEditor())
+    util.openPath 'multi-2way-diff.txt', (editorView) ->
+      cs = Conflict.all({}, editorView.getEditor())
 
-    expect(cs.length).toBe(2)
-    expect(util.rowRangeFrom cs[0].ours.marker).toEqual([5, 7])
-    expect(util.rowRangeFrom cs[0].theirs.marker).toEqual([8, 9])
-    expect(util.rowRangeFrom cs[1].ours.marker).toEqual([14, 15])
-    expect(util.rowRangeFrom cs[1].theirs.marker).toEqual([16, 17])
+      expect(cs.length).toBe(2)
+      expect(util.rowRangeFrom cs[0].ours.marker).toEqual([5, 7])
+      expect(util.rowRangeFrom cs[0].theirs.marker).toEqual([8, 9])
+      expect(util.rowRangeFrom cs[1].ours.marker).toEqual([14, 15])
+      expect(util.rowRangeFrom cs[1].theirs.marker).toEqual([16, 17])
 
   describe 'when rebasing', ->
     [conflict] = []
 
     beforeEach ->
-      editorView = util.openPath 'rebase-2way-diff.txt'
-      conflict = Conflict.all({ isRebase: true }, editorView.getEditor())[0]
+      util.openPath 'rebase-2way-diff.txt', (editorView) ->
+        conflict = Conflict.all({ isRebase: true }, editorView.getEditor())[0]
 
     it 'swaps the lines for "ours" and "theirs"', ->
       expect(util.rowRangeFrom conflict.theirs.marker).toEqual([3, 4])
@@ -68,9 +68,9 @@ describe "Conflict", ->
     [editor, conflict] = []
 
     beforeEach ->
-      editorView = util.openPath('single-2way-diff.txt')
-      editor = editorView.getEditor()
-      [conflict] = Conflict.all {}, editor
+      util.openPath 'single-2way-diff.txt', (editorView) ->
+        editor = editorView.getEditor()
+        [conflict] = Conflict.all {}, editor
 
     it 'retains a reference to conflict', ->
       expect(conflict.ours.conflict).toBe(conflict)
@@ -106,9 +106,9 @@ describe "Conflict", ->
     [conflicts, navigator] = []
 
     beforeEach ->
-      editorView = util.openPath('triple-2way-diff.txt')
-      conflicts = Conflict.all({}, editorView.getEditor())
-      navigator = conflicts[1].navigator
+      util.openPath 'triple-2way-diff.txt', (editorView) ->
+        conflicts = Conflict.all({}, editorView.getEditor())
+        navigator = conflicts[1].navigator
 
     it 'knows its conflict', ->
       expect(navigator.conflict).toBe(conflicts[1])
