@@ -13,7 +13,14 @@ describe 'ResolverView', ->
     }
     view = new ResolverView(fakeEditor)
 
-    GitBridge._gitCommand = -> 'git'
+    atom.config.set('merge-conflicts.gitPath', 'git')
+    done = false
+    GitBridge.locateGitAnd (err) ->
+      throw err if err?
+      done = true
+
+    waitsFor -> done
+
     GitBridge.process = ({stdout, exit}) ->
       stdout('UU lib/file1.txt')
       exit(0)
