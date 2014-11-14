@@ -21,8 +21,8 @@ class ResolverView extends View
 
   initialize: (@editor) ->
     @refresh()
-    @editor.getBuffer().on 'saved', => @refresh()
-    @subscribe atom, 'merge-conflicts:quit', (event) => @dismiss()
+    @editor.onDidSave => @refresh()
+    @subscribe atom, 'merge-conflicts:quit', => @dismiss()
 
   getModel: -> null
 
