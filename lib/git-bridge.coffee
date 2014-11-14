@@ -60,9 +60,9 @@ class GitBridge
       exit: exitHandler
     })
 
-  @_repoWorkDir: -> atom.project.getRepo()?.getWorkingDirectory()
+  @_repoWorkDir: -> atom.project.getRepositories()[0].getWorkingDirectory()
 
-  @_repoGitDir: -> atom.project.getRepo()?.getPath()
+  @_repoGitDir: -> atom.project.getRepositories()[0].getPath()
 
   @_statusCodesFrom: (chunk, handler) ->
     for line in chunk.split("\n")

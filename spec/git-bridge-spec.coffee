@@ -4,7 +4,7 @@ path = require 'path'
 
 describe 'GitBridge', ->
 
-  repoBase = -> atom.project.getRepo().getWorkingDirectory()
+  repoBase = -> atom.project.getRepositories()[0].getWorkingDirectory()
 
   beforeEach ->
     done = false

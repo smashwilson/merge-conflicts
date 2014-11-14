@@ -26,7 +26,7 @@ class ResolverView extends View
 
   getModel: -> null
 
-  relativePath: -> atom.project.getRepo().relativize @editor.getUri()
+  relativePath: -> atom.project.getRepositories()[0].relativize @editor.getUri()
 
   refresh: ->
     GitBridge.isStaged @relativePath(), (err, staged) =>
