@@ -21,12 +21,12 @@ class ResolverView extends View
 
   initialize: (@editor) ->
     @refresh()
-    @editor.getBuffer().on 'saved', => @refresh()
-    @subscribe atom, 'merge-conflicts:quit', (event) => @dismiss()
+    @editor.onDidSave => @refresh()
+    @subscribe atom, 'merge-conflicts:quit', => @dismiss()
 
   getModel: -> null
 
-  relativePath: -> atom.project.getRepo().relativize @editor.getUri()
+  relativePath: -> atom.project.getRepositories()[0].relativize @editor.getUri()
 
   refresh: ->
     GitBridge.isStaged @relativePath(), (err, staged) =>

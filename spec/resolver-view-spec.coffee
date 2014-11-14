@@ -9,7 +9,7 @@ describe 'ResolverView', ->
       isModified: -> true
       getUri: -> 'lib/file1.txt'
       save: ->
-      getBuffer: -> { on: -> }
+      onDidSave: ->
     }
     view = new ResolverView(fakeEditor)
 
@@ -52,4 +52,4 @@ describe 'ResolverView', ->
     expect(fakeEditor.save).toHaveBeenCalled()
     expect(c).toBe('git')
     expect(a).toEqual(['add', 'lib/file1.txt'])
-    expect(o).toEqual({ cwd: atom.project.getRepo().getWorkingDirectory() })
+    expect(o).toEqual({ cwd: atom.project.getRepositories()[0].getWorkingDirectory() })

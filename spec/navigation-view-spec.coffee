@@ -7,12 +7,13 @@ describe 'NavigationView', ->
   [view, editorView, editor, conflicts, conflict] = []
 
   beforeEach ->
-    editorView = util.openPath("triple-2way-diff.txt")
-    editor = editorView.getEditor()
-    conflicts = Conflict.all({}, editor)
-    conflict = conflicts[1]
+    util.openPath "triple-2way-diff.txt", (v) ->
+      editorView = v
+      editor = editorView.getEditor()
+      conflicts = Conflict.all({}, editor)
+      conflict = conflicts[1]
 
-    view = new NavigationView(conflict.navigator, editorView)
+      view = new NavigationView(conflict.navigator, editorView)
 
   it 'deletes the separator line on resolution', ->
     c.ours.resolve() for c in conflicts

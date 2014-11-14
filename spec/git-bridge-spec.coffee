@@ -4,7 +4,7 @@ path = require 'path'
 
 describe 'GitBridge', ->
 
-  repoBase = -> atom.project.getRepo().getWorkingDirectory()
+  repoBase = -> atom.project.getRepositories()[0].getWorkingDirectory()
 
   beforeEach ->
     done = false
@@ -101,7 +101,7 @@ describe 'GitBridge', ->
   describe 'rebase detection', ->
 
     withRoot = (gitDir, callback) ->
-      fullDir = path.join atom.project.getRootDirectory().getPath(), gitDir
+      fullDir = path.join atom.project.getDirectories()[0].getPath(), gitDir
       saved = GitBridge._repoGitDir
       GitBridge._repoGitDir = -> fullDir
       callback()

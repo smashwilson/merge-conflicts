@@ -46,8 +46,8 @@ class ConflictMarker
       @conflictsResolved()
 
   installEvents: ->
-    @subscribe @editor(), 'contents-modified', => @detectDirty()
-    @subscribe @editorView, 'editor:will-be-removed', => @cleanup()
+    @editor().onDidStopChanging => @detectDirty()
+    @editor().onDidDestroy => @cleanup()
 
     @editorView.command 'merge-conflicts:accept-current', => @acceptCurrent()
     @editorView.command 'merge-conflicts:accept-ours', => @acceptOurs()
@@ -187,5 +187,5 @@ class ConflictMarker
 
   focusConflict: (conflict) ->
     st = conflict.ours.marker.getBufferRange().start
-    @editorView.scrollToBufferPosition st, center: true
+    @editor().scrollToBufferPosition st, center: true
     @editor().setCursorBufferPosition st, autoscroll: false

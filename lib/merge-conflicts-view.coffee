@@ -40,7 +40,7 @@ class MergeConflictsView extends View
     @editorSub = null
 
     @subscribe atom, 'merge-conflicts:resolved', (event) =>
-      p = atom.project.getRepo().relativize event.file
+      p = atom.project.getRepositories()[0].relativize event.file
       progress = @pathList.find("li:contains('#{p}') progress")[0]
       if progress?
         progress.max = event.total

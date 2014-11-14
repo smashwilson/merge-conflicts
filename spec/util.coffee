@@ -1,15 +1,14 @@
 {WorkspaceView} = require 'atom'
 
-module.exports = {
-  openPath: (path) ->
-    fullPath = atom.project.resolve(path)
-
+module.exports =
+  openPath: (path, callback) ->
     atom.workspaceView = new WorkspaceView
     atom.workspaceView.attachToDom()
-    atom.workspaceView.openSync(fullPath)
 
-    atom.workspaceView.getActiveView()
+    waitsForPromise -> atom.workspaceView.open(path)
+
+    runs ->
+      callback(atom.workspaceView.getActiveView())
 
   rowRangeFrom: (marker) ->
     [marker.getTailBufferPosition().row, marker.getHeadBufferPosition().row]
-}
