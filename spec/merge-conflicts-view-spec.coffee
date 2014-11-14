@@ -11,10 +11,10 @@ describe 'MergeConflictsView', ->
   [view, state] = []
 
   fullPath = (fname) ->
-    path.join atom.project.getPath(), 'path', fname
+    path.join atom.project.getPaths()[0], 'path', fname
 
   repoPath = (fname) ->
-    atom.project.getRepo().relativize fullPath(fname)
+    atom.project.getRepositories()[0].relativize fullPath(fname)
 
   beforeEach ->
     conflicts = _.map ['file1.txt', 'file2.txt'], (fname) ->
