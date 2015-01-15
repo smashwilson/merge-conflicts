@@ -8,7 +8,7 @@
 # For more detailed documentation see
 # https://atom.io/docs/latest/advanced/keymaps
 
-'.editor.conflicted':
+'atom-text-editor.conflicted':
   'ctrl-m down': 'merge-conflicts:next-unresolved'
   'ctrl-m up': 'merge-conflicts:previous-unresolved'
   'ctrl-m enter': 'merge-conflicts:accept-current'
@@ -16,5 +16,5 @@
   'ctrl-m 1': 'merge-conflicts:accept-ours'
   'ctrl-m 2': 'merge-conflicts:accept-theirs'
 
-'.workspace':
+'atom-workspace':
   'ctrl-m d': 'merge-conflicts:detect'
