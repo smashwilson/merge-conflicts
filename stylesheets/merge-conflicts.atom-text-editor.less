@@ -1,0 +1,20 @@
+@import "variables";
+
+.conflict-resolved {
+  background: @resolved-line-color;
+}
+
+.conflict-ours {
+  background: @ours-line-color;
+  &.cursor-line { background: @ours-current-color; }
+}
+
+.conflict-theirs {
+  background: @theirs-line-color;
+  &.cursor-line { background: @theirs-current-color; }
+}
+
+.conflict-dirty {
+  background: @dirty-line-color;
+  &.cursor-line { background: @dirty-current-color; }
+}
