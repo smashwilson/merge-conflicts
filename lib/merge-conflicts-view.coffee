@@ -101,7 +101,7 @@ class MergeConflictsView extends View
     @hide 'fast', =>
       MergeConflictsView.instance = null
       @remove()
-    atom.workspace.addTopPanel item: viewClass(@state)
+    atom.workspace.addTopPanel item: new viewClass(@state)
 
   sideResolver: (side) ->
     (event) ->

@@ -69,7 +69,7 @@ class ConflictMarker
 
   conflictsResolved: ->
     @cleanup()
-    @editorView.append new ResolverView(@editor())
+    atom.workspace.addTopPanel item: new ResolverView(@editor())
 
   detectDirty: ->
     # Only detect dirty regions within CoveringViews that have a cursor within them.
