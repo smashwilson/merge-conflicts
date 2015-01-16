@@ -1,3 +1,4 @@
+{$} = require 'atom'
 ConflictMarker = require '../lib/conflict-marker'
 {GitBridge} = require '../lib/git-bridge'
 util = require './util'
@@ -164,8 +165,9 @@ describe 'ConflictMarker', ->
       it 'removes the .conflicted class', ->
         expect(editorView.hasClass 'conflicted').toBe(false)
 
-      it 'appends a ResolverView to the editor', ->
-        expect(editorView.find('.resolver').length).toBe(1)
+      it 'appends a ResolverView to the workspace', ->
+        workspaceView = atom.views.getView atom.workspace
+        expect($(workspaceView).find('.resolver').length).toBe(1)
 
   describe 'with a rebase conflict', ->
     [active] = []
