@@ -65,7 +65,7 @@ class ConflictMarker
   cleanup: ->
     @unsubscribe()
     v.remove() for v in @coveringViews
-    @editorView.removeClass 'conflicted'
+    $(@editorView).removeClass 'conflicted'
 
   conflictsResolved: ->
     @cleanup()

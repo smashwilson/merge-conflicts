@@ -40,7 +40,7 @@ class CoveringView extends View
     scrollTop = @editor().getScrollTop()
 
     @offset top: ref.top + anchor.top - scrollTop
-    @height @editorView.lineHeight
+    @height @editor().getLineHeightInPixels()
 
   editor: -> @editorView.getModel()
 
