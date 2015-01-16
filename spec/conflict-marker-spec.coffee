@@ -29,18 +29,18 @@ describe 'ConflictMarker', ->
         editorView.getFirstVisibleScreenRow = -> 0
         editorView.getLastVisibleScreenRow = -> 999
 
-        editor = editorView.getEditor()
+        editor = editorView.getModel()
         state =
           isRebase: false
 
         m = new ConflictMarker(state, editorView)
 
     it 'attaches two SideViews and a NavigationView for each conflict', ->
-      expect(editorView.find('.side').length).toBe(6)
-      expect(editorView.find('.navigation').length).toBe(3)
+      expect($(editorView).find('.side').length).toBe(6)
+      expect($(editorView).find('.navigation').length).toBe(3)
 
     it 'adds the conflicted class', ->
-      expect(editorView.hasClass 'conflicted').toBe(true)
+      expect($(editorView).hasClass 'conflicted').toBe(true)
 
     it 'locates the correct lines', ->
       lines = m.linesForMarker m.conflicts[1].ours.marker

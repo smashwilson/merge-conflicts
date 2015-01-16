@@ -20,7 +20,7 @@ describe 'SideView', ->
     expect(view.hasClass 'bottom').toBe(false)
 
   it 'positions itself over the banner line', ->
-    refBanner = editorView.find('.line:contains("<<<<<<<")').eq 0
+    refBanner = $(editorView).find('.line:contains("<<<<<<<")')
     expect(view.offset().top).toEqual(refBanner.offset().top)
     expect(view.height()).toEqual(refBanner.height())
 
@@ -32,7 +32,7 @@ describe 'SideView', ->
     [editor] = []
 
     beforeEach ->
-      editor = editorView.getEditor()
+      editor = editorView.getModel()
       editor.setCursorBufferPosition [1, 0]
       editor.insertText "I won't keep them, but "
       view.detectDirty()
