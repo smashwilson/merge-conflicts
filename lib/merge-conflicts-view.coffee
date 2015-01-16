@@ -57,7 +57,7 @@ class MergeConflictsView extends View
 
   navigate: (event, element) ->
     repoPath = element.find(".path").text()
-    fullPath = path.join atom.project.getRepo().getWorkingDirectory(), repoPath
+    fullPath = path.join atom.project.getRepositories()[0].getWorkingDirectory(), repoPath
     atom.workspace.open(fullPath)
 
   minimize: ->
@@ -101,7 +101,7 @@ class MergeConflictsView extends View
     @hide 'fast', =>
       MergeConflictsView.instance = null
       @remove()
-    atom.workspaceView.appendToTop new viewClass(@state)
+    atom.workspace.addTopPanel item: viewClass(@state)
 
   sideResolver: (side) ->
     (event) ->
@@ -109,30 +109,24 @@ class MergeConflictsView extends View
       GitBridge.checkoutSide side, p, (err) ->
         return if handleErr(err)
 
-        full = path.join atom.project.path, p
+        full = path.join atom.project.getPaths()[0], p
         atom.emit 'merge-conflicts:resolved', file: full, total: 1, resolved: 1
         atom.workspace.open p
 
-  editorView: (filePath) ->
-    if filePath
-      for _editorView in atom.workspaceView.getEditorViews()
-        return _editorView if _editorView.getEditor().getPath() is filePath
-    return null
-
-  editor: (filePath) ->
-    @editorView(filePath)?.getEditor()
-
   stageFile: (event, element) ->
     repoPath = element.closest('li').find('.path').text()
-    filePath = path.join atom.project.getRepo().getWorkingDirectory(), repoPath
-    @editor(filePath)?.save()
+    filePath = path.join atom.project.getRepositories()[0].getWorkingDirectory(), repoPath
+
+    for e in atom.workspace.getTextEditors()
+      e.save() if e.getPath() is filePath
+
     GitBridge.add repoPath, (err) ->
       return if handleErr(err)
 
       atom.emit 'merge-conflicts:staged', file: filePath
 
   @detect: ->
-    return unless atom.project.getRepo()
+    return unless atom.project.getRepositories().length > 0
     return if @instance?
 
     MergeState.read (err, state) =>
@@ -141,20 +135,20 @@ class MergeConflictsView extends View
       if not state.isEmpty()
         view = new MergeConflictsView(state)
         @instance = view
-        atom.workspaceView.appendToBottom(view)
+        atom.workspace.addBottomPanel item: view
 
-        @instance.editorSub = atom.workspaceView.eachEditorView (view) =>
-          if view.attached and view.getPane()?
-            marker = @markConflictsIn state, view
-            @instance.markers.push marker if marker?
+        @instance.editorSub = atom.workspace.observeTextEditors (editor) =>
+          marker = @markConflictsIn state, editor
+          @instance.markers.push marker if marker?
       else
-        atom.workspaceView.appendToTop new NothingToMergeView(state)
+        atom.workspace.addTopPanel item: new NothingToMergeView(state)
 
-  @markConflictsIn: (state, editorView) ->
+  @markConflictsIn: (state, editor) ->
     return if state.isEmpty()
 
-    fullPath = editorView.getEditor().getPath()
-    repoPath = atom.project.getRepo().relativize fullPath
+    fullPath = editor.getPath()
+    repoPath = atom.project.getRepositories()[0].relativize fullPath
     return unless _.contains state.conflictPaths(), repoPath
 
+    editorView = atom.views.getView editor
     new ConflictMarker(state, editorView)

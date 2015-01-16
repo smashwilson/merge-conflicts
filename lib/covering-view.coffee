@@ -35,7 +35,7 @@ class CoveringView extends View
     @editorView.component.checkForVisibilityChange()
 
     marker = @cover()
-    anchor = @editorView.offset()
+    anchor = $(@editorView).offset()
     ref = @offsetForMarker marker
     scrollTop = @editor().getScrollTop()
 
