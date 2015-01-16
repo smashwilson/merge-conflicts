@@ -1,4 +1,4 @@
-{$} = require 'atom'
+{$} = require 'atom-space-pen-views'
 SideView = require '../lib/side-view'
 Conflict = require '../lib/conflict'
 util = require './util'
@@ -6,12 +6,12 @@ util = require './util'
 describe 'SideView', ->
   [view, editorView, ours, theirs] = []
 
-  text = -> editorView.getEditor().getText()
+  text = -> editorView.getModel().getText()
 
   beforeEach ->
     util.openPath "single-2way-diff.txt", (v) ->
       editorView = v
-      conflict = Conflict.all({ isRebase: false }, editorView.getEditor())[0]
+      conflict = Conflict.all({ isRebase: false }, editorView.getModel())[0]
       [ours, theirs] = [conflict.ours, conflict.theirs]
       view = new SideView(ours, editorView)
 
