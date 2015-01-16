@@ -1,4 +1,4 @@
-{$, View} = require 'atom'
+{$, View} = require 'atom-space-pen-views'
 _ = require 'underscore-plus'
 path = require 'path'
 {Subscriber} = require 'emissary'

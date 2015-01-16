@@ -1,4 +1,4 @@
-{BufferedProcess} = require 'atom'
+{BufferedProcess} = require 'atom-space-pen-views'
 fs = require 'fs'
 path = require 'path'
 
