@@ -17,7 +17,7 @@ class ConflictMarker
     @conflicts = Conflict.all(@state, @editorView.getModel())
     @adapter = EditorAdapter.adapt(@editorView)
 
-    @editorView.addClass 'conflicted' if @conflicts
+    $(@editorView).addClass 'conflicted' if @conflicts
 
     @coveringViews = []
     for c in @conflicts
@@ -49,14 +49,14 @@ class ConflictMarker
     @editor().onDidStopChanging => @detectDirty()
     @editor().onDidDestroy => @cleanup()
 
-    @editorView.command 'merge-conflicts:accept-current', => @acceptCurrent()
-    @editorView.command 'merge-conflicts:accept-ours', => @acceptOurs()
-    @editorView.command 'merge-conflicts:accept-theirs', => @acceptTheirs()
-    @editorView.command 'merge-conflicts:ours-then-theirs', => @acceptOursThenTheirs()
-    @editorView.command 'merge-conflicts:theirs-then-ours', => @acceptTheirsThenOurs()
-    @editorView.command 'merge-conflicts:next-unresolved', => @nextUnresolved()
-    @editorView.command 'merge-conflicts:previous-unresolved', => @previousUnresolved()
-    @editorView.command 'merge-conflicts:revert-current', => @revertCurrent()
+    atom.commands.add 'atom-text-editor', 'merge-conflicts:accept-current', => @acceptCurrent()
+    atom.commands.add 'atom-text-editor', 'merge-conflicts:accept-ours', => @acceptOurs()
+    atom.commands.add 'atom-text-editor', 'merge-conflicts:accept-theirs', => @acceptTheirs()
+    atom.commands.add 'atom-text-editor', 'merge-conflicts:ours-then-theirs', => @acceptOursThenTheirs()
+    atom.commands.add 'atom-text-editor', 'merge-conflicts:theirs-then-ours', => @acceptTheirsThenOurs()
+    atom.commands.add 'atom-text-editor', 'merge-conflicts:next-unresolved', => @nextUnresolved()
+    atom.commands.add 'atom-text-editor', 'merge-conflicts:previous-unresolved', => @previousUnresolved()
+    atom.commands.add 'atom-text-editor', 'merge-conflicts:revert-current', => @revertCurrent()
 
     @subscribe atom, 'merge-conflicts:resolved', ({total, resolved, file}) =>
       if file is @editor().getPath() and total is resolved
@@ -65,11 +65,11 @@ class ConflictMarker
   cleanup: ->
     @unsubscribe()
     v.remove() for v in @coveringViews
-    @editorView.removeClass 'conflicted'
+    $(@editorView).removeClass 'conflicted'
 
   conflictsResolved: ->
     @cleanup()
-    @editorView.append new ResolverView(@editor())
+    atom.workspace.addTopPanel item: new ResolverView(@editor())
 
   detectDirty: ->
     # Only detect dirty regions within CoveringViews that have a cursor within them.
@@ -173,7 +173,7 @@ class ConflictMarker
           matching.push c.theirs
     matching
 
-  editor: -> @editorView.getEditor()
+  editor: -> @editorView.getModel()
 
   linesForMarker: (marker) -> @adapter.linesForMarker(marker)
 

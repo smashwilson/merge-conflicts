@@ -4,7 +4,7 @@ _ = require 'underscore-plus'
 class EditorAdapter
 
   constructor: (@view) ->
-    @editor = @view.getEditor()
+    @editor = @view.getModel()
 
   append: (child) ->
 
@@ -17,7 +17,7 @@ class EditorAdapter
 class ReactAdapter extends EditorAdapter
 
   append: (child) ->
-    @view.appendToLinesView child
+    $(@view).find('.overlayer').append child
     child.css('z-index', 2)
 
   linesElement: -> @view.find('.lines')
