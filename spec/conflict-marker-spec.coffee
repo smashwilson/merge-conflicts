@@ -1,4 +1,4 @@
-{$} = require 'atom-space-pen-views'
+{$} = require 'space-pen'
 ConflictMarker = require '../lib/conflict-marker'
 {GitBridge} = require '../lib/git-bridge'
 util = require './util'
