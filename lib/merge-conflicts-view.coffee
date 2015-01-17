@@ -1,7 +1,7 @@
-{$, View} = require 'atom'
+{$, View} = require 'atom-space-pen-views'
+{CompositeDisposable} = require 'atom'
 _ = require 'underscore-plus'
 path = require 'path'
-{Subscriber} = require 'emissary'
 
 {GitBridge} = require './git-bridge'
 MergeState = require './merge-state'
@@ -14,7 +14,6 @@ module.exports =
 class MergeConflictsView extends View
 
   instance: null
-  Subscriber.includeInto this
 
   @content: (state) ->
     @div class: 'merge-conflicts tool-panel panel-bottom padded', =>
@@ -25,7 +24,7 @@ class MergeConflictsView extends View
       @div outlet: 'body', =>
         @ul class: 'block list-group', outlet: 'pathList', =>
           for {path: p, message} in state.conflicts
-            @li click: 'navigate', class: 'list-item navigate', =>
+            @li click: 'navigate', "data-path": p, class: 'list-item navigate', =>
               @span class: 'inline-block icon icon-diff-modified status-modified path', p
               @div class: 'pull-right', =>
                 @button click: 'stageFile', class: 'btn btn-xs btn-success inline-block-tight stage-ready', style: 'display: none', 'Stage'
@@ -37,23 +36,29 @@ class MergeConflictsView extends View
 
   initialize: (@state) ->
     @markers = []
-    @editorSub = null
+    @subs = new CompositeDisposable
 
-    @subscribe atom, 'merge-conflicts:resolved', (event) =>
+    @subs.add atom.emitter.on 'merge-conflicts:resolved', (event) =>
       p = atom.project.getRepositories()[0].relativize event.file
-      progress = @pathList.find("li:contains('#{p}') progress")[0]
-      if progress?
-        progress.max = event.total
-        progress.value = event.resolved
-      else
-        console.log "Unrecognized conflict path: #{p}"
-      if event.total is event.resolved
-        @pathList.find("li:contains('#{p}') .stage-ready").eq(0).show()
+      found = false
+      for listElement in @pathList.children()
+        li = $(listElement)
+        if li.data('path') is p
+          found = true
 
-    @subscribe atom, 'merge-conflicts:staged', => @refresh()
+          progress = li.find('progress')[0]
+          progress.max = event.total
+          progress.value = event.resolved
 
-    @command 'merge-conflicts:entire-file-ours', @sideResolver('ours')
-    @command 'merge-conflicts:entire-file-theirs', @sideResolver('theirs')
+          li.find('.stage-ready').show() if event.total is event.resolved
+
+      unless found
+        console.error "Unrecognized conflict path: #{p}"
+
+    @subs.add atom.emitter.on 'merge-conflicts:staged', => @refresh()
+
+    @subs.add atom.commands.add @element, 'merge-conflicts:entire-file-ours', @sideResolver('ours')
+    @subs.add atom.commands.add @element, 'merge-conflicts:entire-file-theirs', @sideResolver('theirs')
 
   navigate: (event, element) ->
     repoPath = element.find(".path").text()
@@ -69,7 +74,7 @@ class MergeConflictsView extends View
     @body.show 'fast'
 
   quit: ->
-    atom.emit 'merge-conflicts:quit'
+    atom.emitter.emit 'merge-conflicts:quit'
     @finish(MaybeLaterView)
 
   refresh: ->
@@ -93,10 +98,10 @@ class MergeConflictsView extends View
         @finish(SuccessView)
 
   finish: (viewClass) ->
-    @unsubscribe()
     m.cleanup() for m in @markers
     @markers = []
-    @editorSub.off()
+
+    @subs.dispose()
 
     @hide 'fast', =>
       MergeConflictsView.instance = null
@@ -137,7 +142,7 @@ class MergeConflictsView extends View
         @instance = view
         atom.workspace.addBottomPanel item: view
 
-        @instance.editorSub = atom.workspace.observeTextEditors (editor) =>
+        @instance.subs.add atom.workspace.observeTextEditors (editor) =>
           marker = @markConflictsIn state, editor
           @instance.markers.push marker if marker?
       else

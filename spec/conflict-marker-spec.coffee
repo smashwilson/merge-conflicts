@@ -1,4 +1,4 @@
-{$} = require 'atom'
+{$} = require 'atom-space-pen-views'
 ConflictMarker = require '../lib/conflict-marker'
 {GitBridge} = require '../lib/git-bridge'
 util = require './util'
@@ -29,18 +29,18 @@ describe 'ConflictMarker', ->
         editorView.getFirstVisibleScreenRow = -> 0
         editorView.getLastVisibleScreenRow = -> 999
 
-        editor = editorView.getEditor()
+        editor = editorView.getModel()
         state =
           isRebase: false
 
         m = new ConflictMarker(state, editorView)
 
     it 'attaches two SideViews and a NavigationView for each conflict', ->
-      expect(editorView.find('.side').length).toBe(6)
-      expect(editorView.find('.navigation').length).toBe(3)
+      expect($(editorView).find('.side').length).toBe(6)
+      expect($(editorView).find('.navigation').length).toBe(3)
 
     it 'adds the conflicted class', ->
-      expect(editorView.hasClass 'conflicted').toBe(true)
+      expect($(editorView).hasClass 'conflicted').toBe(true)
 
     it 'locates the correct lines', ->
       lines = m.linesForMarker m.conflicts[1].ours.marker
@@ -55,7 +55,7 @@ describe 'ConflictMarker', ->
       expect(lines.hasClass 'conflict-theirs').toBe(true)
 
     it 'applies the "dirty" class to modified sides', ->
-      editor = editorView.getEditor()
+      editor = editorView.getModel()
       editor.setCursorBufferPosition [14, 0]
       editor.insertText "Make conflict 1 dirty"
       detectDirty()
@@ -69,15 +69,15 @@ describe 'ConflictMarker', ->
       atom.on 'merge-conflicts:resolved', (e) -> event = e
       m.conflicts[2].theirs.resolve()
 
-      expect(event.file).toBe(editorView.getEditor().getPath())
+      expect(event.file).toBe(editorView.getModel().getPath())
       expect(event.total).toBe(3)
       expect(event.resolved).toBe(1)
       expect(event.source).toBe(m)
 
     it 'tracks the active conflict side', ->
-      editorView.getEditor().setCursorBufferPosition [11, 0]
+      editorView.getModel().setCursorBufferPosition [11, 0]
       expect(m.active()).toEqual([])
-      editorView.getEditor().setCursorBufferPosition [14, 5]
+      editorView.getModel().setCursorBufferPosition [14, 5]
       expect(m.active()).toEqual([m.conflicts[1].ours])
 
     describe 'with an active merge conflict', ->
@@ -88,28 +88,28 @@ describe 'ConflictMarker', ->
         active = m.conflicts[1]
 
       it 'accepts the current side with merge-conflicts:accept-current', ->
-        editorView.trigger 'merge-conflicts:accept-current'
+        atom.commands.dispatch editorView, 'merge-conflicts:accept-current'
         expect(active.resolution).toBe(active.ours)
 
       it "does nothing if you have cursors in both sides", ->
         editor.addCursorAtBufferPosition [16, 2]
-        editorView.trigger 'merge-conflicts:accept-current'
+        atom.commands.dispatch editorView, 'merge-conflicts:accept-current'
         expect(active.resolution).toBeNull()
 
       it 'accepts "ours" on merge-conflicts:accept-ours', ->
-        editorView.trigger 'merge-conflicts:accept-ours'
+        atom.commands.dispatch editorView, 'merge-conflicts:accept-current'
         expect(active.resolution).toBe(active.ours)
 
       it 'accepts "theirs" on merge-conflicts:accept-theirs', ->
-        editorView.trigger 'merge-conflicts:accept-theirs'
+        atom.commands.dispatch editorView, 'merge-conflicts:accept-theirs'
         expect(active.resolution).toBe(active.theirs)
 
       it 'jumps to the next unresolved on merge-conflicts:next-unresolved', ->
-        editorView.trigger 'merge-conflicts:next-unresolved'
+        atom.commands.dispatch editorView, 'merge-conflicts:next-unresolved'
         expect(cursors()).toEqual([[22, 0]])
 
       it 'jumps to the previous unresolved on merge-conflicts:previous-unresolved', ->
-        editorView.trigger 'merge-conflicts:previous-unresolved'
+        atom.commands.dispatch editorView, 'merge-conflicts:previous-unresolved'
         expect(cursors()).toEqual([[5, 0]])
 
       it 'reverts a dirty hunk on merge-conflicts:revert-current', ->
@@ -117,18 +117,18 @@ describe 'ConflictMarker', ->
         detectDirty()
         expect(active.ours.isDirty).toBe(true)
 
-        editorView.trigger 'merge-conflicts:revert-current'
+        atom.commands.dispatch editorView, 'merge-conflicts:revert-current'
         detectDirty()
         expect(active.ours.isDirty).toBe(false)
 
       it 'accepts ours-then-theirs on merge-conflicts:ours-then-theirs', ->
-        editorView.trigger 'merge-conflicts:ours-then-theirs'
+        atom.commands.dispatch editorView, 'merge-conflicts:ours-then-theirs'
         expect(active.resolution).toBe(active.ours)
         t = editor.getTextInBufferRange active.resolution.marker.getBufferRange()
         expect(t).toBe("My middle changes\nYour middle changes\n")
 
       it 'accepts theirs-then-ours on merge-conflicts:theirs-then-ours', ->
-        editorView.trigger 'merge-conflicts:theirs-then-ours'
+        atom.commands.dispatch editorView, 'merge-conflicts:theirs-then-ours'
         expect(active.resolution).toBe(active.theirs)
         t = editor.getTextInBufferRange active.resolution.marker.getBufferRange()
         expect(t).toBe("Your middle changes\nMy middle changes\n")
@@ -140,18 +140,18 @@ describe 'ConflictMarker', ->
 
       it 'no-ops the resolution commands', ->
         for e in ['accept-current', 'accept-ours', 'accept-theirs', 'revert-current']
-          editorView.trigger "merge-conflicts:#{e}"
+          atom.commands.dispatch editorView, "merge-conflicts:#{e}"
           expect(m.active()).toEqual([])
           for c in m.conflicts
             expect(c.isResolved()).toBe(false)
 
       it 'jumps to the next unresolved on merge-conflicts:next-unresolved', ->
         expect(m.active()).toEqual([])
-        editorView.trigger 'merge-conflicts:next-unresolved'
+        atom.commands.dispatch editorView, 'merge-conflicts:next-unresolved'
         expect(cursors()).toEqual([[14, 0]])
 
       it 'jumps to the previous unresolved on merge-conflicts:next-unresolved', ->
-        editorView.trigger 'merge-conflicts:previous-unresolved'
+        atom.commands.dispatch editorView, 'merge-conflicts:previous-unresolved'
         expect(cursors()).toEqual([[5, 0]])
 
     describe 'when the resolution is complete', ->
@@ -159,11 +159,11 @@ describe 'ConflictMarker', ->
       beforeEach -> c.ours.resolve() for c in m.conflicts
 
       it 'removes all of the CoveringViews', ->
-        expect(editorView.find('.overlayer .side').length).toBe(0)
-        expect(editorView.find('.overlayer .navigation').length).toBe(0)
+        expect($(editorView).find('.overlayer .side').length).toBe(0)
+        expect($(editorView).find('.overlayer .navigation').length).toBe(0)
 
       it 'removes the .conflicted class', ->
-        expect(editorView.hasClass 'conflicted').toBe(false)
+        expect($(editorView).hasClass 'conflicted').toBe(false)
 
       it 'appends a ResolverView to the workspace', ->
         workspaceView = atom.views.getView atom.workspace
@@ -178,7 +178,7 @@ describe 'ConflictMarker', ->
         editorView.getFirstVisibleScreenRow = -> 0
         editorView.getLastVisibleScreenRow = -> 999
 
-        editor = editorView.getEditor()
+        editor = editorView.getModel()
         state =
           isRebase: true
 
@@ -188,13 +188,13 @@ describe 'ConflictMarker', ->
         active = m.conflicts[0]
 
     it 'accepts theirs-then-ours on merge-conflicts:theirs-then-ours', ->
-      editorView.trigger 'merge-conflicts:theirs-then-ours'
+      atom.commands.dispatch editorView, 'merge-conflicts:theirs-then-ours'
       expect(active.resolution).toBe(active.theirs)
       t = editor.getTextInBufferRange active.resolution.marker.getBufferRange()
       expect(t).toBe("These are your changes\nThese are my changes\n")
 
     it 'accepts ours-then-theirs on merge-conflicts:ours-then-theirs', ->
-      editorView.trigger 'merge-conflicts:ours-then-theirs'
+      atom.commands.dispatch editorView, 'merge-conflicts:ours-then-theirs'
       expect(active.resolution).toBe(active.ours)
       t = editor.getTextInBufferRange active.resolution.marker.getBufferRange()
       expect(t).toBe("These are my changes\nThese are your changes\n")

@@ -1,4 +1,5 @@
-{View} = require 'atom'
+{CompositeDisposable} = require 'atom'
+{View} = require 'atom-space-pen-views'
 {GitBridge} = require './git-bridge'
 handleErr = require './error-view'
 
@@ -20,9 +21,12 @@ class ResolverView extends View
         @button class: 'btn btn-primary', click: 'resolve', 'Stage'
 
   initialize: (@editor) ->
+    @disposables = new CompositeDisposable()
+
     @refresh()
     @editor.onDidSave => @refresh()
-    @subscribe atom, 'merge-conflicts:quit', => @dismiss()
+
+    @disposables.add atom.commands.add @element, 'merge-conflicts:quit', => @dismiss()
 
   getModel: -> null
 
@@ -39,7 +43,7 @@ class ResolverView extends View
 
       unless needsSaved or needsStaged
         @hide 'fast', -> @remove()
-        atom.emit 'merge-conflicts:staged', file: @editor.getUri()
+        atom.emitter.emit 'merge-conflicts:staged', file: @editor.getUri()
         return
 
       if needsSaved

@@ -1,4 +1,4 @@
-{View} = require 'atom'
+{View} = require 'atom-space-pen-views'
 {GitNotFoundError} = require './git-bridge'
 
 class GitNotFoundErrorView extends View

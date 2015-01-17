@@ -1,4 +1,4 @@
-{$} = require 'atom'
+{$} = require 'atom-space-pen-views'
 _ = require 'underscore-plus'
 
 class EditorAdapter
