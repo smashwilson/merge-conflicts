@@ -43,7 +43,7 @@ class ResolverView extends View
 
       unless needsSaved or needsStaged
         @hide 'fast', -> @remove()
-        atom.emit 'merge-conflicts:staged', file: @editor.getUri()
+        atom.emitter.emit 'merge-conflicts:staged', file: @editor.getUri()
         return
 
       if needsSaved

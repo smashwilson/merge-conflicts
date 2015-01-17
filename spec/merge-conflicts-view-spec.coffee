@@ -18,28 +18,27 @@ describe 'MergeConflictsView', ->
 
   beforeEach ->
     conflicts = _.map ['file1.txt', 'file2.txt'], (fname) ->
-      { path: path.join('spec', 'fixtures', 'path', fname), message: 'both modified' }
+      { path: repoPath(fname), message: 'both modified' }
 
     util.openPath 'triple-2way-diff.txt', (editorView) ->
       state = new MergeState conflicts, false
-      conflicts = Conflict.all state, editorView.getEditor()
+      conflicts = Conflict.all state, editorView.getModel()
 
       view = new MergeConflictsView state
 
   describe 'conflict resolution progress', ->
     progressFor = (filename) ->
-      view.pathList.find("li:contains('#{filename}') progress")[0]
+      view.pathList.find("li[data-path='#{repoPath filename}'] progress")[0]
 
     it 'starts at zero', ->
       expect(progressFor('file1.txt').value).toBe(0)
       expect(progressFor('file2.txt').value).toBe(0)
 
     it 'advances when requested', ->
-      atom.emit 'merge-conflicts:resolved', {
+      atom.emitter.emit 'merge-conflicts:resolved',
         file: fullPath('file1.txt'),
         total: 3,
         resolved: 2
-      }
       progress1 = progressFor 'file1.txt'
       expect(progress1.value).toBe(2)
       expect(progress1.max).toBe(3)
@@ -47,7 +46,7 @@ describe 'MergeConflictsView', ->
   describe 'tracking the progress of staging', ->
 
     isMarkedWith = (filename, icon) ->
-      rs = view.pathList.find("li:contains('#{filename}') span.icon-#{icon}")
+      rs = view.pathList.find("li[data-path='#{repoPath filename}'] span.icon-#{icon}")
       rs.length isnt 0
 
     it 'starts without files marked as staged', ->
@@ -60,7 +59,7 @@ describe 'MergeConflictsView', ->
         exit(0)
         { process: { on: (err) -> } }
 
-      atom.emit 'merge-conflicts:staged', file: fullPath('file1.txt')
+      atom.emitter.emit 'merge-conflicts:staged', file: fullPath('file1.txt')
       expect(isMarkedWith 'file1.txt', 'check').toBe(true)
       expect(isMarkedWith 'file2.txt', 'dash').toBe(true)
 
