@@ -1,5 +1,8 @@
 module.exports =
   openPath: (path, callback) ->
+    workspaceElement = atom.views.getView(atom.workspace)
+    jasmine.attachToDOM(workspaceElement)
+
     waitsForPromise -> atom.workspace.open(path)
 
     runs ->
