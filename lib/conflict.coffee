@@ -1,5 +1,5 @@
 {$} = require 'atom-space-pen-views'
-{Emitter} = require 'emissary'
+{Emitter} = require 'atom'
 
 {Side, OurSide, TheirSide} = require './side'
 Navigator = require './navigator'
@@ -97,9 +97,9 @@ class Marker
 module.exports =
 class Conflict
 
-  Emitter.includeInto this
-
   constructor: (@ours, @theirs, @parent, @navigator, @state) ->
+    @emitter = new Emitter
+
     @ours.conflict = this
     @theirs.conflict = this
     @navigator.conflict = this
@@ -107,9 +107,12 @@ class Conflict
 
   isResolved: -> @resolution?
 
+  onDidResolveConflict: (callback) ->
+    @emitter.on 'resolve-conflict', callback
+
   resolveAs: (side) ->
     @resolution = side
-    @emit "conflict:resolved"
+    @emitter.emit 'resolve-conflict'
 
   scrollTarget: -> @ours.marker.getTailBufferPosition()
 
