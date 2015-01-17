@@ -1,5 +1,5 @@
 {CompositeDisposable} = require 'atom'
-{View} = require 'atom-space-pen-views'
+{View} = require 'space-pen'
 {GitBridge} = require './git-bridge'
 handleErr = require './error-view'
 

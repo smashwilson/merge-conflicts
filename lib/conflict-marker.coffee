@@ -1,4 +1,4 @@
-{$} = require 'atom-space-pen-views'
+{$} = require 'space-pen'
 _ = require 'underscore-plus'
 {Emitter, CompositeDisposable} = require 'atom'
 

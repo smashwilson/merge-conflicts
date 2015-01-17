@@ -1,4 +1,4 @@
-{$} = require 'atom-space-pen-views'
+{$} = require 'space-pen'
 SideView = require '../lib/side-view'
 Conflict = require '../lib/conflict'
 util = require './util'

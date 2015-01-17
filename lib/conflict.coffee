@@ -1,4 +1,4 @@
-{$} = require 'atom-space-pen-views'
+{$} = require 'space-pen'
 {Emitter} = require 'atom'
 
 {Side, OurSide, TheirSide} = require './side'
