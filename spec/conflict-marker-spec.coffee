@@ -66,7 +66,7 @@ describe 'ConflictMarker', ->
 
     it 'broadcasts the "merge-conflicts:resolved" event', ->
       event = null
-      atom.on 'merge-conflicts:resolved', (e) -> event = e
+      atom.emitter.on 'merge-conflicts:resolved', (e) -> event = e
       m.conflicts[2].theirs.resolve()
 
       expect(event.file).toBe(editorView.getModel().getPath())
