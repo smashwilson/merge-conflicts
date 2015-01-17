@@ -94,7 +94,7 @@ class MergeConflictsView extends View
           @pathList.find("li:contains('#{p}') .stage-ready").eq(0).hide()
 
       if @state.isEmpty()
-        atom.emit 'merge-conflicts:done'
+        atom.emitter.emit 'merge-conflicts:done'
         @finish(SuccessView)
 
   finish: (viewClass) ->
@@ -115,7 +115,7 @@ class MergeConflictsView extends View
         return if handleErr(err)
 
         full = path.join atom.project.getPaths()[0], p
-        atom.emit 'merge-conflicts:resolved', file: full, total: 1, resolved: 1
+        atom.emitter.emit 'merge-conflicts:resolved', file: full, total: 1, resolved: 1
         atom.workspace.open p
 
   stageFile: (event, element) ->
@@ -128,7 +128,7 @@ class MergeConflictsView extends View
     GitBridge.add repoPath, (err) ->
       return if handleErr(err)
 
-      atom.emit 'merge-conflicts:staged', file: filePath
+      atom.emitter.emit 'merge-conflicts:staged', file: filePath
 
   @detect: ->
     return unless atom.project.getRepositories().length > 0
