@@ -25,7 +25,7 @@ class ConflictMarker
       @coveringViews.push new NavigationView(c.navigator, @editorView)
       @coveringViews.push new SideView(c.theirs, @editorView)
 
-      c.on 'conflict:resolved', =>
+      @subs.add c.onDidResolveConflict =>
         unresolved = (v for v in @coveringViews when not v.conflict().isResolved())
         v.reposition() for v in unresolved
         resolvedCount = @conflicts.length - Math.floor(unresolved.length / 3)
