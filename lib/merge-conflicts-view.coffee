@@ -43,7 +43,6 @@ class MergeConflictsView extends View
       found = false
       for listElement in @pathList.children()
         li = $(listElement)
-        console.log "Testing listElement [#{li.data('path')}] = [#{p}]"
         if li.data('path') is p
           found = true
 
