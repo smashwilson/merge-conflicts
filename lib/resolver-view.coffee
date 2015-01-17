@@ -21,12 +21,14 @@ class ResolverView extends View
         @button class: 'btn btn-primary', click: 'resolve', 'Stage'
 
   initialize: (@editor) ->
-    @disposables = new CompositeDisposable()
+    @subs = new CompositeDisposable()
 
     @refresh()
     @editor.onDidSave => @refresh()
 
-    @disposables.add atom.commands.add @element, 'merge-conflicts:quit', => @dismiss()
+    @subs.add atom.commands.add @element, 'merge-conflicts:quit', => @dismiss()
+
+  detached: -> @subs.dispose()
 
   getModel: -> null
 
