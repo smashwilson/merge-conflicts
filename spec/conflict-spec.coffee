@@ -98,7 +98,7 @@ describe "Conflict", ->
 
     it 'broadcasts an event on resolution', ->
       resolved = false
-      conflict.on "conflict:resolved", -> resolved = true
+      conflict.onDidResolveConflict -> resolved = true
       conflict.ours.resolve()
       expect(resolved).toBe(true)
 
