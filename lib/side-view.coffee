@@ -1,3 +1,4 @@
+{CompositeDisposable} = require 'atom'
 {CoveringView} = require './covering-view'
 
 module.exports =
@@ -14,6 +15,7 @@ class SideView extends CoveringView
 
   initialize: (@side, editorView) ->
     super editorView
+    @subs = new CompositeDisposable
 
     @decoration = null
 
@@ -21,10 +23,12 @@ class SideView extends CoveringView
     @prependKeystroke @side.eventName(), @useMeBtn
     @prependKeystroke 'merge-conflicts:revert-current', @revertBtn
 
-    @side.conflict.on 'conflict:resolved', =>
+    @subs.add @side.conflict.onDidResolveConflict =>
       @deleteMarker @side.refBannerMarker
       @deleteMarker @side.marker unless @side.wasChosen()
       @remove()
+
+  detached: -> @subs.dispose()
 
   cover: -> @side.refBannerMarker
 
