@@ -1,4 +1,6 @@
 {$} = require 'space-pen'
+_ = require 'underscore-plus'
+
 ConflictMarker = require '../lib/conflict-marker'
 {GitBridge} = require '../lib/git-bridge'
 util = require './util'
@@ -11,6 +13,17 @@ describe 'ConflictMarker', ->
   detectDirty = ->
     for sv in m.coveringViews
       sv.detectDirty() if 'detectDirty' of sv
+
+  linesForMarker = (marker) ->
+    fromBuffer = marker.getTailBufferPosition()
+    fromScreen = editor.screenPositionForBufferPosition fromBuffer
+    toBuffer = marker.getHeadBufferPosition()
+    toScreen = editor.screenPositionForBufferPosition toBuffer
+
+    result = $()
+    for row in _.range(fromScreen.row, toScreen.row)
+      result = result.add editorView.component.lineNodeForScreenRow(row)
+    result
 
   beforeEach ->
     done = false
@@ -43,15 +56,15 @@ describe 'ConflictMarker', ->
       expect($(editorView).hasClass 'conflicted').toBe(true)
 
     it 'locates the correct lines', ->
-      lines = m.linesForMarker m.conflicts[1].ours.marker
+      lines = linesForMarker m.conflicts[1].ours.marker
       expect(lines.text()).toBe("My middle changes")
 
     it 'applies the "ours" class to our sides of conflicts', ->
-      lines = m.linesForMarker m.conflicts[0].ours.marker
+      lines = linesForMarker m.conflicts[0].ours.marker
       expect(lines.hasClass 'conflict-ours').toBe(true)
 
     it 'applies the "theirs" class to their sides of conflicts', ->
-      lines = m.linesForMarker m.conflicts[0].theirs.marker
+      lines = linesForMarker m.conflicts[0].theirs.marker
       expect(lines.hasClass 'conflict-theirs').toBe(true)
 
     it 'applies the "dirty" class to modified sides', ->
@@ -59,7 +72,7 @@ describe 'ConflictMarker', ->
       editor.insertText "Make conflict 1 dirty"
       detectDirty()
 
-      lines = m.linesForMarker m.conflicts[1].ours.marker
+      lines = linesForMarker m.conflicts[1].ours.marker
       expect(lines.hasClass 'conflict-dirty').toBe(true)
       expect(lines.hasClass 'conflict-ours').toBe(false)
 

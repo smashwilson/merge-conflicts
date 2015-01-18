@@ -17,8 +17,6 @@ class ConflictMarker
     @conflicts = Conflict.all(@state, @editor)
 
     @editorView = atom.views.getView @editor
-    @adapter = EditorAdapter.adapt(@editorView)
-
     $(@editorView).addClass 'conflicted' if @conflicts
 
     @coveringViews = []
@@ -174,8 +172,6 @@ class ConflictMarker
         if c.theirs.marker.getBufferRange().containsPoint p
           matching.push c.theirs
     matching
-
-  linesForMarker: (marker) -> @adapter.linesForMarker(marker)
 
   combineSides: (first, second) ->
     text = @editor.getTextInBufferRange second.marker.getBufferRange()
