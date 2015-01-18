@@ -24,7 +24,7 @@ class ResolverView extends View
     @subs = new CompositeDisposable()
 
     @refresh()
-    @editor.onDidSave => @refresh()
+    @subs.add @editor.onDidSave => @refresh()
 
     @subs.add atom.commands.add @element, 'merge-conflicts:quit', => @dismiss()
 
