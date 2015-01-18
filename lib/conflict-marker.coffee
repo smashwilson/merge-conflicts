@@ -11,26 +11,23 @@ ResolverView = require './resolver-view'
 module.exports =
 class ConflictMarker
 
-  constructor: (@state, @editorView) ->
+  constructor: (@state, @editor) ->
     @subs = new CompositeDisposable
 
-    @conflicts = Conflict.all(@state, @editorView.getModel())
-    @adapter = EditorAdapter.adapt(@editorView)
-
-    $(@editorView).addClass 'conflicted' if @conflicts
+    @conflicts = Conflict.all(@state, @editor)
 
     @coveringViews = []
     for c in @conflicts
-      @coveringViews.push new SideView(c.ours, @editorView)
-      @coveringViews.push new NavigationView(c.navigator, @editorView)
-      @coveringViews.push new SideView(c.theirs, @editorView)
+      @coveringViews.push new SideView(c.ours, @editor)
+      @coveringViews.push new NavigationView(c.navigator, @editor)
+      @coveringViews.push new SideView(c.theirs, @editor)
 
       @subs.add c.onDidResolveConflict =>
         unresolved = (v for v in @coveringViews when not v.conflict().isResolved())
         v.reposition() for v in unresolved
         resolvedCount = @conflicts.length - Math.floor(unresolved.length / 3)
         atom.emitter.emit 'merge-conflicts:resolved',
-          file: @editor().getPath(),
+          file: @editor.getPath(),
           total: @conflicts.length, resolved: resolvedCount,
           source: this
 
@@ -39,15 +36,15 @@ class ConflictMarker
       @installEvents()
       @focusConflict @conflicts[0]
     else
-      atom.emit 'merge-conflicts:resolved',
-        file: @editor().getPath(),
+      atom.emitter.emit 'merge-conflicts:resolved',
+        file: @editor.getPath(),
         total: 1, resolved: 1,
         source: this
       @conflictsResolved()
 
   installEvents: ->
-    @subs.add @editor().onDidStopChanging => @detectDirty()
-    @subs.add @editor().onDidDestroy => @cleanup()
+    @subs.add @editor.onDidStopChanging => @detectDirty()
+    @subs.add @editor.onDidDestroy => @cleanup()
 
     @subs.add atom.commands.add 'atom-text-editor', 'merge-conflicts:accept-current', => @acceptCurrent()
     @subs.add atom.commands.add 'atom-text-editor', 'merge-conflicts:accept-ours', => @acceptOurs()
@@ -59,22 +56,21 @@ class ConflictMarker
     @subs.add atom.commands.add 'atom-text-editor', 'merge-conflicts:revert-current', => @revertCurrent()
 
     @subs.add atom.emitter.on 'merge-conflicts:resolved', ({total, resolved, file}) =>
-      if file is @editor().getPath() and total is resolved
+      if file is @editor.getPath() and total is resolved
         @conflictsResolved()
 
   cleanup: ->
     @subs.dispose()
     v.remove() for v in @coveringViews
-    $(@editorView).removeClass 'conflicted'
 
   conflictsResolved: ->
     @cleanup()
-    atom.workspace.addTopPanel item: new ResolverView(@editor())
+    atom.workspace.addTopPanel item: new ResolverView(@editor)
 
   detectDirty: ->
     # Only detect dirty regions within CoveringViews that have a cursor within them.
     potentials = []
-    for c in @editor().getCursors()
+    for c in @editor.getCursors()
       for v in @coveringViews
         potentials.push(v) if v.includesCursor(c)
 
@@ -113,7 +109,7 @@ class ConflictMarker
       n = final.conflict.navigator.nextUnresolved()
       @focusConflict(n) if n?
     else
-      orderedCursors = _.sortBy @editor().getCursors(), (c) ->
+      orderedCursors = _.sortBy @editor.getCursors(), (c) ->
         c.getBufferPosition().row
       lastCursor = _.last orderedCursors
       return unless lastCursor?
@@ -138,7 +134,7 @@ class ConflictMarker
       p = initial.conflict.navigator.previousUnresolved()
       @focusConflict(p) if p?
     else
-      orderedCursors = _.sortBy @editor().getCursors(), (c) ->
+      orderedCursors = _.sortBy @editor.getCursors(), (c) ->
         c.getBufferPosition().row
       firstCursor = _.first orderedCursors
       return unless firstCursor?
@@ -163,7 +159,7 @@ class ConflictMarker
         view.revert() if view.isDirty()
 
   active: ->
-    positions = (c.getBufferPosition() for c in @editor().getCursors())
+    positions = (c.getBufferPosition() for c in @editor.getCursors())
     matching = []
     for c in @conflicts
       for p in positions
@@ -173,19 +169,15 @@ class ConflictMarker
           matching.push c.theirs
     matching
 
-  editor: -> @editorView.getModel()
-
-  linesForMarker: (marker) -> @adapter.linesForMarker(marker)
-
   combineSides: (first, second) ->
-    text = @editor().getTextInBufferRange second.marker.getBufferRange()
+    text = @editor.getTextInBufferRange second.marker.getBufferRange()
     e = first.marker.getBufferRange().end
-    insertPoint = @editor().setTextInBufferRange([e, e], text).end
+    insertPoint = @editor.setTextInBufferRange([e, e], text).end
     first.marker.setHeadBufferPosition insertPoint
     first.followingMarker.setTailBufferPosition insertPoint
     first.resolve()
 
   focusConflict: (conflict) ->
     st = conflict.ours.marker.getBufferRange().start
-    @editor().scrollToBufferPosition st, center: true
-    @editor().setCursorBufferPosition st, autoscroll: false
+    @editor.scrollToBufferPosition st, center: true
+    @editor.setCursorBufferPosition st, autoscroll: false

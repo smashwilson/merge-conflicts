@@ -13,7 +13,7 @@ describe 'NavigationView', ->
       conflicts = Conflict.all({}, editor)
       conflict = conflicts[1]
 
-      view = new NavigationView(conflict.navigator, editorView)
+      view = new NavigationView(conflict.navigator, editor)
 
   it 'deletes the separator line on resolution', ->
     c.ours.resolve() for c in conflicts

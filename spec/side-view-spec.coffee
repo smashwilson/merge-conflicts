@@ -10,10 +10,11 @@ describe 'SideView', ->
 
   beforeEach ->
     util.openPath "single-2way-diff.txt", (v) ->
+      editor = v.getModel()
       editorView = v
-      conflict = Conflict.all({ isRebase: false }, editorView.getModel())[0]
+      conflict = Conflict.all({ isRebase: false }, editor)[0]
       [ours, theirs] = [conflict.ours, conflict.theirs]
-      view = new SideView(ours, editorView)
+      view = new SideView(ours, editor)
 
   it 'applies its position as a CSS class', ->
     expect(view.hasClass 'top').toBe(true)

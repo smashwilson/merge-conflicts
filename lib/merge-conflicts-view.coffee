@@ -84,14 +84,14 @@ class MergeConflictsView extends View
       # Any files that were present, but aren't there any more, have been
       # resolved.
       for item in @pathList.find('li')
-        p = $(item).find('.path').text()
+        p = $(item).data('path')
         icon = $(item).find('.staged')
         icon.removeClass 'icon-dash icon-check text-success'
         if _.contains @state.conflictPaths(), p
           icon.addClass 'icon-dash'
         else
           icon.addClass 'icon-check text-success'
-          @pathList.find("li:contains('#{p}') .stage-ready").eq(0).hide()
+          @pathList.find("li[data-path='#{p}'] .stage-ready").hide()
 
       if @state.isEmpty()
         atom.emitter.emit 'merge-conflicts:done'
@@ -110,7 +110,7 @@ class MergeConflictsView extends View
 
   sideResolver: (side) ->
     (event) ->
-      p = $(event.target).closest('li').find('.path').text()
+      p = $(event.target).closest('li').data('path')
       GitBridge.checkoutSide side, p, (err) ->
         return if handleErr(err)
 
@@ -119,7 +119,7 @@ class MergeConflictsView extends View
         atom.workspace.open p
 
   stageFile: (event, element) ->
-    repoPath = element.closest('li').find('.path').text()
+    repoPath = element.closest('li').data('path')
     filePath = path.join atom.project.getRepositories()[0].getWorkingDirectory(), repoPath
 
     for e in atom.workspace.getTextEditors()
@@ -155,5 +155,4 @@ class MergeConflictsView extends View
     repoPath = atom.project.getRepositories()[0].relativize fullPath
     return unless _.contains state.conflictPaths(), repoPath
 
-    editorView = atom.views.getView editor
-    new ConflictMarker(state, editorView)
+    new ConflictMarker(state, editor)

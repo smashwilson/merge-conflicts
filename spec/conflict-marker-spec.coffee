@@ -1,4 +1,6 @@
 {$} = require 'space-pen'
+_ = require 'underscore-plus'
+
 ConflictMarker = require '../lib/conflict-marker'
 {GitBridge} = require '../lib/git-bridge'
 util = require './util'
@@ -11,6 +13,17 @@ describe 'ConflictMarker', ->
   detectDirty = ->
     for sv in m.coveringViews
       sv.detectDirty() if 'detectDirty' of sv
+
+  linesForMarker = (marker) ->
+    fromBuffer = marker.getTailBufferPosition()
+    fromScreen = editor.screenPositionForBufferPosition fromBuffer
+    toBuffer = marker.getHeadBufferPosition()
+    toScreen = editor.screenPositionForBufferPosition toBuffer
+
+    result = $()
+    for row in _.range(fromScreen.row, toScreen.row)
+      result = result.add editorView.component.lineNodeForScreenRow(row)
+    result
 
   beforeEach ->
     done = false
@@ -33,34 +46,30 @@ describe 'ConflictMarker', ->
         state =
           isRebase: false
 
-        m = new ConflictMarker(state, editorView)
+        m = new ConflictMarker(state, editor)
 
     it 'attaches two SideViews and a NavigationView for each conflict', ->
       expect($(editorView).find('.side').length).toBe(6)
       expect($(editorView).find('.navigation').length).toBe(3)
 
-    it 'adds the conflicted class', ->
-      expect($(editorView).hasClass 'conflicted').toBe(true)
-
     it 'locates the correct lines', ->
-      lines = m.linesForMarker m.conflicts[1].ours.marker
+      lines = linesForMarker m.conflicts[1].ours.marker
       expect(lines.text()).toBe("My middle changes")
 
     it 'applies the "ours" class to our sides of conflicts', ->
-      lines = m.linesForMarker m.conflicts[0].ours.marker
+      lines = linesForMarker m.conflicts[0].ours.marker
       expect(lines.hasClass 'conflict-ours').toBe(true)
 
     it 'applies the "theirs" class to their sides of conflicts', ->
-      lines = m.linesForMarker m.conflicts[0].theirs.marker
+      lines = linesForMarker m.conflicts[0].theirs.marker
       expect(lines.hasClass 'conflict-theirs').toBe(true)
 
     it 'applies the "dirty" class to modified sides', ->
-      editor = editorView.getModel()
       editor.setCursorBufferPosition [14, 0]
       editor.insertText "Make conflict 1 dirty"
       detectDirty()
 
-      lines = m.linesForMarker m.conflicts[1].ours.marker
+      lines = linesForMarker m.conflicts[1].ours.marker
       expect(lines.hasClass 'conflict-dirty').toBe(true)
       expect(lines.hasClass 'conflict-ours').toBe(false)
 
@@ -69,15 +78,15 @@ describe 'ConflictMarker', ->
       atom.emitter.on 'merge-conflicts:resolved', (e) -> event = e
       m.conflicts[2].theirs.resolve()
 
-      expect(event.file).toBe(editorView.getModel().getPath())
+      expect(event.file).toBe(editor.getPath())
       expect(event.total).toBe(3)
       expect(event.resolved).toBe(1)
       expect(event.source).toBe(m)
 
     it 'tracks the active conflict side', ->
-      editorView.getModel().setCursorBufferPosition [11, 0]
+      editor.setCursorBufferPosition [11, 0]
       expect(m.active()).toEqual([])
-      editorView.getModel().setCursorBufferPosition [14, 5]
+      editor.setCursorBufferPosition [14, 5]
       expect(m.active()).toEqual([m.conflicts[1].ours])
 
     describe 'with an active merge conflict', ->
@@ -182,7 +191,7 @@ describe 'ConflictMarker', ->
         state =
           isRebase: true
 
-        m = new ConflictMarker(state, editorView)
+        m = new ConflictMarker(state, editor)
 
         editor.setCursorBufferPosition [3, 14]
         active = m.conflicts[0]
