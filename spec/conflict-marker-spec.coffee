@@ -33,7 +33,7 @@ describe 'ConflictMarker', ->
         state =
           isRebase: false
 
-        m = new ConflictMarker(state, editorView)
+        m = new ConflictMarker(state, editor)
 
     it 'attaches two SideViews and a NavigationView for each conflict', ->
       expect($(editorView).find('.side').length).toBe(6)
@@ -55,7 +55,6 @@ describe 'ConflictMarker', ->
       expect(lines.hasClass 'conflict-theirs').toBe(true)
 
     it 'applies the "dirty" class to modified sides', ->
-      editor = editorView.getModel()
       editor.setCursorBufferPosition [14, 0]
       editor.insertText "Make conflict 1 dirty"
       detectDirty()
@@ -69,15 +68,15 @@ describe 'ConflictMarker', ->
       atom.emitter.on 'merge-conflicts:resolved', (e) -> event = e
       m.conflicts[2].theirs.resolve()
 
-      expect(event.file).toBe(editorView.getModel().getPath())
+      expect(event.file).toBe(editor.getPath())
       expect(event.total).toBe(3)
       expect(event.resolved).toBe(1)
       expect(event.source).toBe(m)
 
     it 'tracks the active conflict side', ->
-      editorView.getModel().setCursorBufferPosition [11, 0]
+      editor.setCursorBufferPosition [11, 0]
       expect(m.active()).toEqual([])
-      editorView.getModel().setCursorBufferPosition [14, 5]
+      editor.setCursorBufferPosition [14, 5]
       expect(m.active()).toEqual([m.conflicts[1].ours])
 
     describe 'with an active merge conflict', ->
@@ -182,7 +181,7 @@ describe 'ConflictMarker', ->
         state =
           isRebase: true
 
-        m = new ConflictMarker(state, editorView)
+        m = new ConflictMarker(state, editor)
 
         editor.setCursorBufferPosition [3, 14]
         active = m.conflicts[0]

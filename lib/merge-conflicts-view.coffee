@@ -155,5 +155,4 @@ class MergeConflictsView extends View
     repoPath = atom.project.getRepositories()[0].relativize fullPath
     return unless _.contains state.conflictPaths(), repoPath
 
-    editorView = atom.views.getView editor
-    new ConflictMarker(state, editorView)
+    new ConflictMarker(state, editor)
