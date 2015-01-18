@@ -1,8 +1,5 @@
 {CompositeDisposable} = require 'atom'
 MergeConflictsView = require './merge-conflicts-view'
-SideView = require './side-view'
-NavigationView = require './navigation-view'
-Conflict = require './conflict'
 {GitBridge} = require './git-bridge'
 handleErr = require './error-view'
 
