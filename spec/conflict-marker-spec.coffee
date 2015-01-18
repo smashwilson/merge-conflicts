@@ -52,9 +52,6 @@ describe 'ConflictMarker', ->
       expect($(editorView).find('.side').length).toBe(6)
       expect($(editorView).find('.navigation').length).toBe(3)
 
-    it 'adds the conflicted class', ->
-      expect($(editorView).hasClass 'conflicted').toBe(true)
-
     it 'locates the correct lines', ->
       lines = linesForMarker m.conflicts[1].ours.marker
       expect(lines.text()).toBe("My middle changes")

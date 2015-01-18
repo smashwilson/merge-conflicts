@@ -4,7 +4,7 @@
 module.exports =
 class SideView extends CoveringView
 
-  @content: (side, editorView) ->
+  @content: (side, editor) ->
     @div class: "side #{side.klass()} #{side.position} ui-site-#{side.site()}", =>
       @div class: 'controls', =>
         @label class: 'text-highlight', side.ref
@@ -13,8 +13,8 @@ class SideView extends CoveringView
           @button class: 'btn btn-xs inline-block-tight revert', click: 'revert', outlet: 'revertBtn', 'Revert'
           @button class: 'btn btn-xs inline-block-tight', click: 'useMe', outlet: 'useMeBtn', 'Use Me'
 
-  initialize: (@side, editorView) ->
-    super editorView
+  initialize: (@side, editor) ->
+    super editor
     @subs = new CompositeDisposable
 
     @decoration = null
@@ -37,7 +37,7 @@ class SideView extends CoveringView
       type: 'line'
       class: @side.lineClass()
     @decoration.destroy() if @decoration?
-    @decoration = @editor().decorateMarker(@side.marker, args)
+    @decoration = @editor.decorateMarker(@side.marker, args)
 
   conflict: -> @side.conflict
 
@@ -54,12 +54,11 @@ class SideView extends CoveringView
     @decorate()
 
   revert: ->
-    @editor().setTextInBufferRange @side.marker.getBufferRange(),
-      @side.originalText
+    @editor.setTextInBufferRange @side.marker.getBufferRange(), @side.originalText
     @decorate()
 
   detectDirty: ->
-    currentText = @editor().getTextInBufferRange @side.marker.getBufferRange()
+    currentText = @editor.getTextInBufferRange @side.marker.getBufferRange()
     @side.isDirty = currentText isnt @side.originalText
 
     @decorate()

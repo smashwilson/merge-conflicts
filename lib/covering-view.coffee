@@ -5,7 +5,8 @@ _ = require 'underscore-plus'
 
 class CoveringView extends View
 
-  initialize: (@editorView) ->
+  initialize: (@editor) ->
+    @editorView = atom.views.getView @editor
     @adapter = EditorAdapter.adapt(@editorView)
 
     @adapter.append(this)
@@ -30,34 +31,28 @@ class CoveringView extends View
   getModel: -> null
 
   reposition: ->
-    # FIXME this is a workaround for a TextEditorView bug.
-    # https://github.com/atom/atom/pull/3517
-    @editorView.component.checkForVisibilityChange()
-
     marker = @cover()
     anchor = $(@editorView).offset()
     ref = @offsetForMarker marker
-    scrollTop = @editor().getScrollTop()
+    scrollTop = @editor.getScrollTop()
 
     @offset top: ref.top + anchor.top - scrollTop
-    @height @editor().getLineHeightInPixels()
+    @height @editor.getLineHeightInPixels()
 
-  editor: -> @editorView.getModel()
-
-  buffer: -> @editor().getBuffer()
+  buffer: -> @editor.getBuffer()
 
   includesCursor: (cursor) -> false
 
   offsetForMarker: (marker) ->
     position = marker.getTailBufferPosition()
-    @editor().pixelPositionForBufferPosition position
+    @editor.pixelPositionForBufferPosition position
 
   deleteMarker: (marker) ->
     @buffer().delete marker.getBufferRange()
     marker.destroy()
 
   scrollTo: (positionOrNull) ->
-    @editor().setCursorBufferPosition positionOrNull if positionOrNull?
+    @editor.setCursorBufferPosition positionOrNull if positionOrNull?
 
   prependKeystroke: (eventName, element) ->
     bindings = atom.keymap.findKeyBindings

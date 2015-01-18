@@ -16,14 +16,11 @@ class ConflictMarker
 
     @conflicts = Conflict.all(@state, @editor)
 
-    @editorView = atom.views.getView @editor
-    $(@editorView).addClass 'conflicted' if @conflicts
-
     @coveringViews = []
     for c in @conflicts
-      @coveringViews.push new SideView(c.ours, @editorView)
-      @coveringViews.push new NavigationView(c.navigator, @editorView)
-      @coveringViews.push new SideView(c.theirs, @editorView)
+      @coveringViews.push new SideView(c.ours, @editor)
+      @coveringViews.push new NavigationView(c.navigator, @editor)
+      @coveringViews.push new SideView(c.theirs, @editor)
 
       @subs.add c.onDidResolveConflict =>
         unresolved = (v for v in @coveringViews when not v.conflict().isResolved())
@@ -49,14 +46,14 @@ class ConflictMarker
     @subs.add @editor.onDidStopChanging => @detectDirty()
     @subs.add @editor.onDidDestroy => @cleanup()
 
-    @subs.add atom.commands.add 'atom-text-editor.conflicted', 'merge-conflicts:accept-current', => @acceptCurrent()
-    @subs.add atom.commands.add 'atom-text-editor.conflicted', 'merge-conflicts:accept-ours', => @acceptOurs()
-    @subs.add atom.commands.add 'atom-text-editor.conflicted', 'merge-conflicts:accept-theirs', => @acceptTheirs()
-    @subs.add atom.commands.add 'atom-text-editor.conflicted', 'merge-conflicts:ours-then-theirs', => @acceptOursThenTheirs()
-    @subs.add atom.commands.add 'atom-text-editor.conflicted', 'merge-conflicts:theirs-then-ours', => @acceptTheirsThenOurs()
-    @subs.add atom.commands.add 'atom-text-editor.conflicted', 'merge-conflicts:next-unresolved', => @nextUnresolved()
-    @subs.add atom.commands.add 'atom-text-editor.conflicted', 'merge-conflicts:previous-unresolved', => @previousUnresolved()
-    @subs.add atom.commands.add 'atom-text-editor.conflicted', 'merge-conflicts:revert-current', => @revertCurrent()
+    @subs.add atom.commands.add 'atom-text-editor', 'merge-conflicts:accept-current', => @acceptCurrent()
+    @subs.add atom.commands.add 'atom-text-editor', 'merge-conflicts:accept-ours', => @acceptOurs()
+    @subs.add atom.commands.add 'atom-text-editor', 'merge-conflicts:accept-theirs', => @acceptTheirs()
+    @subs.add atom.commands.add 'atom-text-editor', 'merge-conflicts:ours-then-theirs', => @acceptOursThenTheirs()
+    @subs.add atom.commands.add 'atom-text-editor', 'merge-conflicts:theirs-then-ours', => @acceptTheirsThenOurs()
+    @subs.add atom.commands.add 'atom-text-editor', 'merge-conflicts:next-unresolved', => @nextUnresolved()
+    @subs.add atom.commands.add 'atom-text-editor', 'merge-conflicts:previous-unresolved', => @previousUnresolved()
+    @subs.add atom.commands.add 'atom-text-editor', 'merge-conflicts:revert-current', => @revertCurrent()
 
     @subs.add atom.emitter.on 'merge-conflicts:resolved', ({total, resolved, file}) =>
       if file is @editor.getPath() and total is resolved
@@ -65,7 +62,6 @@ class ConflictMarker
   cleanup: ->
     @subs.dispose()
     v.remove() for v in @coveringViews
-    $(@editorView).removeClass 'conflicted'
 
   conflictsResolved: ->
     @cleanup()
