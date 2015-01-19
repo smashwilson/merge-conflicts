@@ -6,16 +6,12 @@ _ = require 'underscore-plus'
 class CoveringView extends View
 
   initialize: (@editor) ->
-    @cssInitialized = false
-
     @decoration = @editor.decorateMarker @cover(),
       type: 'overlay',
       item: this,
       position: 'tail'
 
   attached: ->
-    return if @cssInitialized
-
     rightPosition = if @editor.verticallyScrollable()
         @editor.getVerticalScrollbarWidth()
       else
@@ -25,8 +21,6 @@ class CoveringView extends View
 
     @css 'margin-top': -@editor.getLineHeightInPixels()
     @height @editor.getLineHeightInPixels()
-
-    @cssInitialized = true
 
   remove: ->
     @decoration.destroy()
