@@ -50,12 +50,12 @@
 
 // This targetting is temporary until SideViews work as overlay decorations.
 // See https://github.com/smashwilson/merge-conflicts/pull/93 for progress.
-.overlayer {
+atom-overlay {
   .side {
     padding: 0 20px;
-    width: 100%;
-    position: absolute;
     left: 0;
+    right: 0;
+
     span {
       margin-left: 10px;
     }
@@ -72,7 +72,7 @@
       border-top-left-radius: 5px;
       border-top-right-radius: 5px;
       button {
-        margin-top: 5px;
+        margin-top: 1px;
       }
     }
 
@@ -80,7 +80,7 @@
       border-bottom-left-radius: 5px;
       border-bottom-right-radius: 5px;
       button {
-        margin-top: -35px;
+        margin-top: -1px;
       }
     }
 
@@ -95,10 +95,9 @@
 
   .navigation {
     padding: 0 20px;
-    background: @base-background-color;
-    width: 100%;
-    position: absolute;
     left: 0;
+    right: 0;
+    background: @base-background-color;
 
     span.pull-right {
       clear: right;

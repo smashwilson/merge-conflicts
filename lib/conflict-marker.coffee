@@ -6,7 +6,6 @@ Conflict = require './conflict'
 SideView = require './side-view'
 NavigationView = require './navigation-view'
 ResolverView = require './resolver-view'
-{EditorAdapter} = require './editor-adapter'
 
 module.exports =
 class ConflictMarker
@@ -24,7 +23,6 @@ class ConflictMarker
 
       @subs.add c.onDidResolveConflict =>
         unresolved = (v for v in @coveringViews when not v.conflict().isResolved())
-        v.reposition() for v in unresolved
         resolvedCount = @conflicts.length - Math.floor(unresolved.length / 3)
         atom.emitter.emit 'merge-conflicts:resolved',
           file: @editor.getPath(),

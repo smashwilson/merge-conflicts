@@ -20,11 +20,6 @@ describe 'SideView', ->
     expect(view.hasClass 'top').toBe(true)
     expect(view.hasClass 'bottom').toBe(false)
 
-  xit 'positions itself over the banner line', ->
-    refBanner = $(editorView).find('.line:contains("<<<<<<<")')
-    expect(view.offset().top).toEqual(refBanner.offset().top)
-    expect(view.height()).toEqual(refBanner.height())
-
   it 'knows if its text is unaltered', ->
     expect(ours.isDirty).toBe(false)
     expect(theirs.isDirty).toBe(false)
