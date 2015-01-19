@@ -6,7 +6,6 @@ Conflict = require './conflict'
 SideView = require './side-view'
 NavigationView = require './navigation-view'
 ResolverView = require './resolver-view'
-{EditorAdapter} = require './editor-adapter'
 
 module.exports =
 class ConflictMarker

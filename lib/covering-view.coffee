@@ -1,6 +1,5 @@
 {View, $} = require 'space-pen'
 _ = require 'underscore-plus'
-{EditorAdapter} = require './editor-adapter'
 
 
 class CoveringView extends View
