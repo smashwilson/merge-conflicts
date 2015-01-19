@@ -6,13 +6,30 @@ _ = require 'underscore-plus'
 class CoveringView extends View
 
   initialize: (@editor) ->
-    @editorView = atom.views.getView @editor
-    @adapter = EditorAdapter.adapt(@editorView)
+    @cssInitialized = false
 
-    @adapter.append(this)
-    @reposition()
+    @decoration = @editor.decorateMarker @cover(),
+      type: 'overlay',
+      item: this,
+      position: 'tail'
 
-    @cover().onDidChange => @reposition()
+  attached: ->
+    return if @cssInitialized
+
+    rightPosition = if @editor.verticallyScrollable()
+        @editor.getVerticalScrollbarWidth()
+      else
+        0
+
+    @parent().css right: rightPosition
+
+    @css 'margin-top': -@editor.getLineHeightInPixels()
+    @height @editor.getLineHeightInPixels()
+
+    @cssInitialized = true
+
+  remove: ->
+    @decoration.destroy()
 
   # Override to specify the marker of the first line that should be covered.
   cover: -> null
@@ -30,22 +47,9 @@ class CoveringView extends View
 
   getModel: -> null
 
-  reposition: ->
-    marker = @cover()
-    anchor = $(@editorView).offset()
-    ref = @offsetForMarker marker
-    scrollTop = @editor.getScrollTop()
-
-    @offset top: ref.top + anchor.top - scrollTop
-    @height @editor.getLineHeightInPixels()
-
   buffer: -> @editor.getBuffer()
 
   includesCursor: (cursor) -> false
-
-  offsetForMarker: (marker) ->
-    position = marker.getTailBufferPosition()
-    @editor.pixelPositionForBufferPosition position
 
   deleteMarker: (marker) ->
     @buffer().delete marker.getBufferRange()
@@ -55,9 +59,7 @@ class CoveringView extends View
     @editor.setCursorBufferPosition positionOrNull if positionOrNull?
 
   prependKeystroke: (eventName, element) ->
-    bindings = atom.keymap.findKeyBindings
-      target: @editorView[0]
-      command: eventName
+    bindings = atom.keymap.findKeyBindings command: eventName
 
     for e in bindings
       original = element.text()
