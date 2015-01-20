@@ -30,6 +30,8 @@ class ConflictMarker
           source: this
 
     if @conflicts.length > 0
+      atom.views.getView(@editor).classList.add 'conflicted'
+
       cv.decorate() for cv in @coveringViews
       @installEvents()
       @focusConflict @conflicts[0]
@@ -44,20 +46,22 @@ class ConflictMarker
     @subs.add @editor.onDidStopChanging => @detectDirty()
     @subs.add @editor.onDidDestroy => @cleanup()
 
-    @subs.add atom.commands.add 'atom-text-editor', 'merge-conflicts:accept-current', => @acceptCurrent()
-    @subs.add atom.commands.add 'atom-text-editor', 'merge-conflicts:accept-ours', => @acceptOurs()
-    @subs.add atom.commands.add 'atom-text-editor', 'merge-conflicts:accept-theirs', => @acceptTheirs()
-    @subs.add atom.commands.add 'atom-text-editor', 'merge-conflicts:ours-then-theirs', => @acceptOursThenTheirs()
-    @subs.add atom.commands.add 'atom-text-editor', 'merge-conflicts:theirs-then-ours', => @acceptTheirsThenOurs()
-    @subs.add atom.commands.add 'atom-text-editor', 'merge-conflicts:next-unresolved', => @nextUnresolved()
-    @subs.add atom.commands.add 'atom-text-editor', 'merge-conflicts:previous-unresolved', => @previousUnresolved()
-    @subs.add atom.commands.add 'atom-text-editor', 'merge-conflicts:revert-current', => @revertCurrent()
+    @subs.add atom.commands.add 'atom-text-editor',
+      'merge-conflicts:accept-current': => @acceptCurrent(),
+      'merge-conflicts:accept-ours': => @acceptOurs(),
+      'merge-conflicts:accept-theirs': => @acceptTheirs(),
+      'merge-conflicts:ours-then-theirs': => @acceptOursThenTheirs(),
+      'merge-conflicts:theirs-then-ours': => @acceptTheirsThenOurs(),
+      'merge-conflicts:next-unresolved': => @nextUnresolved(),
+      'merge-conflicts:previous-unresolved': => @previousUnresolved(),
+      'merge-conflicts:revert-current': => @revertCurrent()
 
     @subs.add atom.emitter.on 'merge-conflicts:resolved', ({total, resolved, file}) =>
       if file is @editor.getPath() and total is resolved
         @conflictsResolved()
 
   cleanup: ->
+    atom.views.getView(@editor).classList.remove 'conflicted'
     @subs.dispose()
     v.remove() for v in @coveringViews
 
@@ -75,6 +79,8 @@ class ConflictMarker
     v.detectDirty() for v in _.uniq(potentials)
 
   acceptCurrent: ->
+    return unless @editor is atom.workspace.getActiveTextEditor()
+
     sides = @active()
 
     # Do nothing if you have cursors in *both* sides of a single conflict.
@@ -89,19 +95,26 @@ class ConflictMarker
 
     side.resolve() for side in sides
 
-  acceptOurs: -> side.conflict.ours.resolve() for side in @active()
+  acceptOurs: ->
+    return unless @editor is atom.workspace.getActiveTextEditor()
+    side.conflict.ours.resolve() for side in @active()
 
-  acceptTheirs: -> side.conflict.theirs.resolve() for side in @active()
+  acceptTheirs: ->
+    return unless @editor is atom.workspace.getActiveTextEditor()
+    side.conflict.theirs.resolve() for side in @active()
 
   acceptOursThenTheirs: ->
+    return unless @editor is atom.workspace.getActiveTextEditor()
     for side in @active()
       @combineSides side.conflict.ours, side.conflict.theirs
 
   acceptTheirsThenOurs: ->
+    return unless @editor is atom.workspace.getActiveTextEditor()
     for side in @active()
       @combineSides side.conflict.theirs, side.conflict.ours
 
   nextUnresolved: ->
+    return unless @editor is atom.workspace.getActiveTextEditor()
     final = _.last @active()
     if final?
       n = final.conflict.navigator.nextUnresolved()
@@ -127,6 +140,7 @@ class ConflictMarker
       @focusConflict target
 
   previousUnresolved: ->
+    return unless @editor is atom.workspace.getActiveTextEditor()
     initial = _.first @active()
     if initial?
       p = initial.conflict.navigator.previousUnresolved()
@@ -152,6 +166,7 @@ class ConflictMarker
       @focusConflict target
 
   revertCurrent: ->
+    return unless @editor is atom.workspace.getActiveTextEditor()
     for side in @active()
       for view in @coveringViews when view.conflict() is side.conflict
         view.revert() if view.isDirty()

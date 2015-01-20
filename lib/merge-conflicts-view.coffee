@@ -57,8 +57,9 @@ class MergeConflictsView extends View
 
     @subs.add atom.emitter.on 'merge-conflicts:staged', => @refresh()
 
-    @subs.add atom.commands.add @element, 'merge-conflicts:entire-file-ours', @sideResolver('ours')
-    @subs.add atom.commands.add @element, 'merge-conflicts:entire-file-theirs', @sideResolver('theirs')
+    @subs.add atom.commands.add @element,
+      'merge-conflicts:entire-file-ours': @sideResolver('ours'),
+      'merge-conflicts:entire-file-theirs': @sideResolver('theirs')
 
   navigate: (event, element) ->
     repoPath = element.find(".path").text()
