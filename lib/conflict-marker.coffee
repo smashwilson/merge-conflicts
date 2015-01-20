@@ -79,6 +79,8 @@ class ConflictMarker
     v.detectDirty() for v in _.uniq(potentials)
 
   acceptCurrent: ->
+    return unless @editor is atom.workspace.getActiveTextEditor()
+
     sides = @active()
 
     # Do nothing if you have cursors in *both* sides of a single conflict.
@@ -93,19 +95,26 @@ class ConflictMarker
 
     side.resolve() for side in sides
 
-  acceptOurs: -> side.conflict.ours.resolve() for side in @active()
+  acceptOurs: ->
+    return unless @editor is atom.workspace.getActiveTextEditor()
+    side.conflict.ours.resolve() for side in @active()
 
-  acceptTheirs: -> side.conflict.theirs.resolve() for side in @active()
+  acceptTheirs: ->
+    return unless @editor is atom.workspace.getActiveTextEditor()
+    side.conflict.theirs.resolve() for side in @active()
 
   acceptOursThenTheirs: ->
+    return unless @editor is atom.workspace.getActiveTextEditor()
     for side in @active()
       @combineSides side.conflict.ours, side.conflict.theirs
 
   acceptTheirsThenOurs: ->
+    return unless @editor is atom.workspace.getActiveTextEditor()
     for side in @active()
       @combineSides side.conflict.theirs, side.conflict.ours
 
   nextUnresolved: ->
+    return unless @editor is atom.workspace.getActiveTextEditor()
     final = _.last @active()
     if final?
       n = final.conflict.navigator.nextUnresolved()
@@ -131,6 +140,7 @@ class ConflictMarker
       @focusConflict target
 
   previousUnresolved: ->
+    return unless @editor is atom.workspace.getActiveTextEditor()
     initial = _.first @active()
     if initial?
       p = initial.conflict.navigator.previousUnresolved()
@@ -156,6 +166,7 @@ class ConflictMarker
       @focusConflict target
 
   revertCurrent: ->
+    return unless @editor is atom.workspace.getActiveTextEditor()
     for side in @active()
       for view in @coveringViews when view.conflict() is side.conflict
         view.revert() if view.isDirty()
