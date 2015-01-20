@@ -10,13 +10,19 @@ module.exports =
     @emitter = new Emitter
 
     pkgEmitter =
+      onDidResolveConflict: @onDidResolveConflict
       didResolveConflict: (event) => @emitter.emit 'did-resolve-conflict', event
+      onDidStageFile: @onDidStageFile
       didStageFile: (event) => @emitter.emit 'did-stage-file', event
+      onDidQuitConflictResolution: @onDidQuitConflictResolution
+      didQuitConflictResolution: => @emitter.emit 'did-quit-conflict-resolution'
+      onDidCompleteConflictResolution: @onDidCompleteConflictResolution
+      didCompleteConflictResolution: => @emitter.emit 'did-complete-conflict-resolution'
 
     @subs.add atom.commands.add 'atom-workspace', 'merge-conflicts:detect', ->
       GitBridge.locateGitAnd (err) ->
         return handleErr(err) if err?
-        MergeConflictsView.detect()
+        MergeConflictsView.detect(pkgEmitter)
 
   deactivate: ->
     @subs.dispose()
@@ -37,3 +43,15 @@ module.exports =
   #
   onDidStageFile: (callback) ->
     @emitter.on 'did-stage-file', callback
+
+  # Invoke a callback if conflict resolution is prematurely exited, while conflicts remain
+  # unresolved.
+  #
+  onDidQuitConflictResolution: (callback) ->
+    @emitter.on 'did-quit-conflict-resolution', callback
+
+  # Invoke a callback if conflict resolution is completed successfully, with all conflicts resolved
+  # and all files staged.
+  #
+  onDidCompleteConflictResolution: (callback) ->
+    @emitter.on 'did-complete-conflict-resolution', callback

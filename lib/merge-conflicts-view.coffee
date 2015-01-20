@@ -14,7 +14,7 @@ class MergeConflictsView extends View
 
   instance: null
 
-  @content: (state) ->
+  @content: (state, pkg) ->
     @div class: 'merge-conflicts tool-panel panel-bottom padded', =>
       @div class: 'panel-heading', =>
         @text 'Conflicts'
@@ -33,11 +33,11 @@ class MergeConflictsView extends View
         @div class: 'block pull-right', =>
           @button class: 'btn btn-sm', click: 'quit', 'Quit'
 
-  initialize: (@state) ->
+  initialize: (@state, @pkg) ->
     @markers = []
     @subs = new CompositeDisposable
 
-    @subs.add atom.emitter.on 'merge-conflicts:resolved', (event) =>
+    @subs.add @pkg.onDidResolveConflict (event) =>
       p = atom.project.getRepositories()[0].relativize event.file
       found = false
       for listElement in @pathList.children()
@@ -54,7 +54,7 @@ class MergeConflictsView extends View
       unless found
         console.error "Unrecognized conflict path: #{p}"
 
-    @subs.add atom.emitter.on 'merge-conflicts:staged', => @refresh()
+    @subs.add @pkg.onDidStageFile => @refresh()
 
     @subs.add atom.commands.add @element,
       'merge-conflicts:entire-file-ours': @sideResolver('ours'),
@@ -74,7 +74,7 @@ class MergeConflictsView extends View
     @body.show 'fast'
 
   quit: ->
-    atom.emitter.emit 'merge-conflicts:quit'
+    @pkg.didQuitConflictResolution()
     @finish(MaybeLaterView)
 
   refresh: ->
@@ -94,7 +94,7 @@ class MergeConflictsView extends View
           @pathList.find("li[data-path='#{p}'] .stage-ready").hide()
 
       if @state.isEmpty()
-        atom.emitter.emit 'merge-conflicts:done'
+        @pkg.didCompleteConflictResolution()
         @finish(SuccessView)
 
   finish: (viewClass) ->
@@ -115,7 +115,7 @@ class MergeConflictsView extends View
         return if handleErr(err)
 
         full = path.join atom.project.getPaths()[0], p
-        atom.emitter.emit 'merge-conflicts:resolved', file: full, total: 1, resolved: 1
+        @pkg.didResolveConflict file: full, total: 1, resolved: 1
         atom.workspace.open p
 
   stageFile: (event, element) ->
@@ -128,9 +128,9 @@ class MergeConflictsView extends View
     GitBridge.add repoPath, (err) ->
       return if handleErr(err)
 
-      atom.emitter.emit 'merge-conflicts:staged', file: filePath
+      @pkg.didStageFile file: filePath
 
-  @detect: ->
+  @detect: (pkg) ->
     return unless atom.project.getRepositories().length > 0
     return if @instance?
 
