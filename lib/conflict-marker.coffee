@@ -44,14 +44,15 @@ class ConflictMarker
     @subs.add @editor.onDidStopChanging => @detectDirty()
     @subs.add @editor.onDidDestroy => @cleanup()
 
-    @subs.add atom.commands.add 'atom-text-editor', 'merge-conflicts:accept-current', => @acceptCurrent()
-    @subs.add atom.commands.add 'atom-text-editor', 'merge-conflicts:accept-ours', => @acceptOurs()
-    @subs.add atom.commands.add 'atom-text-editor', 'merge-conflicts:accept-theirs', => @acceptTheirs()
-    @subs.add atom.commands.add 'atom-text-editor', 'merge-conflicts:ours-then-theirs', => @acceptOursThenTheirs()
-    @subs.add atom.commands.add 'atom-text-editor', 'merge-conflicts:theirs-then-ours', => @acceptTheirsThenOurs()
-    @subs.add atom.commands.add 'atom-text-editor', 'merge-conflicts:next-unresolved', => @nextUnresolved()
-    @subs.add atom.commands.add 'atom-text-editor', 'merge-conflicts:previous-unresolved', => @previousUnresolved()
-    @subs.add atom.commands.add 'atom-text-editor', 'merge-conflicts:revert-current', => @revertCurrent()
+    @subs.add atom.commands.add 'atom-text-editor',
+      'merge-conflicts:accept-current': => @acceptCurrent(),
+      'merge-conflicts:accept-ours': => @acceptOurs(),
+      'merge-conflicts:accept-theirs': => @acceptTheirs(),
+      'merge-conflicts:ours-then-theirs': => @acceptOursThenTheirs(),
+      'merge-conflicts:theirs-then-ours': => @acceptTheirsThenOurs(),
+      'merge-conflicts:next-unresolved': => @nextUnresolved(),
+      'merge-conflicts:previous-unresolved': => @previousUnresolved(),
+      'merge-conflicts:revert-current': => @revertCurrent()
 
     @subs.add atom.emitter.on 'merge-conflicts:resolved', ({total, resolved, file}) =>
       if file is @editor.getPath() and total is resolved
