@@ -10,7 +10,6 @@ ConflictMarker = require './conflict-marker'
 {SuccessView, MaybeLaterView, NothingToMergeView} = require './message-views'
 handleErr = require './error-view'
 
-module.exports =
 class MergeConflictsView extends View
 
   instance: null
@@ -157,3 +156,7 @@ class MergeConflictsView extends View
     return unless _.contains state.conflictPaths(), repoPath
 
     new ConflictMarker(state, editor)
+
+
+module.exports =
+  MergeConflictsView: MergeConflictsView
