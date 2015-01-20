@@ -30,6 +30,8 @@ class ConflictMarker
           source: this
 
     if @conflicts.length > 0
+      atom.views.getView(@editor).classList.add 'conflicted'
+
       cv.decorate() for cv in @coveringViews
       @installEvents()
       @focusConflict @conflicts[0]
@@ -59,6 +61,7 @@ class ConflictMarker
         @conflictsResolved()
 
   cleanup: ->
+    atom.views.getView(@editor).classList.remove 'conflicted'
     @subs.dispose()
     v.remove() for v in @coveringViews
 
