@@ -31,7 +31,7 @@ class GitBridge
       'git' # Search the inherited execution PATH. Unreliable on Macs.
       '/usr/local/bin/git' # Homebrew
       '"%PROGRAMFILES%\\Git\\bin\\git"' # Reasonable Windows default
-      '"%APPDATA%\\..\\Local\\Programs\\Git\\bin\\git"' # Contributed Windows path
+      '"%LOCALAPPDATA%\\Programs\\Git\\bin\\git"' # Contributed Windows path
     ]
 
     possiblePath = search.shift()
