@@ -143,12 +143,12 @@ class MergeConflictsView extends View
         atom.workspace.addBottomPanel item: view
 
         @instance.subs.add atom.workspace.observeTextEditors (editor) =>
-          marker = @markConflictsIn state, editor
+          marker = @markConflictsIn state, editor, pkg
           @instance.markers.push marker if marker?
       else
         atom.workspace.addTopPanel item: new NothingToMergeView(state)
 
-  @markConflictsIn: (state, editor) ->
+  @markConflictsIn: (state, editor, pkg) ->
     return if state.isEmpty()
 
     fullPath = editor.getPath()
