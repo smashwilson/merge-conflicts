@@ -37,7 +37,7 @@ describe 'ConflictMarker', ->
     waitsFor -> done
 
   afterEach ->
-    pkg.cleanup()
+    pkg.dispose()
 
   describe 'with a merge conflict', ->
 

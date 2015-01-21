@@ -8,7 +8,7 @@ Conflict = require '../lib/conflict'
 util = require './util'
 
 describe 'MergeConflictsView', ->
-  [view, state] = []
+  [view, state, pkg] = []
 
   fullPath = (fname) ->
     path.join atom.project.getPaths()[0], 'path', fname
@@ -17,6 +17,8 @@ describe 'MergeConflictsView', ->
     atom.project.getRepositories()[0].relativize fullPath(fname)
 
   beforeEach ->
+    pkg = util.pkgEmitter()
+
     conflicts = _.map ['file1.txt', 'file2.txt'], (fname) ->
       { path: repoPath(fname), message: 'both modified' }
 
@@ -24,7 +26,10 @@ describe 'MergeConflictsView', ->
       state = new MergeState conflicts, false
       conflicts = Conflict.all state, editorView.getModel()
 
-      view = new MergeConflictsView state
+      view = new MergeConflictsView(state, pkg)
+
+  afterEach ->
+    pkg.dispose()
 
   describe 'conflict resolution progress', ->
     progressFor = (filename) ->
@@ -35,7 +40,7 @@ describe 'MergeConflictsView', ->
       expect(progressFor('file2.txt').value).toBe(0)
 
     it 'advances when requested', ->
-      atom.emitter.emit 'merge-conflicts:resolved',
+      pkg.didResolveConflict
         file: fullPath('file1.txt'),
         total: 3,
         resolved: 2
@@ -59,7 +64,7 @@ describe 'MergeConflictsView', ->
         exit(0)
         { process: { on: (err) -> } }
 
-      atom.emitter.emit 'merge-conflicts:staged', file: fullPath('file1.txt')
+      pkg.didStageFile file: fullPath('file1.txt')
       expect(isMarkedWith 'file1.txt', 'check').toBe(true)
       expect(isMarkedWith 'file2.txt', 'dash').toBe(true)
 

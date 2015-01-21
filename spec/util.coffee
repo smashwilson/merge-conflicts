@@ -1,7 +1,5 @@
 {Emitter} = require 'atom'
 
-emitter = null
-
 module.exports =
   openPath: (path, callback) ->
     workspaceElement = atom.views.getView(atom.workspace)
@@ -27,5 +25,5 @@ module.exports =
       didQuitConflictResolution: -> emitter.emit 'did-quit-conflict-resolution'
       onDidCompleteConflictResolution: (callback) -> emitter.on 'did-complete-conflict-resolution', callback
       didCompleteConflictResolution: -> emitter.emit 'did-complete-conflict-resolution'
-      cleanup: -> emitter.dispose()
+      dispose: -> emitter.dispose()
     }
