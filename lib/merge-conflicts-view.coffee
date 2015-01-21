@@ -138,7 +138,7 @@ class MergeConflictsView extends View
       return if handleErr(err)
 
       if not state.isEmpty()
-        view = new MergeConflictsView(state)
+        view = new MergeConflictsView(state, pkg)
         @instance = view
         atom.workspace.addBottomPanel item: view
 
@@ -155,7 +155,7 @@ class MergeConflictsView extends View
     repoPath = atom.project.getRepositories()[0].relativize fullPath
     return unless _.contains state.conflictPaths(), repoPath
 
-    new ConflictMarker(state, editor)
+    new ConflictMarker(state, editor, pkg)
 
 
 module.exports =

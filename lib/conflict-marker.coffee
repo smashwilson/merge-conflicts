@@ -10,7 +10,7 @@ ResolverView = require './resolver-view'
 module.exports =
 class ConflictMarker
 
-  constructor: (@state, @editor) ->
+  constructor: (@state, @editor, @pkg) ->
     @subs = new CompositeDisposable
 
     @conflicts = Conflict.all(@state, @editor)
@@ -24,7 +24,7 @@ class ConflictMarker
       @subs.add c.onDidResolveConflict =>
         unresolved = (v for v in @coveringViews when not v.conflict().isResolved())
         resolvedCount = @conflicts.length - Math.floor(unresolved.length / 3)
-        atom.emitter.emit 'merge-conflicts:resolved',
+        @pkg.didResolveConflict
           file: @editor.getPath(),
           total: @conflicts.length, resolved: resolvedCount,
           source: this
@@ -36,7 +36,7 @@ class ConflictMarker
       @installEvents()
       @focusConflict @conflicts[0]
     else
-      atom.emitter.emit 'merge-conflicts:resolved',
+      @pkg.didResolveConflict
         file: @editor.getPath(),
         total: 1, resolved: 1,
         source: this
@@ -56,7 +56,7 @@ class ConflictMarker
       'merge-conflicts:previous-unresolved': => @previousUnresolved(),
       'merge-conflicts:revert-current': => @revertCurrent()
 
-    @subs.add atom.emitter.on 'merge-conflicts:resolved', ({total, resolved, file}) =>
+    @subs.add @pkg.onDidResolveConflict ({total, resolved, file}) =>
       if file is @editor.getPath() and total is resolved
         @conflictsResolved()
 
