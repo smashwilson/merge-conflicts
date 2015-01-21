@@ -1,17 +1,19 @@
 ResolverView = require '../lib/resolver-view'
 {GitBridge} = require '../lib/git-bridge'
+util = require './util'
 
 describe 'ResolverView', ->
-  [view, fakeEditor] = []
+  [view, fakeEditor, pkg] = []
 
   beforeEach ->
+    pkg = util.pkgEmitter()
     fakeEditor = {
       isModified: -> true
-      getUri: -> 'lib/file1.txt'
+      getURI: -> 'lib/file1.txt'
       save: ->
       onDidSave: ->
     }
-    view = new ResolverView(fakeEditor)
+    view = new ResolverView(fakeEditor, pkg)
 
     atom.config.set('merge-conflicts.gitPath', 'git')
     done = false
