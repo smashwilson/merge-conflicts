@@ -10,13 +10,13 @@ module.exports =
     @emitter = new Emitter
 
     pkgEmitter =
-      onDidResolveConflict: @onDidResolveConflict
+      onDidResolveConflict: (callback) => @onDidResolveConflict(callback)
       didResolveConflict: (event) => @emitter.emit 'did-resolve-conflict', event
-      onDidStageFile: @onDidStageFile
+      onDidStageFile: (callback) => @onDidStageFile(callback)
       didStageFile: (event) => @emitter.emit 'did-stage-file', event
-      onDidQuitConflictResolution: @onDidQuitConflictResolution
+      onDidQuitConflictResolution: (callback) => @onDidQuitConflictResolution(callback)
       didQuitConflictResolution: => @emitter.emit 'did-quit-conflict-resolution'
-      onDidCompleteConflictResolution: @onDidCompleteConflictResolution
+      onDidCompleteConflictResolution: (callback) => @onDidCompleteConflictResolution(callback)
       didCompleteConflictResolution: => @emitter.emit 'did-complete-conflict-resolution'
 
     @subs.add atom.commands.add 'atom-workspace', 'merge-conflicts:detect', ->
