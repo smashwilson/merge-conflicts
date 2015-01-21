@@ -6,7 +6,7 @@ ConflictMarker = require '../lib/conflict-marker'
 util = require './util'
 
 describe 'ConflictMarker', ->
-  [editorView, editor, state, m] = []
+  [editorView, editor, state, m, pkg] = []
 
   cursors = -> c.getBufferPosition().toArray() for c in editor.getCursors()
 
@@ -26,6 +26,8 @@ describe 'ConflictMarker', ->
     result
 
   beforeEach ->
+    pkg = util.pkgEmitter()
+
     done = false
 
     GitBridge.locateGitAnd (err) ->
@@ -33,6 +35,9 @@ describe 'ConflictMarker', ->
       done = true
 
     waitsFor -> done
+
+  afterEach ->
+    pkg.dispose()
 
   describe 'with a merge conflict', ->
 
@@ -46,7 +51,7 @@ describe 'ConflictMarker', ->
         state =
           isRebase: false
 
-        m = new ConflictMarker(state, editor)
+        m = new ConflictMarker(state, editor, pkg)
 
     it 'attaches two SideViews and a NavigationView for each conflict', ->
       expect($(editorView).find('.side').length).toBe(6)
@@ -73,9 +78,9 @@ describe 'ConflictMarker', ->
       expect(lines.hasClass 'conflict-dirty').toBe(true)
       expect(lines.hasClass 'conflict-ours').toBe(false)
 
-    it 'broadcasts the "merge-conflicts:resolved" event', ->
+    it 'broadcasts the onDidResolveConflict event', ->
       event = null
-      atom.emitter.on 'merge-conflicts:resolved', (e) -> event = e
+      pkg.onDidResolveConflict (e) -> event = e
       m.conflicts[2].theirs.resolve()
 
       expect(event.file).toBe(editor.getPath())
@@ -191,7 +196,7 @@ describe 'ConflictMarker', ->
         state =
           isRebase: true
 
-        m = new ConflictMarker(state, editor)
+        m = new ConflictMarker(state, editor, pkg)
 
         editor.setCursorBufferPosition [3, 14]
         active = m.conflicts[0]

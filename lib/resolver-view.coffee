@@ -6,7 +6,7 @@ handleErr = require './error-view'
 module.exports =
 class ResolverView extends View
 
-  @content: (editor) ->
+  @content: (editor, pkg) ->
     @div class: 'overlay from-top resolver', =>
       @div class: 'block text-highlight', "We're done here"
       @div class: 'block', =>
@@ -20,7 +20,7 @@ class ResolverView extends View
       @div class: 'pull-right', =>
         @button class: 'btn btn-primary', click: 'resolve', 'Stage'
 
-  initialize: (@editor) ->
+  initialize: (@editor, @pkg) ->
     @subs = new CompositeDisposable()
 
     @refresh()
@@ -32,7 +32,7 @@ class ResolverView extends View
 
   getModel: -> null
 
-  relativePath: -> atom.project.getRepositories()[0].relativize @editor.getUri()
+  relativePath: -> atom.project.getRepositories()[0].relativize @editor.getURI()
 
   refresh: ->
     GitBridge.isStaged @relativePath(), (err, staged) =>
@@ -45,7 +45,7 @@ class ResolverView extends View
 
       unless needsSaved or needsStaged
         @hide 'fast', -> @remove()
-        atom.emitter.emit 'merge-conflicts:staged', file: @editor.getUri()
+        @pkg.didStageFile file: @editor.getURI()
         return
 
       if needsSaved
