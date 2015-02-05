@@ -40,10 +40,13 @@ class SideView extends CoveringView
   cover: -> @side.refBannerMarker
 
   decorate: ->
+    @decoration?.destroy()
+
+    return if @side.conflict.isResolved() && !@side.wasChosen()
+
     args =
       type: 'line'
       class: @side.lineClass()
-    @decoration.destroy() if @decoration?
     @decoration = @editor.decorateMarker(@side.marker, args)
 
   conflict: -> @side.conflict

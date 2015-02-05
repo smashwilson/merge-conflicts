@@ -1,5 +1,6 @@
 ## 1.2.10
 
+- Don't decorate destroyed markers. [#124](https://github.com/smashwilson/merge-conflicts/pull/124)
 - Missed a fat arrow. [#125](https://github.com/smashwilson/merge-conflicts/pull/125)
 - Control subscription cleanup in CoveringViews. [#123](https://github.com/smashwilson/merge-conflicts/pull/123)
 
