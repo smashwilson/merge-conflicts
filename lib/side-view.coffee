@@ -16,19 +16,25 @@ class SideView extends CoveringView
   initialize: (@side, editor) ->
     super editor
     @subs = new CompositeDisposable
-
     @decoration = null
 
     @detectDirty()
     @prependKeystroke @side.eventName(), @useMeBtn
     @prependKeystroke 'merge-conflicts:revert-current', @revertBtn
 
+  attached: ->
+    super
+
+    @decorate()
     @subs.add @side.conflict.onDidResolveConflict =>
       @deleteMarker @side.refBannerMarker
       @deleteMarker @side.marker unless @side.wasChosen()
       @remove()
+      @cleanup()
 
-  detached: -> @subs.dispose()
+  cleanup: ->
+    super
+    @subs.dispose()
 
   cover: -> @side.refBannerMarker
 

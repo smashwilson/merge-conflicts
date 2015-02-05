@@ -20,9 +20,12 @@ class NavigationView extends CoveringView
 
     @subs.add @navigator.conflict.onDidResolveConflict =>
       @deleteMarker @cover()
-      @hide()
+      @remove()
+      @cleanup()
 
-  detached: -> @subs.dispose()
+  cleanup: ->
+    super
+    @subs.dispose()
 
   cover: -> @navigator.separatorMarker
 
