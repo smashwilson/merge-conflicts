@@ -125,7 +125,7 @@ class MergeConflictsView extends View
     for e in atom.workspace.getTextEditors()
       e.save() if e.getPath() is filePath
 
-    GitBridge.add repoPath, (err) ->
+    GitBridge.add repoPath, (err) =>
       return if handleErr(err)
 
       @pkg.didStageFile file: filePath
