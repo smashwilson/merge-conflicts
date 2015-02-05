@@ -1,3 +1,4 @@
+{CompositeDisposable} = require 'atom'
 {View, $} = require 'space-pen'
 _ = require 'underscore-plus'
 
@@ -5,10 +6,13 @@ _ = require 'underscore-plus'
 class CoveringView extends View
 
   initialize: (@editor) ->
-    @decoration = @editor.decorateMarker @cover(),
+    @coverSubs = new CompositeDisposable
+    @overlay = @editor.decorateMarker @cover(),
       type: 'overlay',
       item: this,
       position: 'tail'
+
+    @coverSubs.add @editor.onDidDestroy => @cleanup()
 
   attached: ->
     rightPosition = if @editor.verticallyScrollable()
@@ -21,8 +25,11 @@ class CoveringView extends View
     @css 'margin-top': -@editor.getLineHeightInPixels()
     @height @editor.getLineHeightInPixels()
 
-  remove: ->
-    @decoration.destroy()
+  cleanup: ->
+    @coverSubs.dispose()
+
+    @overlay?.destroy()
+    @overlay = null
 
   # Override to specify the marker of the first line that should be covered.
   cover: -> null

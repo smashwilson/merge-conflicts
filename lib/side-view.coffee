@@ -14,21 +14,28 @@ class SideView extends CoveringView
           @button class: 'btn btn-xs inline-block-tight', click: 'useMe', outlet: 'useMeBtn', 'Use Me'
 
   initialize: (@side, editor) ->
-    super editor
     @subs = new CompositeDisposable
-
     @decoration = null
+
+    super editor
 
     @detectDirty()
     @prependKeystroke @side.eventName(), @useMeBtn
     @prependKeystroke 'merge-conflicts:revert-current', @revertBtn
 
+  attached: ->
+    super
+
+    @decorate()
     @subs.add @side.conflict.onDidResolveConflict =>
       @deleteMarker @side.refBannerMarker
       @deleteMarker @side.marker unless @side.wasChosen()
       @remove()
+      @cleanup()
 
-  detached: -> @subs.dispose()
+  cleanup: ->
+    super
+    @subs.dispose()
 
   cover: -> @side.refBannerMarker
 

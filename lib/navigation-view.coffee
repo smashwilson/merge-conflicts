@@ -12,17 +12,21 @@ class NavigationView extends CoveringView
         @button class: 'btn btn-xs', click: 'down', outlet: 'nextBtn', 'next'
 
   initialize: (@navigator, editor) ->
-    super editor
     @subs = new CompositeDisposable
+
+    super editor
 
     @prependKeystroke 'merge-conflicts:previous-unresolved', @prevBtn
     @prependKeystroke 'merge-conflicts:next-unresolved', @nextBtn
 
     @subs.add @navigator.conflict.onDidResolveConflict =>
       @deleteMarker @cover()
-      @hide()
+      @remove()
+      @cleanup()
 
-  detached: -> @subs.dispose()
+  cleanup: ->
+    super
+    @subs.dispose()
 
   cover: -> @navigator.separatorMarker
 

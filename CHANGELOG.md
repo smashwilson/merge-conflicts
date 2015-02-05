@@ -1,3 +1,7 @@
+## 1.2.10
+
+- Control subscription cleanup in CoveringViews. [#123](https://github.com/smashwilson/merge-conflicts/pull/123)
+
 ## 1.2.9
 
 - It actually works again :wink:
