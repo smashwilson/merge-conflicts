@@ -14,9 +14,10 @@ class SideView extends CoveringView
           @button class: 'btn btn-xs inline-block-tight', click: 'useMe', outlet: 'useMeBtn', 'Use Me'
 
   initialize: (@side, editor) ->
-    super editor
     @subs = new CompositeDisposable
     @decoration = null
+
+    super editor
 
     @detectDirty()
     @prependKeystroke @side.eventName(), @useMeBtn
