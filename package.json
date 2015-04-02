@@ -7,9 +7,9 @@
   "contributors": [
     "Maximilian Schüßler <maximilian@mschuessler.org>"
   ],
-  "activationEvents": [
-    "merge-conflicts:detect"
-  ],
+  "activationCommands": {
+    "atom-workspace": ["merge-conflicts:detect"]
+  },
   "repository": "https://github.com/smashwilson/merge-conflicts",
   "license": "MIT",
   "engines": {
