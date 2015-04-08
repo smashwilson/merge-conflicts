@@ -1,4 +1,4 @@
-## 1.2.11
+## 1.3.0
 
 - Fix more deprecation warnings. [#132](https://github.com/smashwilson/merge-conflicts/pull/132)
 
