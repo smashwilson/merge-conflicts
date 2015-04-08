@@ -1,3 +1,7 @@
+## 1.2.11
+
+- Fix more deprecation warnings. [#132](https://github.com/smashwilson/merge-conflicts/pull/132)
+
 ## 1.2.10
 
 - Don't decorate destroyed markers. [#124](https://github.com/smashwilson/merge-conflicts/pull/124)
