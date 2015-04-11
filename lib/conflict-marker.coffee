@@ -137,6 +137,8 @@ class ConflictMarker
         target = firstAfter.navigator.nextUnresolved()
       else
         target = firstAfter
+      return unless target?
+
       @focusConflict target
 
   previousUnresolved: ->
@@ -163,6 +165,8 @@ class ConflictMarker
         target = lastBefore.navigator.previousUnresolved()
       else
         target = lastBefore
+      return unless target?
+
       @focusConflict target
 
   revertCurrent: ->

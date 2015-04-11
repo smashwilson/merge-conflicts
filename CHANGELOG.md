@@ -1,3 +1,7 @@
+## 1.3.1
+
+- Handle next-unresolved or previous-unresolved navigation when conflicts exist in that direction, but all are resolved. [#135](https://github.com/smashwilson/merge-conflicts/pull/135)
+
 ## 1.3.0
 
 - Fix more deprecation warnings. [#132](https://github.com/smashwilson/merge-conflicts/pull/132)
