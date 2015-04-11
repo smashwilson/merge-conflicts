@@ -16,6 +16,8 @@ class Side
     else
       "conflict-#{@klass()}"
 
+  markers: -> [@marker, @refBannerMarker]
+
   toString: ->
     text = @originalText.replace(/[\n\r]/, ' ')
     if text.length > 20

@@ -19,3 +19,5 @@ class Navigator
     while current? and current.isResolved()
       current = current.navigator.previous
     current
+
+  markers: -> [@separatorMarker]
