@@ -183,6 +183,17 @@ describe 'ConflictMarker', ->
         workspaceView = atom.views.getView atom.workspace
         expect($(workspaceView).find('.resolver').length).toBe(1)
 
+    describe 'when all resolutions are complete', ->
+
+      beforeEach ->
+        c.ours.resolve() for c in m.conflicts
+        pkg.didCompleteConflictResolution()
+
+      it 'destroys all Conflict markers', ->
+        for c in m.conflicts
+          for marker in c.markers()
+            expect(marker.isDestroyed()).toBe(true)
+
   describe 'with a rebase conflict', ->
     [active] = []
 
