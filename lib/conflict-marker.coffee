@@ -163,6 +163,8 @@ class ConflictMarker
         target = lastBefore.navigator.previousUnresolved()
       else
         target = lastBefore
+      return unless target?
+
       @focusConflict target
 
   revertCurrent: ->
