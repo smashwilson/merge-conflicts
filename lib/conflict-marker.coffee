@@ -60,14 +60,24 @@ class ConflictMarker
       if file is @editor.getPath() and total is resolved
         @conflictsResolved()
 
+    @subs.add @pkg.onDidCompleteConflictResolution => @shutdown()
+    @subs.add @pkg.onDidQuitConflictResolution => @shutdown()
+
   cleanup: ->
     atom.views.getView(@editor).classList.remove 'conflicted'
-    @subs.dispose()
     v.remove() for v in @coveringViews
 
   conflictsResolved: ->
     @cleanup()
     atom.workspace.addTopPanel item: new ResolverView(@editor, @pkg)
+
+  # Public: The package is shutting down, either because everything has been resolved or the user
+  # is quitting prematurely.
+  #
+  shutdown: ->
+    for c in @conflicts
+      m.destroy() for m in c.markers()
+    @subs.dispose()
 
   detectDirty: ->
     # Only detect dirty regions within CoveringViews that have a cursor within them.

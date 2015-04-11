@@ -39,6 +39,8 @@ describe 'ConflictMarker', ->
   afterEach ->
     pkg.dispose()
 
+    m?.shutdown()
+
   describe 'with a merge conflict', ->
 
     beforeEach ->
@@ -186,7 +188,7 @@ describe 'ConflictMarker', ->
     describe 'when all resolutions are complete', ->
 
       beforeEach ->
-        c.ours.resolve() for c in m.conflicts
+        c.theirs.resolve() for c in m.conflicts
         pkg.didCompleteConflictResolution()
 
       it 'destroys all Conflict markers', ->
