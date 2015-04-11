@@ -39,6 +39,8 @@ describe 'ConflictMarker', ->
   afterEach ->
     pkg.dispose()
 
+    m?.shutdown()
+
   describe 'with a merge conflict', ->
 
     beforeEach ->
@@ -182,6 +184,17 @@ describe 'ConflictMarker', ->
       it 'appends a ResolverView to the workspace', ->
         workspaceView = atom.views.getView atom.workspace
         expect($(workspaceView).find('.resolver').length).toBe(1)
+
+    describe 'when all resolutions are complete', ->
+
+      beforeEach ->
+        c.theirs.resolve() for c in m.conflicts
+        pkg.didCompleteConflictResolution()
+
+      it 'destroys all Conflict markers', ->
+        for c in m.conflicts
+          for marker in c.markers()
+            expect(marker.isDestroyed()).toBe(true)
 
   describe 'with a rebase conflict', ->
     [active] = []

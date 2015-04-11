@@ -1,5 +1,6 @@
 {$} = require 'space-pen'
 {Emitter} = require 'atom'
+_ = require 'underscore-plus'
 
 {Side, OurSide, TheirSide} = require './side'
 Navigator = require './navigator'
@@ -115,6 +116,9 @@ class Conflict
     @emitter.emit 'resolve-conflict'
 
   scrollTarget: -> @ours.marker.getTailBufferPosition()
+
+  markers: ->
+    _.flatten [@ours.markers(), @theirs.markers(), @navigator.markers()], true
 
   toString: -> "[conflict: #{@ours} #{@theirs}]"
 
