@@ -1,3 +1,7 @@
+## 1.3.2
+
+- Fix a stacktrace when resolving entire files as ours or theirs. [#137](https://github.com/smashwilson/merge-conflicts/pull/137)
+
 ## 1.3.1
 
 - Clean up all markers when conflict detection is completed or quit. [#136](https://github.com/smashwilson/merge-conflicts/pull/136)

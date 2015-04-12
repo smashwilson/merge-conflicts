@@ -109,9 +109,9 @@ class MergeConflictsView extends View
     atom.workspace.addTopPanel item: new viewClass(@state)
 
   sideResolver: (side) ->
-    (event) ->
+    (event) =>
       p = $(event.target).closest('li').data('path')
-      GitBridge.checkoutSide side, p, (err) ->
+      GitBridge.checkoutSide side, p, (err) =>
         return if handleErr(err)
 
         full = path.join atom.project.getPaths()[0], p
