@@ -1,5 +1,6 @@
 ## 1.3.2
 
+- Use `atom.keymaps` instead of `atom.keymap` for 1.0 compatibility. [#144](https://github.com/smashwilson/merge-conflicts/pull/144)
 - Fix a stacktrace when resolving entire files as ours or theirs. [#137](https://github.com/smashwilson/merge-conflicts/pull/137)
 
 ## 1.3.1
