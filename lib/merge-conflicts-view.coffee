@@ -15,7 +15,7 @@ class MergeConflictsView extends View
   instance: null
 
   @content: (state, pkg) ->
-    @div class: 'merge-conflicts tool-panel panel-bottom padded', =>
+    @div class: 'merge-conflicts tool-panel panel-bottom padded clearfix', =>
       @div class: 'panel-heading', =>
         @text 'Conflicts'
         @span class: 'pull-right icon icon-fold', click: 'minimize', 'Hide'
