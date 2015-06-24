@@ -8,11 +8,30 @@ NavigationView = require './navigation-view'
 ResolverView = require './resolver-view'
 
 module.exports =
-class ConflictMarker
+# Public: Mediate conflict-related decorations and events on behalf of a specific TextEditor.
+#
+class ConflictedEditor
 
-  constructor: (@state, @editor, @pkg) ->
+  # Public: Instantiate a new ConflictedEditor to manage the decorations and events of a specific
+  # TextEditor.
+  #
+  # state [MergeState] - Merge-wide conflict state.
+  # pkg [Emitter] - The package object containing event dispatch and subscription methods.
+  # editor [TextEditor] - An editor containing text that, presumably, includes conflict markers.
+  #
+  constructor: (@state, @pkg, @editor) ->
     @subs = new CompositeDisposable
+    @coveringViews = []
+    @conflicts = []
 
+  # Public: Locate Conflicts within this specific TextEditor.
+  #
+  # Install a pair of SideViews and a NavigationView for each Conflict discovered within the
+  # editor's text. Subscribe to package events related to relevant Conflicts and broadcast
+  # per-editor progress events as they are resolved. Install Atom commands related to conflict
+  # navigation and resolution.
+  #
+  mark: ->
     @conflicts = Conflict.all(@state, @editor)
 
     @coveringViews = []
@@ -42,6 +61,11 @@ class ConflictMarker
         source: this
       @conflictsResolved()
 
+  # Private: Install Atom commands related to Conflict resolution and navigation on the TextEditor.
+  #
+  # Listen for package-global events that relate to the local Conflicts and dispatch them
+  # appropriately.
+  #
   installEvents: ->
     @subs.add @editor.onDidStopChanging => @detectDirty()
     @subs.add @editor.onDidDestroy => @cleanup()
@@ -60,24 +84,25 @@ class ConflictMarker
       if file is @editor.getPath() and total is resolved
         @conflictsResolved()
 
-    @subs.add @pkg.onDidCompleteConflictResolution => @shutdown()
-    @subs.add @pkg.onDidQuitConflictResolution => @shutdown()
+    @subs.add @pkg.onDidCompleteConflictResolution => @cleanup()
+    @subs.add @pkg.onDidQuitConflictResolution => @cleanup()
 
+  # Private: Undo any changes done to the underlying TextEditor.
+  #
   cleanup: ->
     atom.views.getView(@editor).classList.remove 'conflicted'
-    v.remove() for v in @coveringViews
 
+    v.remove() for v in @coveringViews
+    for c in @conflicts
+      m.destroy() for m in c.markers()
+
+    @subs.dispose()
+
+  # Private: Event handler invoked when all conflicts in this file have been resolved.
+  #
   conflictsResolved: ->
     @cleanup()
     atom.workspace.addTopPanel item: new ResolverView(@editor, @pkg)
-
-  # Public: The package is shutting down, either because everything has been resolved or the user
-  # is quitting prematurely.
-  #
-  shutdown: ->
-    for c in @conflicts
-      m.destroy() for m in c.markers()
-    @subs.dispose()
 
   detectDirty: ->
     # Only detect dirty regions within CoveringViews that have a cursor within them.
@@ -88,6 +113,10 @@ class ConflictMarker
 
     v.detectDirty() for v in _.uniq(potentials)
 
+  # Private: Command that accepts each side of a conflict that contains a cursor.
+  #
+  # Conflicts with cursors in both sides will be ignored.
+  #
   acceptCurrent: ->
     return unless @editor is atom.workspace.getActiveTextEditor()
 
@@ -105,24 +134,38 @@ class ConflictMarker
 
     side.resolve() for side in sides
 
+  # Private: Command that accepts the "ours" side of the active conflict.
+  #
   acceptOurs: ->
     return unless @editor is atom.workspace.getActiveTextEditor()
     side.conflict.ours.resolve() for side in @active()
 
+  # Private: Command that accepts the "theirs" side of the active conflict.
+  #
   acceptTheirs: ->
     return unless @editor is atom.workspace.getActiveTextEditor()
     side.conflict.theirs.resolve() for side in @active()
 
+  # Private: Command that uses a composite resolution of the "ours" side followed by the "theirs"
+  # side of the active conflict.
+  #
   acceptOursThenTheirs: ->
     return unless @editor is atom.workspace.getActiveTextEditor()
     for side in @active()
       @combineSides side.conflict.ours, side.conflict.theirs
 
+  # Private: Command that uses a composite resolution of the "theirs" side followed by the "ours"
+  # side of the active conflict.
+  #
   acceptTheirsThenOurs: ->
     return unless @editor is atom.workspace.getActiveTextEditor()
     for side in @active()
       @combineSides side.conflict.theirs, side.conflict.ours
 
+  # Private: Command that navigates to the next unresolved conflict in the editor.
+  #
+  # If the cursor is on or after the final unresolved conflict in the editor, nothing happens.
+  #
   nextUnresolved: ->
     return unless @editor is atom.workspace.getActiveTextEditor()
     final = _.last @active()
@@ -151,6 +194,10 @@ class ConflictMarker
 
       @focusConflict target
 
+  # Private: Command that navigates to the previous unresolved conflict in the editor.
+  #
+  # If the cursor is on or before the first unresolved conflict in the editor, nothing happens.
+  #
   previousUnresolved: ->
     return unless @editor is atom.workspace.getActiveTextEditor()
     initial = _.first @active()
@@ -179,12 +226,18 @@ class ConflictMarker
 
       @focusConflict target
 
+  # Private: Revert manual edits to the current side of the active conflict.
+  #
   revertCurrent: ->
     return unless @editor is atom.workspace.getActiveTextEditor()
     for side in @active()
       for view in @coveringViews when view.conflict() is side.conflict
         view.revert() if view.isDirty()
 
+  # Private: Collect a list of each Side of any Conflict within the editor that contains a cursor.
+  #
+  # Returns [Array<Side>]
+  #
   active: ->
     positions = (c.getBufferPosition() for c in @editor.getCursors())
     matching = []
@@ -196,6 +249,12 @@ class ConflictMarker
           matching.push c.theirs
     matching
 
+  # Private: Resolve a conflict by combining its two Sides in a specific order.
+  #
+  # first [Side] The Side that should occur first in the resolved text.
+  # second [Side] The Side belonging to the same Conflict that should occur second in the resolved
+  #   text.
+  #
   combineSides: (first, second) ->
     text = @editor.getTextInBufferRange second.marker.getBufferRange()
     e = first.marker.getBufferRange().end
@@ -204,6 +263,10 @@ class ConflictMarker
     first.followingMarker.setTailBufferPosition insertPoint
     first.resolve()
 
+  # Private: Scroll the editor and place the cursor at the beginning of a marked conflict.
+  #
+  # conflict [Conflict] Any conflict within the current editor.
+  #
   focusConflict: (conflict) ->
     st = conflict.ours.marker.getBufferRange().start
     @editor.scrollToBufferPosition st, center: true
