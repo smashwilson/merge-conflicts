@@ -92,16 +92,16 @@ class ConflictedEditor
   cleanup: ->
     atom.views.getView(@editor).classList.remove 'conflicted' if @editor?
 
-    v.remove() for v in @coveringViews
     for c in @conflicts
       m.destroy() for m in c.markers()
+
+    v.remove() for v in @coveringViews
 
     @subs.dispose()
 
   # Private: Event handler invoked when all conflicts in this file have been resolved.
   #
   conflictsResolved: ->
-    @cleanup()
     atom.workspace.addTopPanel item: new ResolverView(@editor, @pkg)
 
   detectDirty: ->

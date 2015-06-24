@@ -179,9 +179,6 @@ describe 'ConflictedEditor', ->
         expect($(editorView).find('.overlayer .side').length).toBe(0)
         expect($(editorView).find('.overlayer .navigation').length).toBe(0)
 
-      it 'removes the .conflicted class', ->
-        expect($(editorView).hasClass 'conflicted').toBe(false)
-
       it 'appends a ResolverView to the workspace', ->
         workspaceView = atom.views.getView atom.workspace
         expect($(workspaceView).find('.resolver').length).toBe(1)
@@ -196,6 +193,9 @@ describe 'ConflictedEditor', ->
         for c in m.conflicts
           for marker in c.markers()
             expect(marker.isDestroyed()).toBe(true)
+
+      it 'removes the .conflicted class', ->
+        expect($(editorView).hasClass 'conflicted').toBe(false)
 
   describe 'with a rebase conflict', ->
     [active] = []
