@@ -3,7 +3,7 @@
 _ = require 'underscore-plus'
 
 {Side, OurSide, TheirSide} = require './side'
-Navigator = require './navigator'
+{Navigator} = require './navigator'
 
 CONFLICT_REGEX = /^<{7} (.+)\r?\n([^]*?)={7}\r?\n([^]*?)>{7} (.+)(?:\r?\n)?/mg
 
@@ -131,7 +131,6 @@ class ConflictParser
   #
   _advance: (rowCount) -> @currentRow += rowCount
 
-module.exports =
 # Public: Model an individual conflict parsed from git's automatic conflict resolution output.
 #
 class Conflict
@@ -228,3 +227,6 @@ class Conflict
       previous = c
 
     results
+
+module.exports =
+  Conflict: Conflict

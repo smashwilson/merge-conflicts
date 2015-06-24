@@ -1,7 +1,7 @@
 {$} = require 'space-pen'
-SideView = require '../../lib/view/side-view'
+{SideView} = require '../../lib/view/side-view'
 
-Conflict = require '../../lib/conflict'
+{Conflict} = require '../../lib/conflict'
 util = require '../util'
 
 describe 'SideView', ->

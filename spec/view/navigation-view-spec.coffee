@@ -1,6 +1,6 @@
-NavigationView = require '../../lib/view/navigation-view'
+{NavigationView} = require '../../lib/view/navigation-view'
 
-Conflict = require '../../lib/conflict'
+{Conflict} = require '../../lib/conflict'
 util = require '../util'
 
 describe 'NavigationView', ->

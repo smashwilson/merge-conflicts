@@ -1,4 +1,4 @@
-ResolverView = require '../../lib/view/resolver-view'
+{ResolverView} = require '../../lib/view/resolver-view'
 
 {GitBridge} = require '../../lib/git-bridge'
 util = require '../util'

@@ -2,13 +2,12 @@
 _ = require 'underscore-plus'
 {Emitter, CompositeDisposable} = require 'atom'
 
-Conflict = require './conflict'
+{Conflict} = require './conflict'
 
-SideView = require './view/side-view'
-NavigationView = require './view/navigation-view'
-ResolverView = require './view/resolver-view'
+{SideView} = require './view/side-view'
+{NavigationView} = require './view/navigation-view'
+{ResolverView} = require './view/resolver-view'
 
-module.exports =
 # Public: Mediate conflict-related decorations and events on behalf of a specific TextEditor.
 #
 class ConflictedEditor
@@ -272,3 +271,6 @@ class ConflictedEditor
     st = conflict.ours.marker.getBufferRange().start
     @editor.scrollToBufferPosition st, center: true
     @editor.setCursorBufferPosition st, autoscroll: false
+
+module.exports =
+  ConflictedEditor: ConflictedEditor

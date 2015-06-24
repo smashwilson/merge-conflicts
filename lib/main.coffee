@@ -3,7 +3,7 @@
 {GitBridge} = require './git-bridge'
 
 {MergeConflictsView} = require './view/merge-conflicts-view'
-handleErr = require './view/error-view'
+{handleErr} = require './view/error-view'
 
 module.exports =
 

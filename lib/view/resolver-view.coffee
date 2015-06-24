@@ -3,9 +3,9 @@
 
 {GitBridge} = require '../git-bridge'
 
-handleErr = require './error-view'
+{handleErr} = require './error-view'
 
-module.exports =
+
 class ResolverView extends View
 
   @content: (editor, pkg) ->
@@ -64,3 +64,6 @@ class ResolverView extends View
 
   dismiss: ->
     @hide 'fast', => @remove()
+
+module.exports =
+  ResolverView: ResolverView

@@ -1,7 +1,6 @@
 {CompositeDisposable} = require 'atom'
 {CoveringView} = require './covering-view'
 
-module.exports =
 class NavigationView extends CoveringView
 
   @content: (navigator, editor) ->
@@ -37,3 +36,6 @@ class NavigationView extends CoveringView
   conflict: -> @navigator.conflict
 
   toString: -> "{NavView of: #{@conflict()}}"
+
+module.exports =
+  NavigationView: NavigationView

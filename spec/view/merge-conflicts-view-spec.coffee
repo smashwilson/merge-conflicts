@@ -3,8 +3,8 @@ _ = require 'underscore-plus'
 
 {MergeConflictsView} = require '../../lib/view/merge-conflicts-view'
 
-MergeState = require '../../lib/merge-state'
-Conflict = require '../../lib/conflict'
+{MergeState} = require '../../lib/merge-state'
+{Conflict} = require '../../lib/conflict'
 {GitBridge} = require '../../lib/git-bridge'
 util = require '../util'
 

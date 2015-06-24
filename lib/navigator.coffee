@@ -1,4 +1,3 @@
-module.exports =
 class Navigator
 
   constructor: (@separatorMarker) ->
@@ -21,3 +20,6 @@ class Navigator
     current
 
   markers: -> [@separatorMarker]
+
+module.exports =
+  Navigator: Navigator

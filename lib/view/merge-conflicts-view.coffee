@@ -4,11 +4,11 @@ _ = require 'underscore-plus'
 path = require 'path'
 
 {GitBridge} = require '../git-bridge'
-MergeState = require '../merge-state'
-ConflictedEditor = require '../conflicted-editor'
+{MergeState} = require '../merge-state'
+{ConflictedEditor} = require '../conflicted-editor'
 
-ResolverView = require './resolver-view'
-handleErr = require './error-view'
+{ResolverView} = require './resolver-view'
+{handleErr} = require './error-view'
 
 class MergeConflictsView extends View
 

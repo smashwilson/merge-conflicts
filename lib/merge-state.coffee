@@ -1,6 +1,5 @@
 {GitBridge} = require './git-bridge'
 
-module.exports =
 class MergeState
 
   constructor: (@conflicts, @isRebase) ->
@@ -23,3 +22,6 @@ class MergeState
         callback(err, null)
       else
         callback(null, new MergeState(cs, isr))
+
+module.exports =
+  MergeState: MergeState

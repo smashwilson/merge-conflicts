@@ -25,11 +25,12 @@ class GitNotFoundErrorView extends View
   notRightNow: ->
     @remove()
 
-module.exports = (err) ->
-  return false unless err?
+module.exports =
+  handleErr: (err) ->
+    return false unless err?
 
-  if err instanceof GitNotFoundError
-    atom.workspaceView.appendToTop new GitNotFoundErrorView(err)
+    if err instanceof GitNotFoundError
+      atom.workspaceView.appendToTop new GitNotFoundErrorView(err)
 
-  console.error err
-  true
+    console.error err
+    true

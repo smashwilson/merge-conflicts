@@ -1,7 +1,7 @@
 {$} = require 'space-pen'
 _ = require 'underscore-plus'
 
-ConflictedEditor = require '../lib/conflicted-editor'
+{ConflictedEditor} = require '../lib/conflicted-editor'
 {GitBridge} = require '../lib/git-bridge'
 util = require './util'
 
