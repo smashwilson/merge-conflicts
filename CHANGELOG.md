@@ -1,3 +1,7 @@
+## 1.3.3
+
+- Use Atom's built-in notification API. [#151](https://github.com/smashwilson/merge-conflicts/pull/151)
+
 ## 1.3.2
 
 - Use `atom.keymaps` instead of `atom.keymap` for 1.0 compatibility. [#144](https://github.com/smashwilson/merge-conflicts/pull/144)
