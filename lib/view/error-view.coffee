@@ -1,5 +1,5 @@
 {View} = require 'space-pen'
-{GitNotFoundError} = require './git-bridge'
+{GitNotFoundError} = require '../git-bridge'
 
 class GitNotFoundErrorView extends View
 

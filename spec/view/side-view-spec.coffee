@@ -1,7 +1,8 @@
 {$} = require 'space-pen'
-SideView = require '../lib/side-view'
-Conflict = require '../lib/conflict'
-util = require './util'
+SideView = require '../../lib/view/side-view'
+
+Conflict = require '../../lib/conflict'
+util = require '../util'
 
 describe 'SideView', ->
   [view, editorView, ours, theirs] = []

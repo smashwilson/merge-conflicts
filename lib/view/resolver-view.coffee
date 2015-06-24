@@ -1,6 +1,8 @@
 {CompositeDisposable} = require 'atom'
 {View} = require 'space-pen'
-{GitBridge} = require './git-bridge'
+
+{GitBridge} = require '../git-bridge'
+
 handleErr = require './error-view'
 
 module.exports =

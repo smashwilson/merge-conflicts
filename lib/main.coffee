@@ -1,7 +1,9 @@
 {CompositeDisposable, Emitter} = require 'atom'
-{MergeConflictsView} = require './merge-conflicts-view'
+
 {GitBridge} = require './git-bridge'
-handleErr = require './error-view'
+
+{MergeConflictsView} = require './view/merge-conflicts-view'
+handleErr = require './view/error-view'
 
 module.exports =
 

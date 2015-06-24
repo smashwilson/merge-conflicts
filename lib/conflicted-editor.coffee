@@ -3,9 +3,10 @@ _ = require 'underscore-plus'
 {Emitter, CompositeDisposable} = require 'atom'
 
 Conflict = require './conflict'
-SideView = require './side-view'
-NavigationView = require './navigation-view'
-ResolverView = require './resolver-view'
+
+SideView = require './view/side-view'
+NavigationView = require './view/navigation-view'
+ResolverView = require './view/resolver-view'
 
 module.exports =
 # Public: Mediate conflict-related decorations and events on behalf of a specific TextEditor.
