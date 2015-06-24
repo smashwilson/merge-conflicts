@@ -7,7 +7,6 @@ path = require 'path'
 MergeState = require './merge-state'
 ResolverView = require './resolver-view'
 ConflictMarker = require './conflict-marker'
-{SuccessView, MaybeLaterView, NothingToMergeView} = require './message-views'
 handleErr = require './error-view'
 
 class MergeConflictsView extends View
@@ -75,7 +74,18 @@ class MergeConflictsView extends View
 
   quit: ->
     @pkg.didQuitConflictResolution()
-    @finish(MaybeLaterView)
+
+    detail = "Careful, you've still got conflict markers left!\n"
+    if @state.isRebase
+      detail += '"git rebase --abort"'
+    else
+      detail += '"git merge --abort"'
+    detail += " if you just want to give up on this one."
+
+    @finish ->
+      atom.notifications.addWarning "Maybe Later",
+        detail: detail
+        dismissable: true
 
   refresh: ->
     @state.reread (err, state) =>
@@ -95,9 +105,19 @@ class MergeConflictsView extends View
 
       if @state.isEmpty()
         @pkg.didCompleteConflictResolution()
-        @finish(SuccessView)
 
-  finish: (viewClass) ->
+        detail = "That's everything. "
+        if @state.isRebase
+          detail += '"git rebase --continue" at will to resume rebasing.'
+        else
+          detail += '"git commit" at will to finish the merge.'
+
+        @finish ->
+          atom.notifications.addSuccess "Merge Complete",
+            detail: detail,
+            dismissable: true
+
+  finish: (andThen) ->
     m.cleanup() for m in @markers
     @markers = []
 
@@ -106,7 +126,8 @@ class MergeConflictsView extends View
     @hide 'fast', =>
       MergeConflictsView.instance = null
       @remove()
-    atom.workspace.addTopPanel item: new viewClass(@state)
+
+    andThen()
 
   sideResolver: (side) ->
     (event) =>
@@ -146,7 +167,9 @@ class MergeConflictsView extends View
           marker = @markConflictsIn state, editor, pkg
           @instance.markers.push marker if marker?
       else
-        atom.workspace.addTopPanel item: new NothingToMergeView(state)
+        atom.notifications.addInfo "Nothing to Merge",
+          detail: "No conflicts here!",
+          dismissable: true
 
   @markConflictsIn: (state, editor, pkg) ->
     return if state.isEmpty()
