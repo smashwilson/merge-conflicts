@@ -90,7 +90,7 @@ class ConflictedEditor
   # Private: Undo any changes done to the underlying TextEditor.
   #
   cleanup: ->
-    atom.views.getView(@editor).classList.remove 'conflicted'
+    atom.views.getView(@editor).classList.remove 'conflicted' if @editor?
 
     v.remove() for v in @coveringViews
     for c in @conflicts

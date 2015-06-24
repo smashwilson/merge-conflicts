@@ -6,7 +6,7 @@ path = require 'path'
 {GitBridge} = require './git-bridge'
 MergeState = require './merge-state'
 ResolverView = require './resolver-view'
-ConflictMarker = require './conflict-marker'
+ConflictedEditor = require './conflicted-editor'
 handleErr = require './error-view'
 
 class MergeConflictsView extends View
@@ -178,7 +178,8 @@ class MergeConflictsView extends View
     repoPath = atom.project.getRepositories()[0].relativize fullPath
     return unless _.contains state.conflictPaths(), repoPath
 
-    new ConflictMarker(state, editor, pkg)
+    e = new ConflictedEditor(state, pkg, editor)
+    e.mark()
 
 
 module.exports =
