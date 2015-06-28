@@ -1,9 +1,11 @@
 {CompositeDisposable} = require 'atom'
 {View} = require 'space-pen'
-{GitBridge} = require './git-bridge'
-handleErr = require './error-view'
 
-module.exports =
+{GitBridge} = require '../git-bridge'
+
+{handleErr} = require './error-view'
+
+
 class ResolverView extends View
 
   @content: (editor, pkg) ->
@@ -62,3 +64,6 @@ class ResolverView extends View
 
   dismiss: ->
     @hide 'fast', => @remove()
+
+module.exports =
+  ResolverView: ResolverView

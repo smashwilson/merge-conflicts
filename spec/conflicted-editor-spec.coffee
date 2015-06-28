@@ -1,11 +1,11 @@
 {$} = require 'space-pen'
 _ = require 'underscore-plus'
 
-ConflictMarker = require '../lib/conflict-marker'
+{ConflictedEditor} = require '../lib/conflicted-editor'
 {GitBridge} = require '../lib/git-bridge'
 util = require './util'
 
-describe 'ConflictMarker', ->
+describe 'ConflictedEditor', ->
   [editorView, editor, state, m, pkg] = []
 
   cursors = -> c.getBufferPosition().toArray() for c in editor.getCursors()
@@ -39,7 +39,7 @@ describe 'ConflictMarker', ->
   afterEach ->
     pkg.dispose()
 
-    m?.shutdown()
+    m?.cleanup()
 
   describe 'with a merge conflict', ->
 
@@ -53,7 +53,8 @@ describe 'ConflictMarker', ->
         state =
           isRebase: false
 
-        m = new ConflictMarker(state, editor, pkg)
+        m = new ConflictedEditor(state, pkg, editor)
+        m.mark()
 
     it 'attaches two SideViews and a NavigationView for each conflict', ->
       expect($(editorView).find('.side').length).toBe(6)
@@ -178,9 +179,6 @@ describe 'ConflictMarker', ->
         expect($(editorView).find('.overlayer .side').length).toBe(0)
         expect($(editorView).find('.overlayer .navigation').length).toBe(0)
 
-      it 'removes the .conflicted class', ->
-        expect($(editorView).hasClass 'conflicted').toBe(false)
-
       it 'appends a ResolverView to the workspace', ->
         workspaceView = atom.views.getView atom.workspace
         expect($(workspaceView).find('.resolver').length).toBe(1)
@@ -196,6 +194,9 @@ describe 'ConflictMarker', ->
           for marker in c.markers()
             expect(marker.isDestroyed()).toBe(true)
 
+      it 'removes the .conflicted class', ->
+        expect($(editorView).hasClass 'conflicted').toBe(false)
+
   describe 'with a rebase conflict', ->
     [active] = []
 
@@ -209,7 +210,8 @@ describe 'ConflictMarker', ->
         state =
           isRebase: true
 
-        m = new ConflictMarker(state, editor, pkg)
+        m = new ConflictedEditor(state, pkg, editor)
+        m.mark()
 
         editor.setCursorBufferPosition [3, 14]
         active = m.conflicts[0]

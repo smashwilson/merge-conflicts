@@ -3,11 +3,12 @@
 _ = require 'underscore-plus'
 path = require 'path'
 
-{GitBridge} = require './git-bridge'
-MergeState = require './merge-state'
-ResolverView = require './resolver-view'
-ConflictMarker = require './conflict-marker'
-handleErr = require './error-view'
+{GitBridge} = require '../git-bridge'
+{MergeState} = require '../merge-state'
+{ConflictedEditor} = require '../conflicted-editor'
+
+{ResolverView} = require './resolver-view'
+{handleErr} = require './error-view'
 
 class MergeConflictsView extends View
 
@@ -178,7 +179,8 @@ class MergeConflictsView extends View
     repoPath = atom.project.getRepositories()[0].relativize fullPath
     return unless _.contains state.conflictPaths(), repoPath
 
-    new ConflictMarker(state, editor, pkg)
+    e = new ConflictedEditor(state, pkg, editor)
+    e.mark()
 
 
 module.exports =

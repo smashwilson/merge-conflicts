@@ -1,6 +1,7 @@
-ResolverView = require '../lib/resolver-view'
-{GitBridge} = require '../lib/git-bridge'
-util = require './util'
+{ResolverView} = require '../../lib/view/resolver-view'
+
+{GitBridge} = require '../../lib/git-bridge'
+util = require '../util'
 
 describe 'ResolverView', ->
   [view, fakeEditor, pkg] = []

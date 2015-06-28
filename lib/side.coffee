@@ -47,4 +47,7 @@ class TheirSide extends Side
 
   eventName: -> 'merge-conflicts:accept-theirs'
 
-module.exports = Side: Side, OurSide: OurSide, TheirSide: TheirSide
+module.exports =
+  Side: Side
+  OurSide: OurSide
+  TheirSide: TheirSide

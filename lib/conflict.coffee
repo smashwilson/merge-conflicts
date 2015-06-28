@@ -3,7 +3,7 @@
 _ = require 'underscore-plus'
 
 {Side, OurSide, TheirSide} = require './side'
-Navigator = require './navigator'
+{Navigator} = require './navigator'
 
 CONFLICT_REGEX = /^<{7} (.+)\r?\n([^]*?)={7}\r?\n([^]*?)>{7} (.+)(?:\r?\n)?/mg
 
@@ -12,15 +12,28 @@ TOP = 'top'
 MIDDLE = 'middle'
 BOTTOM = 'bottom'
 
-class Marker
+# Private: ConflictParser discovers git conflict markers in a corpus of text and constructs Conflict
+# instances that mark the correct lines.
+#
+class ConflictParser
 
+  # Common options used to construct markers.
   options =
     persistent: false
     invalidate: 'never'
 
+  # Private: Initialize a parser to operate on a specific TextEditor.
+  #
+  # state [MergeState] - Repository-wide conflict resolution state.
+  # editor [TextEditor] - An editor containing text that may include one or more conflicts.
+  #
   constructor: (@state, @editor) ->
     @position = INVALID
 
+  # Private: Begin handling the result of a CONFLICT_REGEX match.
+  #
+  # m [Array] - The match object returned from CONFLICT_REGEX.
+  #
   start: (@m) ->
     @startRow = @m.range.start.row
     @endRow = @m.range.end.row
@@ -32,14 +45,24 @@ class Marker
     @position = TOP
     @previousSide = null
 
+  # Private: Complete handling of an individual CONFLICT_REGEX match.
+  #
   finish: ->
     @previousSide.followingMarker = @previousSide.refBannerMarker
 
+  # Private: Mark the current lines as "ours".
+  #
+  # Returns [Side] marking the current conflict's side.
+  #
   markOurs: -> @_markHunk OurSide
 
+  # Private: Mark the current lines as a separator.
+  #
+  # Returns [Navigator] containing a marker to the separator line.
+  #
   markSeparator: ->
     unless @position is MIDDLE
-      throw new Error "Unexpected position for separator: #{@position}"
+      throw new Error("Unexpected position for separator: #{@position}")
     @position = BOTTOM
 
     sepRowStart = @currentRow
@@ -52,10 +75,19 @@ class Marker
     # @previousSide should always be populated because @position is MIDDLE.
     @previousSide.followingMarker = marker
 
-    new Navigator marker
+    new Navigator(marker)
 
+  # Private: Mark the current lines as "theirs".
+  #
+  # Returns [Side] marking the current conflict's side.
+  #
   markTheirs: -> @_markHunk TheirSide
 
+  # Private: Mark the current lines and construct a Side of the appropriate class.
+  #
+  # sideKlass [Class] Side subclass to construct.
+  # returns [sideKlass] marking the current lines.
+  #
   _markHunk: (sideKlass) ->
     sidePosition = @position
     switch @position
@@ -80,7 +112,7 @@ class Marker
 
         @position = INVALID
       else
-        throw new Error "Unexpected position for side: #{@position}"
+        throw new Error("Unexpected position for side: #{@position}")
 
     bannerMarker = @editor.markBufferRange(
       [[bannerRowStart, 0], [bannerRowEnd, 0]], @options
@@ -93,11 +125,25 @@ class Marker
     @previousSide = side
     side
 
+  # Private: Advance the row counter.
+  #
+  # rowCount [Integer] The number of rows to advance.
+  #
   _advance: (rowCount) -> @currentRow += rowCount
 
-module.exports =
+# Public: Model an individual conflict parsed from git's automatic conflict resolution output.
+#
 class Conflict
 
+  # Private: Initialize a new Conflict with its constituent Sides, Navigator, and the MergeState
+  # it belongs to.
+  #
+  # ours [Side] the lines of this conflict that the current user contributed (by our best guess).
+  # theirs [Side] the lines of this conflict that another contributor created.
+  # parent [Side] currently unused.
+  # navigator [Navigator] maintains references to surrounding Conflicts in the original file.
+  # state [MergeState] repository-wide information about the current merge.
+  #
   constructor: (@ours, @theirs, @parent, @navigator, @state) ->
     @emitter = new Emitter
 
@@ -106,26 +152,59 @@ class Conflict
     @navigator.conflict = this
     @resolution = null
 
+  # Public: Has this conflict been resolved in any way?
+  #
+  # Return [Boolean]
+  #
   isResolved: -> @resolution?
 
+  # Public: Attach an event handler to be notified when this conflict is resolved.
+  #
+  # callback [Function]
+  #
   onDidResolveConflict: (callback) ->
     @emitter.on 'resolve-conflict', callback
 
+  # Public: Specify which Side is to be kept. Note that either side may have been modified by the
+  # user prior to resolution. Notify any subscribers.
+  #
+  # side [Side] our changes or their changes.
+  #
   resolveAs: (side) ->
     @resolution = side
     @emitter.emit 'resolve-conflict'
 
+  # Public: Locate the position that the editor should scroll to in order to make this conflict
+  # visible.
+  #
+  # Return [Point] buffer coordinates
+  #
   scrollTarget: -> @ours.marker.getTailBufferPosition()
 
+  # Public: Audit all Marker instances owned by subobjects within this Conflict.
+  #
+  # Return [Array<Marker>]
+  #
   markers: ->
     _.flatten [@ours.markers(), @theirs.markers(), @navigator.markers()], true
 
+  # Public: Console-friendly identification of this conflict.
+  #
+  # Return [String] that distinguishes this conflict from others.
+  #
   toString: -> "[conflict: #{@ours} #{@theirs}]"
 
+  # Public: Parse any conflict markers in a TextEditor's buffer and return a Conflict that contains
+  # markers corresponding to each.
+  #
+  # state [MergeState] Repository-wide state of the merge.
+  # editor [TextEditor] The editor to search.
+  # return [Array<Conflict>] A (possibly empty) collection of parsed Conflicts.
+  #
   @all: (state, editor) ->
     results = []
     previous = null
-    marker = new Marker state, editor
+    marker = new ConflictParser(state, editor)
 
     editor.getBuffer().scan CONFLICT_REGEX, (m) ->
       marker.start m
@@ -148,3 +227,6 @@ class Conflict
       previous = c
 
     results
+
+module.exports =
+  Conflict: Conflict

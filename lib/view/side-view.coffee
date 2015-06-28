@@ -1,7 +1,6 @@
 {CompositeDisposable} = require 'atom'
 {CoveringView} = require './covering-view'
 
-module.exports =
 class SideView extends CoveringView
 
   @content: (side, editor) ->
@@ -77,3 +76,6 @@ class SideView extends CoveringView
     @addClass 'dirty' if @side.isDirty
 
   toString: -> "{SideView of: #{@side}}"
+
+module.exports =
+  SideView: SideView

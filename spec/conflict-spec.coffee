@@ -1,4 +1,4 @@
-Conflict = require '../lib/conflict'
+{Conflict} = require '../lib/conflict'
 util = require './util'
 
 describe "Conflict", ->
