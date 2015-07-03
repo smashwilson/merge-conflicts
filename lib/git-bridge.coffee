@@ -61,9 +61,19 @@ class GitBridge
       exit: exitHandler
     })
 
-  @_repoWorkDir: -> atom.project.getRepositories()[0].getWorkingDirectory()
+  @getActivePath: ->
+    atom.workspace.getActivePaneItem()?.getPath?()
 
-  @_repoGitDir: -> atom.project.getRepositories()[0].getPath()
+  @getActiveRepo: ->
+    [rootDir] = atom.project.relativizePath @getActivePath()
+    if rootDir?
+      rootDirIndex = atom.project.getPaths().indexOf(rootDir)
+      repo = atom.project.getRepositories()[rootDirIndex]
+    return repo
+
+  @_repoWorkDir: -> @getActiveRepo().getWorkingDirectory()
+
+  @_repoGitDir: -> @getActiveRepo().getPath()
 
   @_statusCodesFrom: (chunk, handler) ->
     for line in chunk.split("\n")
