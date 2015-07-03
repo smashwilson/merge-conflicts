@@ -69,6 +69,8 @@ class GitBridge
     if rootDir?
       rootDirIndex = atom.project.getPaths().indexOf(rootDir)
       repo = atom.project.getRepositories()[rootDirIndex]
+    else
+      repo = atom.project.getRepositories()[0]
     return repo
 
   @_repoWorkDir: -> @getActiveRepo().getWorkingDirectory()
