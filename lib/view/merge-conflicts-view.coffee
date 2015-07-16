@@ -176,7 +176,9 @@ class MergeConflictsView extends View
     return if state.isEmpty()
 
     fullPath = editor.getPath()
-    repoPath = GitBridge.getActiveRepo().relativize fullPath
+    repoPath = GitBridge.getActiveRepo()?.relativize fullPath
+    return unless repoPath?
+
     return unless _.contains state.conflictPaths(), repoPath
 
     e = new ConflictedEditor(state, pkg, editor)
