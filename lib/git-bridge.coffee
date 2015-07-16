@@ -42,6 +42,15 @@ class GitBridge
         callback(null)
         return
 
+      errorHandler()
+
+    errorHandler = (e) =>
+      if e?
+        e.handle()
+
+        # Suppress the default ENOENT handler
+        e.error.code = "NOTENOENT"
+
       possiblePath = search.shift()
 
       unless possiblePath?
@@ -53,13 +62,13 @@ class GitBridge
         command: possiblePath,
         args: ['--version'],
         exit: exitHandler
-      })
+      }).onWillThrowError errorHandler
 
     @process({
       command: possiblePath,
       args: ['--version'],
       exit: exitHandler
-    })
+    }).onWillThrowError errorHandler
 
   @getActivePath: ->
     atom.workspace.getActivePaneItem()?.getPath?()
