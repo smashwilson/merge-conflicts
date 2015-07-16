@@ -70,11 +70,11 @@ class GitBridge
       exit: exitHandler
     }).onWillThrowError errorHandler
 
-  @getActivePath: ->
+  @_getActivePath: ->
     atom.workspace.getActivePaneItem()?.getPath?()
 
-  @getActiveRepo: ->
-    [rootDir] = atom.project.relativizePath @getActivePath()
+  @getActiveRepo: (filepath) ->
+    [rootDir] = atom.project.relativizePath(filepath or @_getActivePath())
     if rootDir?
       rootDirIndex = atom.project.getPaths().indexOf(rootDir)
       repo = atom.project.getRepositories()[rootDirIndex]
@@ -82,9 +82,18 @@ class GitBridge
       repo = atom.project.getRepositories()[0]
     return repo
 
-  @_repoWorkDir: -> @getActiveRepo().getWorkingDirectory()
+  # Public: Return a filepath relative to the git repository that contains it.
+  #
+  # * `filepath` {String} Absolute path to the file.
+  #
+  # Returns the relative path as a {String}, or null if the path isn't within a known repository.
+  #
+  @repoRelativePath: (filepath) ->
+    @getActiveRepo(filepath)?.relativize filepath
 
-  @_repoGitDir: -> @getActiveRepo().getPath()
+  @_repoWorkDir: (filepath) -> @getActiveRepo(filepath).getWorkingDirectory()
+
+  @_repoGitDir: (filepath) -> @getActiveRepo(filepath).getPath()
 
   @_statusCodesFrom: (chunk, handler) ->
     for line in chunk.split("\n")
@@ -93,7 +102,21 @@ class GitBridge
         [__, indexCode, workCode, p] = m
         handler(indexCode, workCode, p)
 
+  @_checkHealth: (callback, filepath) ->
+    unless GitCmd
+      console.trace("GitBridge method called before locateGitAnd")
+      callback(new Error("GitBridge.locateGitAnd has not been called yet"))
+      return false
+
+    unless @getActiveRepo(filepath)
+      callback(new Error("No git repository detected"))
+      return false
+
+    return true
+
   @withConflicts: (handler) ->
+    return unless @_checkHealth(handler)
+
     conflicts = []
     errMessage = []
 
@@ -127,6 +150,8 @@ class GitBridge
       handler(new GitNotFoundError(errMessage.join("\n")), null)
 
   @isStaged: (filepath, handler) ->
+    return unless @_checkHealth(handler, filepath)
+
     staged = true
 
     stdoutHandler = (chunk) =>
@@ -155,6 +180,8 @@ class GitBridge
       handler(new GitNotFoundError, null)
 
   @checkoutSide: (sideName, filepath, callback) ->
+    return unless @_checkHealth(callback, filepath)
+
     proc = @process({
       command: GitCmd,
       args: ['checkout', "--#{sideName}", filepath],
@@ -172,6 +199,8 @@ class GitBridge
       callback(new GitNotFoundError)
 
   @add: (filepath, callback) ->
+    return unless @_checkHealth(callback, filepath)
+
     @process({
       command: GitCmd,
       args: ['add', filepath],
@@ -186,6 +215,9 @@ class GitBridge
     })
 
   @isRebasing: ->
+    return unless @_checkHealth (e) ->
+      atom.notifications.addError e.message
+
     root = @_repoGitDir()
     return false unless root?
 
