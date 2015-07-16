@@ -45,6 +45,12 @@ class GitBridge
       errorHandler()
 
     errorHandler = (e) =>
+      if e?
+        e.handle()
+
+        # Suppress the default ENOENT handler
+        e.error.code = "NOTENOENT"
+
       possiblePath = search.shift()
 
       unless possiblePath?
@@ -57,8 +63,6 @@ class GitBridge
         args: ['--version'],
         exit: exitHandler
       }).onWillThrowError errorHandler
-
-      e?.handle()
 
     @process({
       command: possiblePath,
