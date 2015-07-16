@@ -30,7 +30,7 @@ module.exports =
     return false unless err?
 
     if err instanceof GitNotFoundError
-      atom.workspaceView.appendToTop new GitNotFoundErrorView(err)
-
-    console.error err
+      atom.workspace.addTopPanel item: new GitNotFoundErrorView(err)
+    else
+      console.error err
     true
