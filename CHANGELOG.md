@@ -1,5 +1,6 @@
 ## 1.3.3
 
+- Improve the "Git not found" error dialog. [#163](https://github.com/smashwilson/merge-conflicts/pull/163)
 - Use alt-m instead of ctrl-m in key bindings. [#162](https://github.com/smashwilson/merge-conflicts/pull/162)
 - Use Atom's built-in notification API. [#151](https://github.com/smashwilson/merge-conflicts/pull/151)
 
