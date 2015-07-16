@@ -1,3 +1,5 @@
+## 1.3.4
+
 ## 1.3.3
 
 - With multiple projects, remember the git repository that you initially detected conflicts within. [#165](https://github.com/smashwilson/merge-conflicts/pull/165)
