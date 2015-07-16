@@ -42,6 +42,9 @@ class GitBridge
         callback(null)
         return
 
+      errorHandler()
+
+    errorHandler = (e) =>
       possiblePath = search.shift()
 
       unless possiblePath?
@@ -53,13 +56,15 @@ class GitBridge
         command: possiblePath,
         args: ['--version'],
         exit: exitHandler
-      })
+      }).onWillThrowError errorHandler
+
+      e?.handle()
 
     @process({
       command: possiblePath,
       args: ['--version'],
       exit: exitHandler
-    })
+    }).onWillThrowError errorHandler
 
   @getActivePath: ->
     atom.workspace.getActivePaneItem()?.getPath?()
