@@ -19,7 +19,7 @@ class GitNotFoundErrorView extends View
             @button class: 'btn inline-block-tight', click: 'notRightNow', 'Not Right Now'
 
   openSettings: ->
-    atom.workspace.open 'atom://config'
+    atom.workspace.open 'atom://config/packages'
     @remove()
 
   notRightNow: ->
