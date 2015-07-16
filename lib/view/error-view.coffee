@@ -43,5 +43,6 @@ module.exports =
     if err instanceof GitNotFoundError
       atom.workspace.addTopPanel item: new GitNotFoundErrorView(err)
     else
-      console.error err
+      atom.notifications.addError err.message
+      console.error err.message, err.trace
     true
