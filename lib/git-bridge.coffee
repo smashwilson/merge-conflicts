@@ -70,11 +70,11 @@ class GitBridge
       exit: exitHandler
     }).onWillThrowError errorHandler
 
-  @getActivePath: ->
+  @_getActivePath: ->
     atom.workspace.getActivePaneItem()?.getPath?()
 
-  @getActiveRepo: ->
-    [rootDir] = atom.project.relativizePath @getActivePath()
+  @_getActiveRepo: ->
+    [rootDir] = atom.project.relativizePath @_getActivePath()
     if rootDir?
       rootDirIndex = atom.project.getPaths().indexOf(rootDir)
       repo = atom.project.getRepositories()[rootDirIndex]
@@ -82,9 +82,9 @@ class GitBridge
       repo = atom.project.getRepositories()[0]
     return repo
 
-  @_repoWorkDir: -> @getActiveRepo().getWorkingDirectory()
+  @_repoWorkDir: -> @_getActiveRepo().getWorkingDirectory()
 
-  @_repoGitDir: -> @getActiveRepo().getPath()
+  @_repoGitDir: -> @_getActiveRepo().getPath()
 
   @_statusCodesFrom: (chunk, handler) ->
     for line in chunk.split("\n")
