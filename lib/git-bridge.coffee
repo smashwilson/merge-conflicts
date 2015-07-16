@@ -82,6 +82,15 @@ class GitBridge
       repo = atom.project.getRepositories()[0]
     return repo
 
+  # Public: Return a filepath relative to the git repository that contains it.
+  #
+  # * `filepath` {String} Absolute path to the file.
+  #
+  # Returns the relative path as a {String}, or null if the path isn't within a known repository.
+  #
+  @repoRelativePath: (filepath) ->
+    @getActiveRepo(filepath)?.relativize filepath
+
   @_repoWorkDir: (filepath) -> @getActiveRepo(filepath).getWorkingDirectory()
 
   @_repoGitDir: (filepath) -> @getActiveRepo(filepath).getPath()
