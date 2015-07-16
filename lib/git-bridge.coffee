@@ -82,15 +82,6 @@ class GitBridge
       repo = atom.project.getRepositories()[0]
     return repo
 
-  # Public: Return a filepath relative to the git repository that contains it.
-  #
-  # * `filepath` {String} Absolute path to the file.
-  #
-  # Returns the relative path as a {String}, or null if the path isn't within a known repository.
-  #
-  @repoRelativePath: (filepath) ->
-    @getActiveRepo(filepath)?.relativize filepath
-
   @_repoWorkDir: (filepath) -> @getActiveRepo(filepath).getWorkingDirectory()
 
   @_repoGitDir: (filepath) -> @getActiveRepo(filepath).getPath()
@@ -102,19 +93,15 @@ class GitBridge
         [__, indexCode, workCode, p] = m
         handler(indexCode, workCode, p)
 
-  @_checkHealth: (callback, filepath) ->
+  @_checkHealth: (callback) ->
     unless GitCmd
       console.trace("GitBridge method called before locateGitAnd")
       callback(new Error("GitBridge.locateGitAnd has not been called yet"))
       return false
 
-    unless @getActiveRepo(filepath)
-      callback(new Error("No git repository detected"))
-      return false
-
     return true
 
-  @withConflicts: (handler) ->
+  @withConflicts: (repo, handler) ->
     return unless @_checkHealth(handler)
 
     conflicts = []
@@ -140,7 +127,7 @@ class GitBridge
     proc = @process({
       command: GitCmd,
       args: ['status', '--porcelain'],
-      options: { cwd: @_repoWorkDir() },
+      options: { cwd: repo.getWorkingDirectory() },
       stdout: stdoutHandler,
       stderr: stderrHandler,
       exit: exitHandler
@@ -149,8 +136,8 @@ class GitBridge
     proc.process.on 'error', (err) ->
       handler(new GitNotFoundError(errMessage.join("\n")), null)
 
-  @isStaged: (filepath, handler) ->
-    return unless @_checkHealth(handler, filepath)
+  @isStaged: (repo, filepath, handler) ->
+    return unless @_checkHealth(handler)
 
     staged = true
 
@@ -170,7 +157,7 @@ class GitBridge
     proc = @process({
       command: GitCmd,
       args: ['status', '--porcelain', filepath],
-      options: { cwd: @_repoWorkDir() },
+      options: { cwd: repo.getWorkingDirectory() },
       stdout: stdoutHandler,
       stderr: stderrHandler,
       exit: exitHandler
@@ -179,13 +166,13 @@ class GitBridge
     proc.process.on 'error', (err) ->
       handler(new GitNotFoundError, null)
 
-  @checkoutSide: (sideName, filepath, callback) ->
-    return unless @_checkHealth(callback, filepath)
+  @checkoutSide: (repo, sideName, filepath, callback) ->
+    return unless @_checkHealth(callback)
 
     proc = @process({
       command: GitCmd,
       args: ['checkout', "--#{sideName}", filepath],
-      options: { cwd: @_repoWorkDir() },
+      options: { cwd: repo.getWorkingDirectory() },
       stdout: (line) -> console.log line
       stderr: (line) -> console.log line
       exit: (code) ->
@@ -198,13 +185,13 @@ class GitBridge
     proc.process.on 'error', (err) ->
       callback(new GitNotFoundError)
 
-  @add: (filepath, callback) ->
-    return unless @_checkHealth(callback, filepath)
+  @add: (repo, filepath, callback) ->
+    return unless @_checkHealth(callback)
 
     @process({
       command: GitCmd,
       args: ['add', filepath],
-      options: { cwd: @_repoWorkDir() },
+      options: { cwd: repo.getWorkingDirectory() },
       stdout: (line) -> console.log line
       stderr: (line) -> console.log line
       exit: (code) ->

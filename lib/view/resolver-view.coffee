@@ -8,7 +8,7 @@
 
 class ResolverView extends View
 
-  @content: (editor, pkg) ->
+  @content: (editor, state, pkg) ->
     @div class: 'overlay from-top resolver', =>
       @div class: 'block text-highlight', "We're done here"
       @div class: 'block', =>
@@ -22,7 +22,7 @@ class ResolverView extends View
       @div class: 'pull-right', =>
         @button class: 'btn btn-primary', click: 'resolve', 'Stage'
 
-  initialize: (@editor, @pkg) ->
+  initialize: (@editor, @state, @pkg) ->
     @subs = new CompositeDisposable()
 
     @refresh()
@@ -35,10 +35,10 @@ class ResolverView extends View
   getModel: -> null
 
   relativePath: ->
-    GitBridge.getActiveRepo().relativize @editor.getURI()
+    @state.repo.relativize @editor.getURI()
 
   refresh: ->
-    GitBridge.isStaged @relativePath(), (err, staged) =>
+    GitBridge.isStaged @state.repo, @relativePath(), (err, staged) =>
       return if handleErr(err)
 
       modified = @editor.isModified()
@@ -58,7 +58,7 @@ class ResolverView extends View
 
   resolve: ->
     @editor.save()
-    GitBridge.add @relativePath(), (err) =>
+    GitBridge.add @state.repo, @relativePath(), (err) =>
       return if handleErr(err)
 
       @refresh()

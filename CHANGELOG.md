@@ -1,5 +1,6 @@
 ## 1.3.3
 
+- With multiple projects, remember the git repository that you initially detected conflicts within. [#165](https://github.com/smashwilson/merge-conflicts/pull/165)
 - Handle projects with no git repository. [#164](https://github.com/smashwilson/merge-conflicts/pull/164)
 - Improve the "Git not found" error dialog. [#163](https://github.com/smashwilson/merge-conflicts/pull/163)
 - Use alt-m instead of ctrl-m in key bindings. [#162](https://github.com/smashwilson/merge-conflicts/pull/162)

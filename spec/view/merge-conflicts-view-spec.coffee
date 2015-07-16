@@ -20,11 +20,20 @@ describe 'MergeConflictsView', ->
   beforeEach ->
     pkg = util.pkgEmitter()
 
+    GitBridge.process = ({exit}) ->
+      exit(0)
+      { process: { on: (err) -> }, onWillThrowError: -> }
+
+    done = false
+    GitBridge.locateGitAnd (err) -> done = true
+    waitsFor -> done
+
     conflicts = _.map ['file1.txt', 'file2.txt'], (fname) ->
       { path: repoPath(fname), message: 'both modified' }
 
     util.openPath 'triple-2way-diff.txt', (editorView) ->
-      state = new MergeState conflicts, false
+      repo = atom.project.getRepositories()[0]
+      state = new MergeState conflicts, repo, false
       conflicts = Conflict.all state, editorView.getModel()
 
       view = new MergeConflictsView(state, pkg)

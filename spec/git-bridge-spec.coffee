@@ -4,7 +4,15 @@ path = require 'path'
 
 describe 'GitBridge', ->
 
-  repoBase = -> atom.project.getRepositories()[0].getWorkingDirectory()
+  gitWorkDir = "/fake/gitroot/"
+
+  repo =
+    getWorkingDirectory: -> gitWorkDir
+    relativize: (fullpath) ->
+      if fullpath.startsWith gitWorkDir
+        fullpath[gitWorkDir.length..]
+      else
+        fullpath
 
   beforeEach ->
     done = false
@@ -27,7 +35,7 @@ describe 'GitBridge', ->
       { process: { on: (callback) -> } }
 
     conflicts = []
-    GitBridge.withConflicts (err, cs) ->
+    GitBridge.withConflicts repo, (err, cs) ->
       throw err if err
       conflicts = cs
 
@@ -37,7 +45,7 @@ describe 'GitBridge', ->
     ])
     expect(c).toBe('/usr/bin/git')
     expect(a).toEqual(['status', '--porcelain'])
-    expect(o).toEqual({ cwd: repoBase() })
+    expect(o).toEqual({ cwd: gitWorkDir })
 
   describe 'isStaged', ->
 
@@ -48,7 +56,7 @@ describe 'GitBridge', ->
         { process: { on: (callback) -> } }
 
       staged = null
-      GitBridge.isStaged checkPath, (err, b) ->
+      GitBridge.isStaged repo, checkPath, (err, b) ->
         throw err if err
         staged = b
       staged
@@ -73,14 +81,14 @@ describe 'GitBridge', ->
       { process: { on: (callback) -> } }
 
     called = false
-    GitBridge.checkoutSide 'ours', 'lib/file1.txt', (err) ->
+    GitBridge.checkoutSide repo, 'ours', 'lib/file1.txt', (err) ->
       throw err if err
       called = true
 
     expect(called).toBe(true)
     expect(c).toBe('/usr/bin/git')
     expect(a).toEqual(['checkout', '--ours', 'lib/file1.txt'])
-    expect(o).toEqual({ cwd: repoBase() })
+    expect(o).toEqual({ cwd: gitWorkDir })
 
   it 'stages changes to a file', ->
     [c, a, o] = []
@@ -89,14 +97,14 @@ describe 'GitBridge', ->
       exit(0)
 
     called = false
-    GitBridge.add 'lib/file1.txt', (err) ->
+    GitBridge.add repo, 'lib/file1.txt', (err) ->
       throw err if err
       called = true
 
     expect(called).toBe(true)
     expect(c).toBe('/usr/bin/git')
     expect(a).toEqual(['add', 'lib/file1.txt'])
-    expect(o).toEqual({ cwd: repoBase() })
+    expect(o).toEqual({ cwd: gitWorkDir })
 
   describe 'rebase detection', ->
 

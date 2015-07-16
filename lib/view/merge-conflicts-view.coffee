@@ -38,7 +38,7 @@ class MergeConflictsView extends View
     @subs = new CompositeDisposable
 
     @subs.add @pkg.onDidResolveConflict (event) =>
-      p = GitBridge.repoRelativePath event.file
+      p = @state.repo.relativize event.file
       found = false
       for listElement in @pathList.children()
         li = $(listElement)
@@ -62,7 +62,7 @@ class MergeConflictsView extends View
 
   navigate: (event, element) ->
     repoPath = element.find(".path").text()
-    fullPath = path.join GitBridge.getActiveRepo().getWorkingDirectory(), repoPath
+    fullPath = path.join @state.repo.getWorkingDirectory(), repoPath
     atom.workspace.open(fullPath)
 
   minimize: ->
@@ -153,10 +153,16 @@ class MergeConflictsView extends View
       @pkg.didStageFile file: filePath
 
   @detect: (pkg) ->
-    return unless atom.project.getRepositories().length > 0
     return if @instance?
 
-    MergeState.read (err, state) =>
+    repo = GitBridge.getActiveRepo()
+    unless repo?
+      atom.notifications.addWarning "No git repository found",
+        detail: "Tip: if you have multiple projects open, open an editor in the one
+          containing conflicts."
+      return
+
+    MergeState.read repo, (err, state) =>
       return if handleErr(err)
 
       if not state.isEmpty()
@@ -176,7 +182,7 @@ class MergeConflictsView extends View
     return if state.isEmpty()
 
     fullPath = editor.getPath()
-    repoPath = GitBridge.repoRelativePath fullPath
+    repoPath = state.repo.relativize fullPath
     return unless repoPath?
 
     return unless _.contains state.conflictPaths(), repoPath

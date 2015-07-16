@@ -6,15 +6,19 @@ util = require '../util'
 describe 'ResolverView', ->
   [view, fakeEditor, pkg] = []
 
+  state =
+    repo:
+      getWorkingDirectory: -> "/fake/gitroot/"
+      relativize: (filepath) -> filepath["/fake/gitroot/".length..]
+
   beforeEach ->
     pkg = util.pkgEmitter()
     fakeEditor = {
       isModified: -> true
-      getURI: -> 'lib/file1.txt'
+      getURI: -> '/fake/gitroot/lib/file1.txt'
       save: ->
       onDidSave: ->
     }
-    view = new ResolverView(fakeEditor, pkg)
 
     atom.config.set('merge-conflicts.gitPath', 'git')
     done = false
@@ -28,6 +32,8 @@ describe 'ResolverView', ->
       stdout('UU lib/file1.txt')
       exit(0)
       { process: { on: (err) -> } }
+
+    view = new ResolverView(fakeEditor, state, pkg)
 
   it 'begins needing both saving and staging', ->
     view.refresh()
@@ -55,4 +61,4 @@ describe 'ResolverView', ->
     expect(fakeEditor.save).toHaveBeenCalled()
     expect(c).toBe('git')
     expect(a).toEqual(['add', 'lib/file1.txt'])
-    expect(o).toEqual({ cwd: atom.project.getRepositories()[0].getWorkingDirectory() })
+    expect(o).toEqual({ cwd: state.repo.getWorkingDirectory() })

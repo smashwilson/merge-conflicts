@@ -52,6 +52,9 @@ describe 'ConflictedEditor', ->
         editor = editorView.getModel()
         state =
           isRebase: false
+          repo:
+            getWorkingDirectory: -> ""
+            relativize: (filepath) -> filepath
 
         m = new ConflictedEditor(state, pkg, editor)
         m.mark()
@@ -209,6 +212,9 @@ describe 'ConflictedEditor', ->
         editor = editorView.getModel()
         state =
           isRebase: true
+          repo:
+            getWorkingDirectory: -> ""
+            relativize: (filepath) -> filepath
 
         m = new ConflictedEditor(state, pkg, editor)
         m.mark()
