@@ -102,7 +102,7 @@ class ConflictedEditor
   # Private: Event handler invoked when all conflicts in this file have been resolved.
   #
   conflictsResolved: ->
-    atom.workspace.addTopPanel item: new ResolverView(@editor, @pkg)
+    atom.workspace.addTopPanel item: new ResolverView(@editor, @state, @pkg)
 
   detectDirty: ->
     # Only detect dirty regions within CoveringViews that have a cursor within them.
