@@ -62,7 +62,7 @@ class MergeConflictsView extends View
 
   navigate: (event, element) ->
     repoPath = element.find(".path").text()
-    fullPath = path.join GitBridge.getActiveRepo().getWorkingDirectory(), repoPath
+    fullPath = path.join @state.repo.getWorkingDirectory(), repoPath
     atom.workspace.open(fullPath)
 
   minimize: ->
