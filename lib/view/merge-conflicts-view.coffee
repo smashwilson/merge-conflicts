@@ -158,8 +158,8 @@ class MergeConflictsView extends View
     repo = GitBridge.getActiveRepo()
     unless repo?
       atom.notifications.addWarning "No git repository found",
-        detail: "Tip: if you have multiple projects open, open an editor in the one"
-          "containing conflicts."
+        detail: "Tip: if you have multiple projects open, open an editor in the one
+          containing conflicts."
       return
 
     MergeState.read repo, (err, state) =>
