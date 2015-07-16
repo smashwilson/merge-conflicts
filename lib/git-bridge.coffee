@@ -93,7 +93,21 @@ class GitBridge
         [__, indexCode, workCode, p] = m
         handler(indexCode, workCode, p)
 
+  @_checkHealth: (callback, filepath) ->
+    unless GitCmd
+      console.trace("GitBridge method called before locateGitAnd")
+      callback(new Error("GitBridge.locateGitAnd has not been called yet"))
+      return false
+
+    unless @getActiveRepo(filepath)
+      callback(new Error("No git repository detected"))
+      return false
+
+    return true
+
   @withConflicts: (handler) ->
+    return unless @_checkHealth(handler)
+
     conflicts = []
     errMessage = []
 
@@ -127,6 +141,8 @@ class GitBridge
       handler(new GitNotFoundError(errMessage.join("\n")), null)
 
   @isStaged: (filepath, handler) ->
+    return unless @_checkHealth(handler, filepath)
+
     staged = true
 
     stdoutHandler = (chunk) =>
@@ -155,6 +171,8 @@ class GitBridge
       handler(new GitNotFoundError, null)
 
   @checkoutSide: (sideName, filepath, callback) ->
+    return unless @_checkHealth(callback, filepath)
+
     proc = @process({
       command: GitCmd,
       args: ['checkout', "--#{sideName}", filepath],
@@ -172,6 +190,8 @@ class GitBridge
       callback(new GitNotFoundError)
 
   @add: (filepath, callback) ->
+    return unless @_checkHealth(callback, filepath)
+
     @process({
       command: GitCmd,
       args: ['add', filepath],
@@ -186,6 +206,9 @@ class GitBridge
     })
 
   @isRebasing: ->
+    return unless @_checkHealth (e) ->
+      atom.notifications.addError e.message
+
     root = @_repoGitDir()
     return false unless root?
 
