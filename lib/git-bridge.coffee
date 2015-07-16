@@ -93,14 +93,10 @@ class GitBridge
         [__, indexCode, workCode, p] = m
         handler(indexCode, workCode, p)
 
-  @_checkHealth: (callback, filepath) ->
+  @_checkHealth: (callback) ->
     unless GitCmd
       console.trace("GitBridge method called before locateGitAnd")
       callback(new Error("GitBridge.locateGitAnd has not been called yet"))
-      return false
-
-    unless @getActiveRepo(filepath)
-      callback(new Error("No git repository detected"))
       return false
 
     return true
@@ -140,8 +136,8 @@ class GitBridge
     proc.process.on 'error', (err) ->
       handler(new GitNotFoundError(errMessage.join("\n")), null)
 
-  @isStaged: (filepath, handler) ->
-    return unless @_checkHealth(handler, filepath)
+  @isStaged: (repo, filepath, handler) ->
+    return unless @_checkHealth(handler)
 
     staged = true
 
@@ -161,7 +157,7 @@ class GitBridge
     proc = @process({
       command: GitCmd,
       args: ['status', '--porcelain', filepath],
-      options: { cwd: @_repoWorkDir() },
+      options: { cwd: repo.getWorkingDirectory() },
       stdout: stdoutHandler,
       stderr: stderrHandler,
       exit: exitHandler
@@ -170,13 +166,13 @@ class GitBridge
     proc.process.on 'error', (err) ->
       handler(new GitNotFoundError, null)
 
-  @checkoutSide: (sideName, filepath, callback) ->
-    return unless @_checkHealth(callback, filepath)
+  @checkoutSide: (repo, sideName, filepath, callback) ->
+    return unless @_checkHealth(callback)
 
     proc = @process({
       command: GitCmd,
       args: ['checkout', "--#{sideName}", filepath],
-      options: { cwd: @_repoWorkDir() },
+      options: { cwd: repo.getWorkingDirectory() },
       stdout: (line) -> console.log line
       stderr: (line) -> console.log line
       exit: (code) ->
@@ -189,13 +185,13 @@ class GitBridge
     proc.process.on 'error', (err) ->
       callback(new GitNotFoundError)
 
-  @add: (filepath, callback) ->
-    return unless @_checkHealth(callback, filepath)
+  @add: (repo, filepath, callback) ->
+    return unless @_checkHealth(callback)
 
     @process({
       command: GitCmd,
       args: ['add', filepath],
-      options: { cwd: @_repoWorkDir() },
+      options: { cwd: repo.getWorkingDirectory() },
       stdout: (line) -> console.log line
       stderr: (line) -> console.log line
       exit: (code) ->
