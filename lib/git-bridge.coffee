@@ -73,8 +73,8 @@ class GitBridge
   @_getActivePath: ->
     atom.workspace.getActivePaneItem()?.getPath?()
 
-  @_getActiveRepo: ->
-    [rootDir] = atom.project.relativizePath @_getActivePath()
+  @getActiveRepo: (filepath) ->
+    [rootDir] = atom.project.relativizePath(filepath or @_getActivePath())
     if rootDir?
       rootDirIndex = atom.project.getPaths().indexOf(rootDir)
       repo = atom.project.getRepositories()[rootDirIndex]
@@ -82,9 +82,9 @@ class GitBridge
       repo = atom.project.getRepositories()[0]
     return repo
 
-  @_repoWorkDir: -> @_getActiveRepo().getWorkingDirectory()
+  @_repoWorkDir: (filepath) -> @getActiveRepo(filepath).getWorkingDirectory()
 
-  @_repoGitDir: -> @_getActiveRepo().getPath()
+  @_repoGitDir: (filepath) -> @getActiveRepo(filepath).getPath()
 
   @_statusCodesFrom: (chunk, handler) ->
     for line in chunk.split("\n")
