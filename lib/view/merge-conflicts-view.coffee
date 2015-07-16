@@ -38,7 +38,7 @@ class MergeConflictsView extends View
     @subs = new CompositeDisposable
 
     @subs.add @pkg.onDidResolveConflict (event) =>
-      p = GitBridge.getActiveRepo().relativize event.file
+      p = GitBridge.getActiveRepo(event.file).relativize event.file
       found = false
       for listElement in @pathList.children()
         li = $(listElement)
@@ -62,7 +62,7 @@ class MergeConflictsView extends View
 
   navigate: (event, element) ->
     repoPath = element.find(".path").text()
-    fullPath = path.join GitBridge.getActiveRepo().getWorkingDirectory(), repoPath
+    fullPath = path.join GitBridge.getActiveRepo(repoPath).getWorkingDirectory(), repoPath
     atom.workspace.open(fullPath)
 
   minimize: ->
@@ -142,7 +142,7 @@ class MergeConflictsView extends View
 
   stageFile: (event, element) ->
     repoPath = element.closest('li').data('path')
-    filePath = path.join GitBridge.getActiveRepo().getWorkingDirectory(), repoPath
+    filePath = path.join GitBridge.getActiveRepo(repoPath).getWorkingDirectory(), repoPath
 
     for e in atom.workspace.getTextEditors()
       e.save() if e.getPath() is filePath
@@ -176,7 +176,7 @@ class MergeConflictsView extends View
     return if state.isEmpty()
 
     fullPath = editor.getPath()
-    repoPath = GitBridge.getActiveRepo()?.relativize fullPath
+    repoPath = GitBridge.getActiveRepo(fullPath)?.relativize fullPath
     return unless repoPath?
 
     return unless _.contains state.conflictPaths(), repoPath
