@@ -142,7 +142,7 @@ class MergeConflictsView extends View
 
   stageFile: (event, element) ->
     repoPath = element.closest('li').data('path')
-    filePath = path.join GitBridge.getActiveRepo(repoPath).getWorkingDirectory(), repoPath
+    filePath = path.join GitBridge.getActiveRepo().getWorkingDirectory(), repoPath
 
     for e in atom.workspace.getTextEditors()
       e.save() if e.getPath() is filePath
