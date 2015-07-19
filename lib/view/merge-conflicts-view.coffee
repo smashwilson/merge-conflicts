@@ -34,7 +34,6 @@ class MergeConflictsView extends View
           @button class: 'btn btn-sm', click: 'quit', 'Quit'
 
   initialize: (@state, @pkg) ->
-    @markers = []
     @subs = new CompositeDisposable
 
     @subs.add @pkg.onDidResolveConflict (event) =>
@@ -119,9 +118,6 @@ class MergeConflictsView extends View
             dismissable: true
 
   finish: (andThen) ->
-    m.cleanup() for m in @markers
-    @markers = []
-
     @subs.dispose()
 
     @hide 'fast', =>
@@ -171,8 +167,7 @@ class MergeConflictsView extends View
         atom.workspace.addBottomPanel item: view
 
         @instance.subs.add atom.workspace.observeTextEditors (editor) =>
-          marker = @markConflictsIn state, editor, pkg
-          @instance.markers.push marker if marker?
+          @markConflictsIn state, editor, pkg
       else
         atom.notifications.addInfo "Nothing to Merge",
           detail: "No conflicts here!",
