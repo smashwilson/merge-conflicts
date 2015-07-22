@@ -21,16 +21,17 @@ class MergeConflictsView extends View
         @span class: 'pull-right icon icon-fold', click: 'minimize', 'Hide'
         @span class: 'pull-right icon icon-unfold', click: 'restore', 'Show'
       @div outlet: 'body', =>
-        @ul class: 'block list-group', outlet: 'pathList', =>
-          for {path: p, message} in state.conflicts
-            @li click: 'navigate', "data-path": p, class: 'list-item navigate', =>
-              @span class: 'inline-block icon icon-diff-modified status-modified path', p
-              @div class: 'pull-right', =>
-                @button click: 'stageFile', class: 'btn btn-xs btn-success inline-block-tight stage-ready', style: 'display: none', 'Stage'
-                @span class: 'inline-block text-subtle', message
-                @progress class: 'inline-block', max: 100, value: 0
-                @span class: 'inline-block icon icon-dash staged'
-        @div class: 'block pull-right', =>
+        @div class: 'conflict-list', =>
+          @ul class: 'block list-group', outlet: 'pathList', =>
+            for {path: p, message} in state.conflicts
+              @li click: 'navigate', "data-path": p, class: 'list-item navigate', =>
+                @span class: 'inline-block icon icon-diff-modified status-modified path', p
+                @div class: 'pull-right', =>
+                  @button click: 'stageFile', class: 'btn btn-xs btn-success inline-block-tight stage-ready', style: 'display: none', 'Stage'
+                  @span class: 'inline-block text-subtle', message
+                  @progress class: 'inline-block', max: 100, value: 0
+                  @span class: 'inline-block icon icon-dash staged'
+        @div class: 'footer block pull-right', =>
           @button class: 'btn btn-sm', click: 'quit', 'Quit'
 
   initialize: (@state, @pkg) ->
