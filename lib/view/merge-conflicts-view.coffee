@@ -20,7 +20,7 @@ class MergeConflictsView extends View
         @text 'Conflicts'
         @span class: 'pull-right icon icon-fold', click: 'minimize', 'Hide'
         @span class: 'pull-right icon icon-unfold', click: 'restore', 'Show'
-      @div outlet: 'body', =>
+      @div class: 'conflict-list', outlet: 'body', =>
         @ul class: 'block list-group', outlet: 'pathList', =>
           for {path: p, message} in state.conflicts
             @li click: 'navigate', "data-path": p, class: 'list-item navigate', =>
@@ -30,8 +30,8 @@ class MergeConflictsView extends View
                 @span class: 'inline-block text-subtle', message
                 @progress class: 'inline-block', max: 100, value: 0
                 @span class: 'inline-block icon icon-dash staged'
-        @div class: 'block pull-right', =>
-          @button class: 'btn btn-sm', click: 'quit', 'Quit'
+      @div class: 'footer block pull-right', =>
+        @button class: 'btn btn-sm', click: 'quit', 'Quit'
 
   initialize: (@state, @pkg) ->
     @subs = new CompositeDisposable
