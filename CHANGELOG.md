@@ -1,3 +1,7 @@
+## 1.3.5
+
+- Using the "stage" button no longer triggers a crash. [#173](https://github.com/smashwilson/merge-conflicts/pull/173)
+
 ## 1.3.4
 
 - Scroll the merge conflicts view when many conflicts exist. [#170](https://github.com/smashwilson/merge-conflicts/pull/170)
