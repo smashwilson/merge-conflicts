@@ -16,6 +16,35 @@ This package detects the conflict markers left by `git merge` and overlays a set
  * Track your progress through a merge with per-file progress bars and a file list.
  * Save and stage your resolved version of each file as it's completed.
 
+## Using
+
+When `git merge` tells you that it couldn't resolve all of your conflicts automatically:
+
+```
+$ git merge branch
+Auto-merging two
+CONFLICT (content): Merge conflict in two
+Auto-merging one
+CONFLICT (content): Merge conflict in one
+Automatic merge failed; fix conflicts and then commit the result.
+```
+
+Open Atom on your project and run the command `Merge Conflicts: Detect` (default hotkey: *alt-m d*). You'll see a panel at the bottom of the window describing your progress through the merge:
+
+![merge progress](https://raw.github.com/smashwilson/merge-conflicts/master/docs/merge-progress.jpg)
+
+Click each filename to visit it and step through the identified conflicts. For each conflict area, click "Use me" on either side of the change to accept that side as-is:
+
+![conflict area](https://raw.github.com/smashwilson/merge-conflicts/master/docs/conflict-area.jpg)
+
+Use the right-click menu to choose more advanced resolutions, like "ours then theirs", or edit any chunk by hand then click "use me" to accept your manual modifications. Once you've addressed all of the conflicts within a file, you'll be prompted to save and stage the changes you've made:
+
+![save and stage?](https://raw.github.com/smashwilson/merge-conflicts/master/docs/were-done-here.jpg)
+
+Finally, when *all* of the conflicts throughout the project have been dealt with, a message will appear to prompt you how to commit the resolution and continue on your way. :tada:
+
+![onward!](https://raw.github.com/smashwilson/merge-conflicts/master/docs/merge-complete.jpg)
+
 ## Events
 
 The merge-conflicts plugin emits a number of events that other packages can subscribe to, if they wish. If you want your plugin to consume one, use code like the following:
@@ -40,27 +69,4 @@ subs.dispose()
 
 ## Contributions
 
-Contributors are welcome! I'm a big believer in [the GitHub flow](http://guides.github.com/overviews/flow/), and the [Atom package contribution guide](https://atom.io/docs/latest/contributing) is a solid resource, too.
-
-Here's the process in a nutshell:
-
- 1. Fork it. :fork_and_knife:
- 2. Run `apm develop merge-conflicts` from your terminal to get a clone of this repo. By default, this will end up in a subdirectory of `${HOME}/github`, but you can customize it by setting `${ATOM_REPOS_HOME}`.
- 3. Fix up your remotes. The convention is to have `origin` pointing to your fork and `upstream` pointing to this repo.
-
- Assuming you set up your username using [the local GitHub Config Convention](https://github.com/blog/180-local-github-config)
-
- ```bash
- $ git config --global github.user your_username
- ```
-
- You can set your remotes up with something like:
-
-   ```bash
-   cd ${ATOM_REPOS_HOME:-~/github}/merge-conflicts
-   git remote rename origin upstream
-   git remote add origin git@github.com:`git config github.user`/merge-conflicts.git
-   ```
-
- 4. Create a branch and work on your awesome bug or feature! Commit often and consider opening a pull request *before* you're done. Follow the style and conventions of existing code and be sure to write specs!
- 5. Get it merged. Profit :dollar:
+Pull requests are welcome, big and small! Check out the [contributing guide](./CONTRIBUTING.md) for details.
