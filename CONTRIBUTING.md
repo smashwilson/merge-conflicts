@@ -1,4 +1,4 @@
-Contributors are welcome! I'm a big believer in [the GitHub flow](http://guides.github.com/overviews/flow/), and the [Atom package contribution guide](https://atom.io/docs/latest/contributing) is a solid resource, too.
+Contributors are welcome! I'm a big believer in [the GitHub flow](http://guides.github.com/overviews/flow/).
 
 Here's the process in a nutshell:
 
