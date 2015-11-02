@@ -1,3 +1,7 @@
+## 1.3.7
+
+- Update the method I was using to read the scrollbar width. [#190](https://github.com/smashwilson/merge-conflicts/pull/190)
+
 ## 1.3.6
 
 - Use transparency instead of `mix()` to allow selection to show through. [#181](https://github.com/smashwilson/merge-conflicts/pull/181)
