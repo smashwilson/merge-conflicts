@@ -15,12 +15,8 @@ class CoveringView extends View
     @coverSubs.add @editor.onDidDestroy => @cleanup()
 
   attached: ->
-    rightPosition = if @editor.verticallyScrollable()
-        @editor.getVerticalScrollbarWidth()
-      else
-        0
-
-    @parent().css right: rightPosition
+    view = atom.views.getView(@editor)
+    @parent().css right: view.getVerticalScrollbarWidth()
 
     @css 'margin-top': -@editor.getLineHeightInPixels()
     @height @editor.getLineHeightInPixels()
