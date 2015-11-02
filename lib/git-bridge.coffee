@@ -187,6 +187,7 @@ class GitBridge
 
   @add: (repo, filepath, callback) ->
     repo.repo.add(filepath)
+    callback(null)
 
   @isRebasing: ->
     return unless @_checkHealth (e) ->

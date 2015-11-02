@@ -91,10 +91,9 @@ describe 'GitBridge', ->
     expect(o).toEqual({ cwd: gitWorkDir })
 
   it 'stages changes to a file', ->
-    [c, a, o] = []
-    GitBridge.process = ({command, args, options, exit}) ->
-      [c, a, o] = [command, args, options]
-      exit(0)
+    p = ""
+    repo.repo =
+      add: (path) -> p = path
 
     called = false
     GitBridge.add repo, 'lib/file1.txt', (err) ->
@@ -102,9 +101,7 @@ describe 'GitBridge', ->
       called = true
 
     expect(called).toBe(true)
-    expect(c).toBe('/usr/bin/git')
-    expect(a).toEqual(['add', 'lib/file1.txt'])
-    expect(o).toEqual({ cwd: gitWorkDir })
+    expect(p).toBe('lib/file1.txt')
 
   describe 'rebase detection', ->
 
