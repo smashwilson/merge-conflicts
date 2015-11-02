@@ -1,5 +1,6 @@
 ## 1.3.7
 
+- Resolving entire files as ours or theirs works again. [#192](https://github.com/smashwilson/merge-conflicts/pull/192)
 - Use GitUtils to stage files instead of shelling out to git. [#191](https://github.com/smashwilson/merge-conflicts/pull/191)
 - Update the method I was using to read the scrollbar width. [#190](https://github.com/smashwilson/merge-conflicts/pull/190)
 
