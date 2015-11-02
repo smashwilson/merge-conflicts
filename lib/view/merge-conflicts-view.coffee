@@ -130,10 +130,10 @@ class MergeConflictsView extends View
   sideResolver: (side) ->
     (event) =>
       p = $(event.target).closest('li').data('path')
-      GitBridge.checkoutSide side, p, (err) =>
+      GitBridge.checkoutSide @state.repo, side, p, (err) =>
         return if handleErr(err)
 
-        full = path.join atom.project.relativizePath(atom.workspace.getActivePaneItem()?.getPath?())[0], p
+        full = path.join @state.repo.getWorkingDirectory(), p
         @pkg.didResolveConflict file: full, total: 1, resolved: 1
         atom.workspace.open p
 
