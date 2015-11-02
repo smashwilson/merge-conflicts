@@ -186,20 +186,8 @@ class GitBridge
       callback(new GitNotFoundError)
 
   @add: (repo, filepath, callback) ->
-    return unless @_checkHealth(callback)
-
-    @process({
-      command: GitCmd,
-      args: ['add', filepath],
-      options: { cwd: repo.getWorkingDirectory() },
-      stdout: (line) -> console.log line
-      stderr: (line) -> console.log line
-      exit: (code) ->
-        if code is 0
-          callback()
-        else
-          callback(new Error("git add failed: exit code #{code}"))
-    })
+    repo.repo.add(filepath)
+    callback(null)
 
   @isRebasing: ->
     return unless @_checkHealth (e) ->

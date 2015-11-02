@@ -10,6 +10,8 @@ describe 'ResolverView', ->
     repo:
       getWorkingDirectory: -> "/fake/gitroot/"
       relativize: (filepath) -> filepath["/fake/gitroot/".length..]
+      repo:
+        add: (filepath) ->
 
   beforeEach ->
     pkg = util.pkgEmitter()
@@ -45,11 +47,10 @@ describe 'ResolverView', ->
     expect(view.actionText.text()).toBe('Stage')
 
   it 'saves and stages the file', ->
-    [c, a, o] = []
+    p = null
+    state.repo.repo.add = (filepath) -> p = filepath
+
     GitBridge.process = ({command, args, options, stdout, exit}) ->
-      if 'add' in args
-        [c, a, o] = [command, args, options]
-        exit(0)
       if 'status' in args
         stdout('M  lib/file1.txt')
         exit(0)
@@ -59,6 +60,4 @@ describe 'ResolverView', ->
 
     view.resolve()
     expect(fakeEditor.save).toHaveBeenCalled()
-    expect(c).toBe('git')
-    expect(a).toEqual(['add', 'lib/file1.txt'])
-    expect(o).toEqual({ cwd: state.repo.getWorkingDirectory() })
+    expect(p).toBe('lib/file1.txt')
