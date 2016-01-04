@@ -1,0 +1,21 @@
+#!/bin/bash -e
+
+MERGED=${MERGED:-$1}
+if [ -z "${MERGED}" ] ; then
+  echo ERR
+  echo Need to have a file to merge
+  exit 1
+fi
+
+#Wait for changes on the merge file
+echo Watching for changes in ${MERGED}
+bash -c "while [ $(stat -f %c $MERGED) -eq \$(stat -f %c $MERGED) ] ; do sleep 1 ; done " &
+PID_CHANGED=$!
+
+#Spawn atom, pointed at the file to merge. Up to the user to edit
+echo Opening ${MERGED} in atom
+atom $MERGED &
+
+#Once the file has been saved, we assume merge is complete.
+#User will need to acknowledge in shell
+wait $PID_CHANGED
