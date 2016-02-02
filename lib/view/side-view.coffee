@@ -11,6 +11,7 @@ class SideView extends CoveringView
         @span class: 'pull-right', =>
           @button class: 'btn btn-xs inline-block-tight revert', click: 'revert', outlet: 'revertBtn', 'Revert'
           @button class: 'btn btn-xs inline-block-tight', click: 'useMe', outlet: 'useMeBtn', 'Use Me'
+          ## TODO: re #185 add another @button here that provides alternate resolutions from `ConflictedEditor`, e.g. "Keep Both"
 
   initialize: (@side, editor) ->
     @subs = new CompositeDisposable
