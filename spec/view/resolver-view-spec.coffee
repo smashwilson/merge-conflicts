@@ -1,6 +1,6 @@
 {ResolverView} = require '../../lib/view/resolver-view'
 
-{GitBridge} = require '../../lib/git-bridge'
+{GitOps} = require '../../lib/git'
 util = require '../util'
 
 describe 'ResolverView', ->

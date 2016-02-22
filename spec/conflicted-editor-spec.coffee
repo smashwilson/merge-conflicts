@@ -2,7 +2,7 @@
 _ = require 'underscore-plus'
 
 {ConflictedEditor} = require '../lib/conflicted-editor'
-{GitBridge} = require '../lib/git-bridge'
+{GitOps} = require '../lib/git'
 util = require './util'
 
 describe 'ConflictedEditor', ->

@@ -5,7 +5,7 @@ _ = require 'underscore-plus'
 
 {MergeState} = require '../../lib/merge-state'
 {Conflict} = require '../../lib/conflict'
-{GitBridge} = require '../../lib/git-bridge'
+{GitOps} = require '../../lib/git'
 util = require '../util'
 
 describe 'MergeConflictsView', ->

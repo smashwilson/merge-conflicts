@@ -1,5 +1,4 @@
 {View} = require 'space-pen'
-{GitNotFoundError} = require '../git-bridge'
 
 class GitNotFoundErrorView extends View
 
@@ -40,7 +39,7 @@ module.exports =
   handleErr: (err) ->
     return false unless err?
 
-    if err instanceof GitNotFoundError
+    if err.isGitError
       atom.workspace.addTopPanel item: new GitNotFoundErrorView(err)
     else
       atom.notifications.addError err.message
