@@ -1,8 +1,6 @@
 {CompositeDisposable} = require 'atom'
 {View} = require 'space-pen'
 
-{GitBridge} = require '../git-bridge'
-
 {handleErr} = require './error-view'
 
 
@@ -35,12 +33,11 @@ class ResolverView extends View
   getModel: -> null
 
   relativePath: ->
-    @state.repo.relativize @editor.getURI()
+    @state.relativize @editor.getURI()
 
   refresh: ->
-    GitBridge.isStaged @state.repo, @relativePath(), (err, staged) =>
-      return if handleErr(err)
-
+    @state.context.isStaged @relativePath()
+    .then (staged) =>
       modified = @editor.isModified()
 
       needsSaved = modified
@@ -55,13 +52,14 @@ class ResolverView extends View
         @actionText.text 'Save and stage'
       else if needsStaged
         @actionText.text 'Stage'
+    .catch handleErr
 
   resolve: ->
     @editor.save()
-    GitBridge.add @state.repo, @relativePath(), (err) =>
-      return if handleErr(err)
-
+    @state.context.add @relativePath()
+    .then =>
       @refresh()
+    .catch handleErr
 
   dismiss: ->
     @hide 'fast', => @remove()
