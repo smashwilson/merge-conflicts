@@ -153,7 +153,7 @@ class MergeConflictsView extends View
     return if @instance?
 
     GitOps.getGitContext()
-    .then (context) ->
+    .then (context) =>
       unless context?
         atom.notifications.addWarning "No git repository found",
           detail: "Tip: if you have multiple projects open, open an editor in the one
