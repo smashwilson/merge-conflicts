@@ -8,17 +8,13 @@ class CoveringView extends View
   initialize: (@editor) ->
     @coverSubs = new CompositeDisposable
     @overlay = @editor.decorateMarker @cover(),
-      type: 'overlay',
+      type: 'block',
       item: this,
-      position: 'tail'
+      position: 'before'
 
     @coverSubs.add @editor.onDidDestroy => @cleanup()
 
   attached: ->
-    view = atom.views.getView(@editor)
-    @parent().css right: view.getVerticalScrollbarWidth()
-
-    @css 'margin-top': -@editor.getLineHeightInPixels()
     @height @editor.getLineHeightInPixels()
 
   cleanup: ->
