@@ -144,7 +144,7 @@ class MergeConflictsView extends View
       e.save() if e.getPath() is filePath
 
     @state.context.add(repoPath)
-    .then ->
+    .then =>
       @pkg.didStageFile file: filePath
     .catch (err) ->
       handleErr(err)
