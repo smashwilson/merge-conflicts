@@ -55,25 +55,16 @@ describe 'GitBridge', ->
       context.isStaged(checkPath)
 
     it 'is true if already resolved', ->
-      statusMeansStaged('M ')
-      .then (s) ->
-        expect(s).toBe(true)
-      .done()
+      waitsForPromise -> statusMeansStaged('M ').then (s) -> expect(s).toBe(true)
 
     it 'is true if resolved as ours', ->
-      statusMeansStaged(' M', 'lib/file1.txt')
-      .then (s) -> expect(s).toBe(true)
-      .done()
+      waitsForPromise -> statusMeansStaged(' M', 'lib/file1.txt').then (s) -> expect(s).toBe(true)
 
     it 'is false if still in conflict', ->
-      statusMeansStaged('UU')
-      .then (s) -> expect(s).toBe(false)
-      .done()
+      waitsForPromise -> statusMeansStaged('UU').then (s) -> expect(s).toBe(false)
 
     it 'is false if resolved, but then modified', ->
-      statusMeansStaged('MM')
-      .then (s) -> expect(s).toBe(false)
-      .done()
+      waitsForPromise -> statusMeansStaged('MM').then (s) -> expect(s).toBe(false)
 
   it 'checks out "our" version of a file from the index', ->
     [c, a, o] = []
