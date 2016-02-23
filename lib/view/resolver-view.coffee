@@ -43,7 +43,7 @@ class ResolverView extends View
       needsStaged = modified or not staged
 
       unless needsSaved or needsStaged
-        @hide 'fast', -> @remove()
+        @hide 'fast', => @remove()
         @pkg.didStageFile file: @editor.getURI()
         return
 
