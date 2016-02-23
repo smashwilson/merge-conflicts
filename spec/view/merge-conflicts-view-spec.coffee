@@ -1,3 +1,4 @@
+{Directory} = require 'atom'
 path = require 'path'
 _ = require 'underscore-plus'
 
@@ -5,35 +6,35 @@ _ = require 'underscore-plus'
 
 {MergeState} = require '../../lib/merge-state'
 {Conflict} = require '../../lib/conflict'
-{GitBridge} = require '../../lib/git-bridge'
+{GitOps} = require '../../lib/git'
 util = require '../util'
 
 describe 'MergeConflictsView', ->
-  [view, state, pkg] = []
+  [view, context, state, pkg] = []
 
   fullPath = (fname) ->
     path.join atom.project.getPaths()[0], 'path', fname
 
   repoPath = (fname) ->
-    atom.project.getRepositories()[0].relativize fullPath(fname)
+    context.workingDirectory.relativize fullPath(fname)
 
   beforeEach ->
     pkg = util.pkgEmitter()
 
-    GitBridge.process = ({exit}) ->
-      exit(0)
-      { process: { on: (err) -> }, onWillThrowError: -> }
+    workingDirectory = new Directory atom.project.getRepositories()[0].getWorkingDirectory()
 
-    done = false
-    GitBridge.locateGitAnd (err) -> done = true
-    waitsFor -> done
+    context =
+      isRebase: false
+      workingDirPath: workingDirectory.path
+      workingDirectory: workingDirectory
+      readConflicts: -> Promise.resolve conflicts
+      checkoutSide: -> Promise.resolve()
 
     conflicts = _.map ['file1.txt', 'file2.txt'], (fname) ->
       { path: repoPath(fname), message: 'both modified' }
 
     util.openPath 'triple-2way-diff.txt', (editorView) ->
-      repo = atom.project.getRepositories()[0]
-      state = new MergeState conflicts, repo, false
+      state = new MergeState conflicts, context, false
       conflicts = Conflict.all state, editorView.getModel()
 
       view = new MergeConflictsView(state, pkg)
@@ -69,14 +70,16 @@ describe 'MergeConflictsView', ->
       expect(isMarkedWith 'file2.txt', 'dash').toBe(true)
 
     it 'marks files as staged on events', ->
-      GitBridge.process = ({stdout, exit}) ->
-        stdout("UU #{repoPath 'file2.txt'}")
-        exit(0)
-        { process: { on: (err) -> } }
+      context.readConflicts = -> Promise.resolve([{ path: repoPath("file2.txt"), message: "both modified"}])
 
       pkg.didStageFile file: fullPath('file1.txt')
-      expect(isMarkedWith 'file1.txt', 'check').toBe(true)
-      expect(isMarkedWith 'file2.txt', 'dash').toBe(true)
+
+      # Terrible hack.
+      waitsFor -> isMarkedWith 'file1.txt', 'check'
+
+      runs ->
+        expect(isMarkedWith 'file1.txt', 'check').toBe(true)
+        expect(isMarkedWith 'file2.txt', 'dash').toBe(true)
 
   it 'minimizes and restores the view on request', ->
     expect(view.hasClass 'minimized').toBe(false)

@@ -1,7 +1,5 @@
 {CompositeDisposable, Emitter} = require 'atom'
 
-{GitBridge} = require './git-bridge'
-
 {MergeConflictsView} = require './view/merge-conflicts-view'
 {handleErr} = require './view/error-view'
 
@@ -22,9 +20,7 @@ module.exports =
       didCompleteConflictResolution: => @emitter.emit 'did-complete-conflict-resolution'
 
     @subs.add atom.commands.add 'atom-workspace', 'merge-conflicts:detect', ->
-      GitBridge.locateGitAnd (err) ->
-        return handleErr(err) if err?
-        MergeConflictsView.detect(pkgEmitter)
+      MergeConflictsView.detect(pkgEmitter)
 
   deactivate: ->
     @subs.dispose()

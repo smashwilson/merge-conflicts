@@ -1,9 +1,8 @@
 {$, View} = require 'space-pen'
 {CompositeDisposable} = require 'atom'
 _ = require 'underscore-plus'
-path = require 'path'
 
-{GitBridge} = require '../git-bridge'
+{GitOps} = require '../git'
 {MergeState} = require '../merge-state'
 {ConflictedEditor} = require '../conflicted-editor'
 
@@ -38,7 +37,7 @@ class MergeConflictsView extends View
     @subs = new CompositeDisposable
 
     @subs.add @pkg.onDidResolveConflict (event) =>
-      p = @state.repo.relativize event.file
+      p = @state.relativize event.file
       found = false
       for listElement in @pathList.children()
         li = $(listElement)
@@ -62,7 +61,7 @@ class MergeConflictsView extends View
 
   navigate: (event, element) ->
     repoPath = element.find(".path").text()
-    fullPath = path.join @state.repo.getWorkingDirectory(), repoPath
+    fullPath = @state.join repoPath
     atom.workspace.open(fullPath)
 
   minimize: ->
@@ -92,8 +91,7 @@ class MergeConflictsView extends View
     @state.reread (err, state) =>
       return if handleErr(err)
 
-      # Any files that were present, but aren't there any more, have been
-      # resolved.
+      # Any files that were present, but aren't there any more, have been resolved.
       for item in @pathList.find('li')
         p = $(item).data('path')
         icon = $(item).find('.staged')
@@ -130,55 +128,58 @@ class MergeConflictsView extends View
   sideResolver: (side) ->
     (event) =>
       p = $(event.target).closest('li').data('path')
-      GitBridge.checkoutSide @state.repo, side, p, (err) =>
-        return if handleErr(err)
-
-        full = path.join @state.repo.getWorkingDirectory(), p
+      @state.context.checkoutSide(side, p)
+      .then ->
+        full = @state.join p
         @pkg.didResolveConflict file: full, total: 1, resolved: 1
         atom.workspace.open p
+      .catch (err) ->
+        handleErr(err)
 
   stageFile: (event, element) ->
     repoPath = element.closest('li').data('path')
-    filePath = path.join GitBridge.getActiveRepo().getWorkingDirectory(), repoPath
+    filePath = @state.join repoPath
 
     for e in atom.workspace.getTextEditors()
       e.save() if e.getPath() is filePath
 
-    GitBridge.add @state.repo, repoPath, (err) =>
-      return if handleErr(err)
-
+    @state.context.add(repoPath)
+    .then =>
       @pkg.didStageFile file: filePath
+    .catch (err) ->
+      handleErr(err)
 
   @detect: (pkg) ->
     return if @instance?
 
-    repo = GitBridge.getActiveRepo()
-    unless repo?
-      atom.notifications.addWarning "No git repository found",
-        detail: "Tip: if you have multiple projects open, open an editor in the one
-          containing conflicts."
-      return
+    GitOps.getGitContext()
+    .then (context) =>
+      unless context?
+        atom.notifications.addWarning "No git repository found",
+          detail: "Tip: if you have multiple projects open, open an editor in the one
+            containing conflicts."
+        return
 
-    MergeState.read repo, (err, state) =>
-      return if handleErr(err)
+      MergeState.read context, (err, state) =>
+        return if handleErr(err)
 
-      if not state.isEmpty()
-        view = new MergeConflictsView(state, pkg)
-        @instance = view
-        atom.workspace.addBottomPanel item: view
+        if not state.isEmpty()
+          view = new MergeConflictsView(state, pkg)
+          @instance = view
+          atom.workspace.addBottomPanel item: view
 
-        @instance.subs.add atom.workspace.observeTextEditors (editor) =>
-          @markConflictsIn state, editor, pkg
-      else
-        atom.notifications.addInfo "Nothing to Merge",
-          detail: "No conflicts here!",
-          dismissable: true
+          @instance.subs.add atom.workspace.observeTextEditors (editor) =>
+            @markConflictsIn state, editor, pkg
+        else
+          atom.notifications.addInfo "Nothing to Merge",
+            detail: "No conflicts here!",
+            dismissable: true
 
   @markConflictsIn: (state, editor, pkg) ->
     return if state.isEmpty()
 
     fullPath = editor.getPath()
-    repoPath = state.repo.relativize fullPath
+    repoPath = state.relativize fullPath
     return unless repoPath?
 
     return unless _.contains state.conflictPaths(), repoPath

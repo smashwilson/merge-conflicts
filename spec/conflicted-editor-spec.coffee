@@ -2,7 +2,7 @@
 _ = require 'underscore-plus'
 
 {ConflictedEditor} = require '../lib/conflicted-editor'
-{GitBridge} = require '../lib/git-bridge'
+{GitOps} = require '../lib/git'
 util = require './util'
 
 describe 'ConflictedEditor', ->
@@ -28,14 +28,6 @@ describe 'ConflictedEditor', ->
   beforeEach ->
     pkg = util.pkgEmitter()
 
-    done = false
-
-    GitBridge.locateGitAnd (err) ->
-      throw err if err?
-      done = true
-
-    waitsFor -> done
-
   afterEach ->
     pkg.dispose()
 
@@ -52,9 +44,9 @@ describe 'ConflictedEditor', ->
         editor = editorView.getModel()
         state =
           isRebase: false
-          repo:
-            getWorkingDirectory: -> ""
-            relativize: (filepath) -> filepath
+          relativize: (filepath) -> filepath
+          context:
+            isStaged: (filepath) -> Promise.resolve false
 
         m = new ConflictedEditor(state, pkg, editor)
         m.mark()
@@ -212,9 +204,9 @@ describe 'ConflictedEditor', ->
         editor = editorView.getModel()
         state =
           isRebase: true
-          repo:
-            getWorkingDirectory: -> ""
-            relativize: (filepath) -> filepath
+          relativize: (filepath) -> filepath
+          context:
+            isStaged: -> Promise.resolve(false)
 
         m = new ConflictedEditor(state, pkg, editor)
         m.mark()
