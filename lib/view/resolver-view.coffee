@@ -3,7 +3,6 @@
 
 {handleErr} = require './error-view'
 
-
 class ResolverView extends View
 
   @content: (editor, state, pkg) ->
