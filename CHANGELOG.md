@@ -1,3 +1,7 @@
+## 1.3.8
+
+- Support for nodegit operations when available, currently in Atom Beta. [#205](https://github.com/smashwilson/merge-conflicts/pull/192)
+
 ## 1.3.7
 
 - Resolving entire files as ours or theirs works again. [#192](https://github.com/smashwilson/merge-conflicts/pull/192)
