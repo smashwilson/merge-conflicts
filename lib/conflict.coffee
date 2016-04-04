@@ -9,7 +9,7 @@ CONFLICT_REGEX = ///
   ^<{7}\ (.+)\r?\n([^]*?)
   # Base side may contain nested conflict markers.
   # Refer: http://stackoverflow.com/questions/16990657/git-merge-diff3-style-need-explanation
-  (?:\|{7}\ (.+)\r?\n((?:(?:<{7}[^]*?>{7})|[^]*?)*?))?
+  (?:\|{7}\ (.+)\r?\n((?:(?:<{7}[^]*?>{7})|[^])*?))?
   ={7}\r?\n([^]*?)
   >{7}\ (.+)(?:\r?\n)?
   ///mg
