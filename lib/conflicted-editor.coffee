@@ -133,35 +133,40 @@ class ConflictedEditor
       seen[side.conflict] = side
     sides = _.difference sides, duplicates
 
-    side.resolve() for side in sides
+    @editor.transact ->
+      side.resolve() for side in sides
 
   # Private: Command that accepts the "ours" side of the active conflict.
   #
   acceptOurs: ->
     return unless @editor is atom.workspace.getActiveTextEditor()
-    side.conflict.ours.resolve() for side in @active()
+    @editor.transact =>
+      side.conflict.ours.resolve() for side in @active()
 
   # Private: Command that accepts the "theirs" side of the active conflict.
   #
   acceptTheirs: ->
     return unless @editor is atom.workspace.getActiveTextEditor()
-    side.conflict.theirs.resolve() for side in @active()
+    @editor.transact =>
+      side.conflict.theirs.resolve() for side in @active()
 
   # Private: Command that uses a composite resolution of the "ours" side followed by the "theirs"
   # side of the active conflict.
   #
   acceptOursThenTheirs: ->
     return unless @editor is atom.workspace.getActiveTextEditor()
-    for side in @active()
-      @combineSides side.conflict.ours, side.conflict.theirs
+    @editor.transact =>
+      for side in @active()
+        @combineSides side.conflict.ours, side.conflict.theirs
 
   # Private: Command that uses a composite resolution of the "theirs" side followed by the "ours"
   # side of the active conflict.
   #
   acceptTheirsThenOurs: ->
     return unless @editor is atom.workspace.getActiveTextEditor()
-    for side in @active()
-      @combineSides side.conflict.theirs, side.conflict.ours
+    @editor.transact =>
+      for side in @active()
+        @combineSides side.conflict.theirs, side.conflict.ours
 
   # Private: Command that navigates to the next unresolved conflict in the editor.
   #
