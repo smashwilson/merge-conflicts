@@ -59,7 +59,8 @@ class SideView extends CoveringView
     t.isLessThanOrEqual(p) and h.isGreaterThanOrEqual(p)
 
   useMe: ->
-    @side.resolve()
+    @editor.transact =>
+      @side.resolve()
     @decorate()
 
   revert: ->
