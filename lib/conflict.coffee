@@ -2,13 +2,21 @@
 {Emitter} = require 'atom'
 _ = require 'underscore-plus'
 
-{Side, OurSide, TheirSide} = require './side'
+{Side, OurSide, TheirSide, BaseSide} = require './side'
 {Navigator} = require './navigator'
 
-CONFLICT_REGEX = /^<{7} (.+)\r?\n([^]*?)={7}\r?\n([^]*?)>{7} (.+)(?:\r?\n)?/mg
+CONFLICT_REGEX = ///
+  ^<{7}\ (.+)\r?\n([^]*?)
+  # Base side may contain nested conflict markers.
+  # Refer: http://stackoverflow.com/questions/16990657/git-merge-diff3-style-need-explanation
+  (?:\|{7}\ (.+)\r?\n((?:(?:<{7}[^]*?>{7})|[^]*?)*?))?
+  ={7}\r?\n([^]*?)
+  >{7}\ (.+)(?:\r?\n)?
+  ///mg
 
 INVALID = null
 TOP = 'top'
+BASE = 'base'
 MIDDLE = 'middle'
 BOTTOM = 'bottom'
 
@@ -56,6 +64,12 @@ class ConflictParser
   #
   markOurs: -> @_markHunk OurSide
 
+  # Private: Mark the current lines as "base".
+  #
+  # Returns [Side] marking the base of conflict, or null if no base conflict marker is found.
+  #
+  markBase: -> @_markHunk BaseSide
+
   # Private: Mark the current lines as a separator.
   #
   # Returns [Navigator] containing a marker to the separator line.
@@ -100,7 +114,19 @@ class ConflictParser
         bannerRowEnd = rowStart = @_advance 1
         rowEnd = @_advance lines.length - 1
 
+        @position = BASE
+      when BASE
         @position = MIDDLE
+
+        ref = @chunks.shift()
+        text = @chunks.shift()
+        # base is optional
+        return null unless text
+        lines = text.split /\n/
+
+        bannerRowStart = @currentRow
+        bannerRowEnd = rowStart = @_advance 1
+        rowEnd = @_advance lines.length - 1
       when BOTTOM
         text = @chunks.shift()
         ref = @chunks.shift()
@@ -121,6 +147,8 @@ class ConflictParser
       [[rowStart, 0], [rowEnd, 0]], @options
     )
 
+    @previousSide.followingMarker = bannerMarker if sidePosition is BASE
+
     side = new sideKlass(text, ref, marker, bannerMarker, sidePosition)
     @previousSide = side
     side
@@ -140,15 +168,16 @@ class Conflict
   #
   # ours [Side] the lines of this conflict that the current user contributed (by our best guess).
   # theirs [Side] the lines of this conflict that another contributor created.
-  # parent [Side] currently unused.
+  # base [Side] the lines of merge base of this conflict. Optional.
   # navigator [Navigator] maintains references to surrounding Conflicts in the original file.
   # state [MergeState] repository-wide information about the current merge.
   #
-  constructor: (@ours, @theirs, @parent, @navigator, @state) ->
+  constructor: (@ours, @theirs, @base, @navigator, @state) ->
     @emitter = new Emitter
 
     @ours.conflict = this
     @theirs.conflict = this
+    @base?.conflict = this
     @navigator.conflict = this
     @resolution = null
 
@@ -186,7 +215,7 @@ class Conflict
   # Return [Array<Marker>]
   #
   markers: ->
-    _.flatten [@ours.markers(), @theirs.markers(), @navigator.markers()], true
+    _.flatten [@ours.markers(), @theirs.markers(), @base?.markers() ? [], @navigator.markers()], true
 
   # Public: Console-friendly identification of this conflict.
   #
@@ -211,16 +240,18 @@ class Conflict
 
       if state.isRebase
         theirs = marker.markTheirs()
+        base = marker.markBase()
         nav = marker.markSeparator()
         ours = marker.markOurs()
       else
         ours = marker.markOurs()
+        base = marker.markBase()
         nav = marker.markSeparator()
         theirs = marker.markTheirs()
 
       marker.finish()
 
-      c = new Conflict(ours, theirs, null, nav, state)
+      c = new Conflict(ours, theirs, base, nav, state)
       results.push c
 
       nav.linkToPrevious previous

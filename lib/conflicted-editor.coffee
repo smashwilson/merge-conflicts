@@ -37,6 +37,7 @@ class ConflictedEditor
     @coveringViews = []
     for c in @conflicts
       @coveringViews.push new SideView(c.ours, @editor)
+      @coveringViews.push new SideView(c.base, @editor) if c.base?
       @coveringViews.push new NavigationView(c.navigator, @editor)
       @coveringViews.push new SideView(c.theirs, @editor)
 
