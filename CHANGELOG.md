@@ -1,4 +1,4 @@
-## 1.3.8
+## 1.4.0
 
 - Handle three-way merge markers. [#219](https://github.com/smashwilson/merge-conflicts/pull/219)
 - Support for nodegit operations when available, currently in Atom Beta. [#205](https://github.com/smashwilson/merge-conflicts/pull/192)
