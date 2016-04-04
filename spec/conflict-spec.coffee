@@ -31,6 +31,52 @@ describe "Conflict", ->
       expect(conflict.ours.followingMarker).toBe(conflict.navigator.separatorMarker)
       expect(conflict.theirs.followingMarker).toBe(conflict.theirs.refBannerMarker)
 
+    it 'does not have base side', ->
+      expect(conflict.base).toBeNull()
+
+  describe 'a single three-way diff', ->
+    [conflict] = []
+
+    beforeEach ->
+      util.openPath 'single-3way-diff.txt', (editorView) ->
+        conflict = Conflict.all({ isRebase: false }, editorView.getModel())[0]
+
+    it 'identifies the correct rows', ->
+      expect(util.rowRangeFrom conflict.ours.marker).toEqual([1, 2])
+      expect(conflict.ours.ref).toBe('HEAD')
+      expect(util.rowRangeFrom conflict.base.marker).toEqual([3, 4])
+      expect(conflict.base.ref).toBe('merged common ancestors')
+      expect(util.rowRangeFrom conflict.theirs.marker).toEqual([5, 6])
+      expect(conflict.theirs.ref).toBe('master')
+
+    it 'finds the ref banners', ->
+      expect(util.rowRangeFrom conflict.ours.refBannerMarker).toEqual([0, 1])
+      expect(util.rowRangeFrom conflict.base.refBannerMarker).toEqual([2, 3])
+      expect(util.rowRangeFrom conflict.theirs.refBannerMarker).toEqual([6, 7])
+
+    it 'finds the separator', ->
+      expect(util.rowRangeFrom conflict.navigator.separatorMarker).toEqual([4, 5])
+
+    it 'marks "ours" as the top and "theirs" as the bottom', ->
+      expect(conflict.ours.position).toBe('top')
+      expect(conflict.base.position).toBe('base')
+      expect(conflict.theirs.position).toBe('bottom')
+
+    it 'links each side to the following marker', ->
+      expect(conflict.ours.followingMarker).toBe(conflict.base.refBannerMarker)
+      expect(conflict.base.followingMarker).toBe(conflict.navigator.separatorMarker)
+      expect(conflict.theirs.followingMarker).toBe(conflict.theirs.refBannerMarker)
+
+  it "identifies the correct rows for complex three-way diff", ->
+    util.openPath 'single-3way-diff-complex.txt', (editorView) ->
+      conflict = Conflict.all({ isRebase: false }, editorView.getModel())[0]
+      expect(util.rowRangeFrom conflict.ours.marker).toEqual([1, 2])
+      expect(conflict.ours.ref).toBe('HEAD')
+      expect(util.rowRangeFrom conflict.base.marker).toEqual([3, 18])
+      expect(conflict.base.ref).toBe('merged common ancestors')
+      expect(util.rowRangeFrom conflict.theirs.marker).toEqual([19, 20])
+      expect(conflict.theirs.ref).toBe('master')
+
   it "finds multiple conflict markings", ->
     util.openPath 'multi-2way-diff.txt', (editorView) ->
       cs = Conflict.all({}, editorView.getModel())
