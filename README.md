@@ -63,7 +63,7 @@ subs.dispose()
 ```
 
  * `onDidResolveConflict`: broadcast whenever a conflict is resolved. `event.file`: the absolute path of the file in which the conflict was found; `event.total`: the total number of conflicts in that file; `event.resolved`: the number of conflicts that are resolved, including this one.
- * `onDidStageFile`: broadcast whenever a file has been completed and staged for commit. `event.file`: the absolute path of the file that was staged.
+ * `onDidResolveFile`: broadcast whenever a file has been completed and staged for commit. `event.file`: the absolute path of the file that was staged.
  * `onDidQuitConflictResolution`: broadcast when you stop merging conflicts by clicking the quit button.
  * `onDidCompleteConflictResolution`: broadcast when all conflicts in all files have successfully been resolved.
 

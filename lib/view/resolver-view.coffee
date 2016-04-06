@@ -35,7 +35,7 @@ class ResolverView extends View
     @state.relativize @editor.getURI()
 
   refresh: ->
-    @state.context.isStaged @relativePath()
+    @state.context.isResolvedFile @relativePath()
     .then (staged) =>
       modified = @editor.isModified()
 
@@ -44,7 +44,7 @@ class ResolverView extends View
 
       unless needsSaved or needsStaged
         @hide 'fast', => @remove()
-        @pkg.didStageFile file: @editor.getURI()
+        @pkg.didResolveFile file: @editor.getURI()
         return
 
       if needsSaved
@@ -55,7 +55,7 @@ class ResolverView extends View
 
   resolve: ->
     @editor.save()
-    @state.context.resolve @relativePath()
+    @state.context.resolveFile @relativePath()
     .then =>
       @refresh()
     .catch handleErr

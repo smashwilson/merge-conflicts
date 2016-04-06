@@ -16,8 +16,8 @@ module.exports =
     pkgEmitter =
       onDidResolveConflict: (callback) => @onDidResolveConflict(callback)
       didResolveConflict: (event) => @emitter.emit 'did-resolve-conflict', event
-      onDidStageFile: (callback) => @onDidStageFile(callback)
-      didStageFile: (event) => @emitter.emit 'did-stage-file', event
+      onDidResolveFile: (callback) => @onDidResolveFile(callback)
+      didResolveFile: (event) => @emitter.emit 'did-resolve-file', event
       onDidQuitConflictResolution: (callback) => @onDidQuitConflictResolution(callback)
       didQuitConflictResolution: => @emitter.emit 'did-quit-conflict-resolution'
       onDidCompleteConflictResolution: (callback) => @onDidCompleteConflictResolution(callback)
@@ -41,10 +41,10 @@ module.exports =
   onDidResolveConflict: (callback) ->
     @emitter.on 'did-resolve-conflict', callback
 
-  # Invoke a callback each time that a completed file is staged.
+  # Invoke a callback each time that a completed file is resolved.
   #
-  onDidStageFile: (callback) ->
-    @emitter.on 'did-stage-file', callback
+  onDidResolveFile: (callback) ->
+    @emitter.on 'did-resolve-file', callback
 
   # Invoke a callback if conflict resolution is prematurely exited, while conflicts remain
   # unresolved.
@@ -53,7 +53,7 @@ module.exports =
     @emitter.on 'did-quit-conflict-resolution', callback
 
   # Invoke a callback if conflict resolution is completed successfully, with all conflicts resolved
-  # and all files staged.
+  # and all files resolved.
   #
   onDidCompleteConflictResolution: (callback) ->
     @emitter.on 'did-complete-conflict-resolution', callback

@@ -26,7 +26,7 @@ class MergeConflictsView extends View
               @li click: 'navigate', "data-path": p, class: 'list-item navigate', =>
                 @span class: 'inline-block icon icon-diff-modified status-modified path', p
                 @div class: 'pull-right', =>
-                  @button click: 'stageFile', class: 'btn btn-xs btn-success inline-block-tight stage-ready', style: 'display: none', resolveMessage
+                  @button click: 'resolveFile', class: 'btn btn-xs btn-success inline-block-tight stage-ready', style: 'display: none', resolveMessage
                   @span class: 'inline-block text-subtle', message
                   @progress class: 'inline-block', max: 100, value: 0
                   @span class: 'inline-block icon icon-dash staged'
@@ -53,7 +53,7 @@ class MergeConflictsView extends View
       unless found
         console.error "Unrecognized conflict path: #{p}"
 
-    @subs.add @pkg.onDidStageFile => @refresh()
+    @subs.add @pkg.onDidResolveFile => @refresh()
 
     @subs.add atom.commands.add @element,
       'merge-conflicts:entire-file-ours': @sideResolver('ours'),
@@ -136,16 +136,16 @@ class MergeConflictsView extends View
       .catch (err) ->
         handleErr(err)
 
-  stageFile: (event, element) ->
+  resolveFile: (event, element) ->
     repoPath = element.closest('li').data('path')
     filePath = @state.join repoPath
 
     for e in atom.workspace.getTextEditors()
       e.save() if e.getPath() is filePath
 
-    @state.context.resolve(repoPath)
+    @state.context.resolveFile(repoPath)
     .then =>
-      @pkg.didStageFile file: filePath
+      @pkg.didResolveFile file: filePath
     .catch (err) ->
       handleErr(err)
 
