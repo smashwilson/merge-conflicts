@@ -4,6 +4,7 @@
 {GitOps} = require './git'
 
 pkgEmitter = null;
+pkgApi = null;
 
 module.exports =
 
@@ -58,9 +59,19 @@ module.exports =
   onDidCompleteConflictResolution: (callback) ->
     @emitter.on 'did-complete-conflict-resolution', callback
 
+  # Register a repository context provider that will have functionality for
+  # retrieving and resolving conflicts.
+  #
+  registerContextApi: (contextApi) ->
+    MergeConflictsView.registerContextApi(contextApi)
+
   provideApi: ->
-    _ = require 'underscore-plus'
-    _.extend({}, pkgEmitter, {
-      registerContextApi: (contextApi) =>
-        MergeConflictsView.registerContextApi(contextApi);
-    });
+    if (pkgApi == null)
+      pkgApi = Object.freeze({
+        registerContextApi: @registerContextApi,
+        onDidResolveConflict: pkgEmitter.onDidResolveConflict,
+        onDidResolveFile: pkgEmitter.onDidResolveConflict,
+        onDidQuitConflictResolution: pkgEmitter.onDidQuitConflictResolution,
+        onDidCompleteConflictResolution: pkgEmitter.onDidCompleteConflictResolution,
+      })
+    pkgApi
