@@ -55,7 +55,7 @@ class ResolverView extends View
 
   resolve: ->
     @editor.save()
-    @state.context.add @relativePath()
+    @state.context.resolve @relativePath()
     .then =>
       @refresh()
     .catch handleErr

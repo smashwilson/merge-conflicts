@@ -12,7 +12,7 @@ describe 'GitBridge', ->
     atom.config.set('merge-conflicts.gitPath', '/usr/bin/git')
 
     waitsForPromise ->
-      GitOps.getGitContext()
+      GitOps.getContext()
       .then (c) ->
         context = c
         context.workingDirPath = gitWorkDir
@@ -37,8 +37,8 @@ describe 'GitBridge', ->
 
     runs ->
       expect(conflicts).toEqual([
-        { path: 'lib/file0.rb', message: 'both modified' }
-        { path: 'lib/file1.rb', message: 'both added' }
+        { path: 'lib/file0.rb', message: 'both modified', resolveMessage : 'Stage' }
+        { path: 'lib/file1.rb', message: 'both added', resolveMessage : 'Stage' }
       ])
       expect(c).toBe('/usr/bin/git')
       expect(a).toEqual(['status', '--porcelain'])
@@ -89,7 +89,7 @@ describe 'GitBridge', ->
 
     called = false
     waitsForPromise ->
-      context.add('lib/file1.txt').then -> called = true
+      context.resolve('lib/file1.txt').then -> called = true
 
     runs ->
       expect(called).toBe(true)

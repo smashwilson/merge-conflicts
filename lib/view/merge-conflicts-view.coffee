@@ -2,7 +2,6 @@
 {CompositeDisposable} = require 'atom'
 _ = require 'underscore-plus'
 
-{GitOps} = require '../git'
 {MergeState} = require '../merge-state'
 {ConflictedEditor} = require '../conflicted-editor'
 
@@ -11,7 +10,8 @@ _ = require 'underscore-plus'
 
 class MergeConflictsView extends View
 
-  instance: null
+  @instance: null
+  @contextApis: []
 
   @content: (state, pkg) ->
     @div class: 'merge-conflicts tool-panel panel-bottom padded clearfix', =>
@@ -22,11 +22,11 @@ class MergeConflictsView extends View
       @div outlet: 'body', =>
         @div class: 'conflict-list', =>
           @ul class: 'block list-group', outlet: 'pathList', =>
-            for {path: p, message} in state.conflicts
+            for {path: p, message, resolveMessage} in state.conflicts
               @li click: 'navigate', "data-path": p, class: 'list-item navigate', =>
                 @span class: 'inline-block icon icon-diff-modified status-modified path', p
                 @div class: 'pull-right', =>
-                  @button click: 'stageFile', class: 'btn btn-xs btn-success inline-block-tight stage-ready', style: 'display: none', 'Stage'
+                  @button click: 'stageFile', class: 'btn btn-xs btn-success inline-block-tight stage-ready', style: 'display: none', resolveMessage
                   @span class: 'inline-block text-subtle', message
                   @progress class: 'inline-block', max: 100, value: 0
                   @span class: 'inline-block icon icon-dash staged'
@@ -143,19 +143,27 @@ class MergeConflictsView extends View
     for e in atom.workspace.getTextEditors()
       e.save() if e.getPath() is filePath
 
-    @state.context.add(repoPath)
+    @state.context.resolve(repoPath)
     .then =>
       @pkg.didStageFile file: filePath
     .catch (err) ->
       handleErr(err)
 
+  @registerContextApi: (contextApi) ->
+    @contextApis.push(contextApi)
+
   @detect: (pkg) ->
     return if @instance?
 
-    GitOps.getGitContext()
-    .then (context) =>
+    Promise.all(@contextApis.map (contextApi) => contextApi.getContext())
+    .then (contexts) =>
+      # filter out nulls and take the highest priority context.
+      context = (
+        _.filter(contexts, Boolean)
+        .sort (context1, context2) => context2.priority - context1.priority
+      )[0];
       unless context?
-        atom.notifications.addWarning "No git repository found",
+        atom.notifications.addWarning "No repository context found",
           detail: "Tip: if you have multiple projects open, open an editor in the one
             containing conflicts."
         return

@@ -1,13 +1,17 @@
 {CompositeDisposable, Emitter} = require 'atom'
 
 {MergeConflictsView} = require './view/merge-conflicts-view'
-{handleErr} = require './view/error-view'
+{GitOps} = require './git'
+
+pkgEmitter = null;
 
 module.exports =
 
   activate: (state) ->
     @subs = new CompositeDisposable
     @emitter = new Emitter
+
+    MergeConflictsView.registerContextApi(GitOps);
 
     pkgEmitter =
       onDidResolveConflict: (callback) => @onDidResolveConflict(callback)
@@ -53,3 +57,10 @@ module.exports =
   #
   onDidCompleteConflictResolution: (callback) ->
     @emitter.on 'did-complete-conflict-resolution', callback
+
+  provideApi: ->
+    _ = require 'underscore-plus'
+    _.extend({}, pkgEmitter, {
+      registerContextApi: (contextApi) =>
+        MergeConflictsView.registerContextApi(contextApi);
+    });
