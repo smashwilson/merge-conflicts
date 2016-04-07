@@ -10,6 +10,7 @@ describe 'ResolverView', ->
     context:
       isResolvedFile: -> Promise.resolve false
       resolveFile: ->
+      resolveText: "Stage"
     relativize: (filepath) -> filepath["/fake/gitroot/".length..]
 
   beforeEach ->

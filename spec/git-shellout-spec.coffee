@@ -37,8 +37,8 @@ describe 'GitBridge', ->
 
     runs ->
       expect(conflicts).toEqual([
-        { path: 'lib/file0.rb', message: 'both modified', resolveMessage : 'Stage' }
-        { path: 'lib/file1.rb', message: 'both added', resolveMessage : 'Stage' }
+        { path: 'lib/file0.rb', message: 'both modified'}
+        { path: 'lib/file1.rb', message: 'both added'}
       ])
       expect(c).toBe('/usr/bin/git')
       expect(a).toEqual(['status', '--porcelain'])

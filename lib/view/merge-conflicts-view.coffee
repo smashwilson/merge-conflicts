@@ -22,11 +22,11 @@ class MergeConflictsView extends View
       @div outlet: 'body', =>
         @div class: 'conflict-list', =>
           @ul class: 'block list-group', outlet: 'pathList', =>
-            for {path: p, message, resolveMessage} in state.conflicts
+            for {path: p, message} in state.conflicts
               @li click: 'navigate', "data-path": p, class: 'list-item navigate', =>
                 @span class: 'inline-block icon icon-diff-modified status-modified path', p
                 @div class: 'pull-right', =>
-                  @button click: 'resolveFile', class: 'btn btn-xs btn-success inline-block-tight stage-ready', style: 'display: none', resolveMessage
+                  @button click: 'resolveFile', class: 'btn btn-xs btn-success inline-block-tight stage-ready', style: 'display: none', state.context.resolveText
                   @span class: 'inline-block text-subtle', message
                   @progress class: 'inline-block', max: 100, value: 0
                   @span class: 'inline-block icon icon-dash staged'
@@ -112,7 +112,7 @@ class MergeConflictsView extends View
           detail += '"git commit" at will to finish the merge.'
 
         @finish ->
-          atom.notifications.addSuccess "Merge Complete",
+          atom.notifications.addSuccess "All Conflicts Resolved",
             detail: detail,
             dismissable: true
 
