@@ -129,7 +129,7 @@ class MergeConflictsView extends View
     (event) =>
       p = $(event.target).closest('li').data('path')
       @state.context.checkoutSide(side, p)
-      .then ->
+      .then =>
         full = @state.join p
         @pkg.didResolveConflict file: full, total: 1, resolved: 1
         atom.workspace.open p
