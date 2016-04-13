@@ -8,8 +8,9 @@ describe 'ResolverView', ->
 
   state =
     context:
-      isStaged: -> Promise.resolve false
-      add: ->
+      isResolvedFile: -> Promise.resolve false
+      resolveFile: ->
+      resolveText: "Stage"
     relativize: (filepath) -> filepath["/fake/gitroot/".length..]
 
   beforeEach ->
@@ -34,7 +35,7 @@ describe 'ResolverView', ->
 
   it 'saves and stages the file', ->
     p = null
-    state.context.add = (filepath) ->
+    state.context.resolveFile = (filepath) ->
       p = filepath
       Promise.resolve()
 

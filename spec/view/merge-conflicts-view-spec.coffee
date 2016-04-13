@@ -72,7 +72,7 @@ describe 'MergeConflictsView', ->
     it 'marks files as staged on events', ->
       context.readConflicts = -> Promise.resolve([{ path: repoPath("file2.txt"), message: "both modified"}])
 
-      pkg.didStageFile file: fullPath('file1.txt')
+      pkg.didResolveFile file: fullPath('file1.txt')
 
       # Terrible hack.
       waitsFor -> isMarkedWith 'file1.txt', 'check'

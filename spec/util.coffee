@@ -19,8 +19,8 @@ module.exports =
     return {
       onDidResolveConflict: (callback) -> emitter.on 'did-resolve-conflict', callback
       didResolveConflict: (event) -> emitter.emit 'did-resolve-conflict', event
-      onDidStageFile: (callback) -> emitter.on 'did-stage-file', callback
-      didStageFile: (event) -> emitter.emit 'did-stage-file', event
+      onDidResolveFile: (callback) -> emitter.on 'did-resolve-file', callback
+      didResolveFile: (event) -> emitter.emit 'did-resolve-file', event
       onDidQuitConflictResolution: (callback) -> emitter.on 'did-quit-conflict-resolution', callback
       didQuitConflictResolution: -> emitter.emit 'did-quit-conflict-resolution'
       onDidCompleteConflictResolution: (callback) -> emitter.on 'did-complete-conflict-resolution', callback

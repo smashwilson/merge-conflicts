@@ -7,11 +7,6 @@
   "contributors": [
     "Maximilian Schüßler <maximilian@mschuessler.org>"
   ],
-  "activationCommands": {
-    "atom-workspace": [
-      "merge-conflicts:detect"
-    ]
-  },
   "repository": "https://github.com/smashwilson/merge-conflicts",
   "license": "MIT",
   "engines": {
@@ -20,5 +15,13 @@
   "dependencies": {
     "space-pen": "^5.0.1",
     "underscore-plus": "1.x"
+  },
+  "providedServices": {
+    "merge-conflicts": {
+      "description": "Register conflict resolver integrations",
+      "versions": {
+        "0.0.0": "provideApi"
+      }
+    }
   }
 }

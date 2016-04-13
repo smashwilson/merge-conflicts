@@ -46,7 +46,7 @@ describe 'ConflictedEditor', ->
           isRebase: false
           relativize: (filepath) -> filepath
           context:
-            isStaged: (filepath) -> Promise.resolve false
+            isResolvedFile: (filepath) -> Promise.resolve false
 
         m = new ConflictedEditor(state, pkg, editor)
         m.mark()
@@ -206,7 +206,7 @@ describe 'ConflictedEditor', ->
           isRebase: true
           relativize: (filepath) -> filepath
           context:
-            isStaged: -> Promise.resolve(false)
+            isResolvedFile: -> Promise.resolve(false)
 
         m = new ConflictedEditor(state, pkg, editor)
         m.mark()

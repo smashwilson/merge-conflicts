@@ -1,5 +1,3 @@
-path = require 'path'
-
 class MergeState
 
   constructor: (@conflicts, @context, @isRebase) ->
@@ -17,7 +15,7 @@ class MergeState
 
   relativize: (filePath) -> @context.workingDirectory.relativize filePath
 
-  join: (relativePath) -> path.join @context.workingDirPath, relativePath
+  join: (relativePath) -> @context.joinPath(relativePath)
 
   @read: (context, callback) ->
     isr = context.isRebasing()
