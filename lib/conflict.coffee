@@ -5,159 +5,97 @@ _ = require 'underscore-plus'
 {Side, OurSide, TheirSide, BaseSide} = require './side'
 {Navigator} = require './navigator'
 
-CONFLICT_REGEX = ///
-  ^<{7}\ (.+)\r?\n([^]*?)
-  # Base side may contain nested conflict markers.
-  # Refer: http://stackoverflow.com/questions/16990657/git-merge-diff3-style-need-explanation
-  (?:\|{7}\ (.+)\r?\n((?:(?:<{7}[^]*?>{7})|[^])*?))?
-  ={7}\r?\n([^]*?)
-  >{7}\ (.+)(?:\r?\n)?
-  ///mg
+CONFLICT_START_REGEX = /^<{7} (.+)\r?\n/g
 
-INVALID = null
+# Side positions
 TOP = 'top'
 BASE = 'base'
-MIDDLE = 'middle'
 BOTTOM = 'bottom'
+
+# Common options used to construct markers.
+options =
+  persistent: false
+  invalidate: 'never'
 
 # Private: ConflictParser discovers git conflict markers in a corpus of text and constructs Conflict
 # instances that mark the correct lines.
 #
-class ConflictParser
+parseConflict = (state, editor, row) ->
+  previousSide = null
 
-  # Common options used to construct markers.
-  options =
-    persistent: false
-    invalidate: 'never'
+  d = (x) -> console.log "#{x} - #{editor.lineTextForBufferRow row}"
 
-  # Private: Initialize a parser to operate on a specific TextEditor.
-  #
-  # state [MergeState] - Repository-wide conflict resolution state.
-  # editor [TextEditor] - An editor containing text that may include one or more conflicts.
-  #
-  constructor: (@state, @editor) ->
-    @position = INVALID
+  # Mark and construct a Side that begins with a banner and description as its first line.
+  markHeaderSide = (position, sideKlass) ->
+    sideRowStart = row
+    description = sideDescription()
+    advanceToBoundary()
+    sideRowEnd = row
 
-  # Private: Begin handling the result of a CONFLICT_REGEX match.
-  #
-  # m [Array] - The match object returned from CONFLICT_REGEX.
-  #
-  start: (@m) ->
-    @startRow = @m.range.start.row
-    @endRow = @m.range.end.row
+    bannerMarker = editor.markBufferRange([[sideRowStart, 0], [sideRowStart + 1, 0]], options)
+    previousSide.followingMarker = bannerMarker if previousSide?
 
-    @chunks = @m.match
-    @chunks.shift()
+    textRange = [[sideRowStart + 1, 0], [sideRowEnd, 0]]
+    textMarker = editor.markBufferRange(textRange, options)
+    text = editor.getTextInBufferRange(textRange)
 
-    @currentRow = @startRow
-    @position = TOP
-    @previousSide = null
+    previousSide = new sideKlass(text, description, textMarker, bannerMarker, position)
 
-  # Private: Complete handling of an individual CONFLICT_REGEX match.
-  #
-  finish: ->
-    @previousSide.followingMarker = @previousSide.refBannerMarker
+  # Mark and construct a Side with a banner and description as its last line.
+  markFooterSide = (position, sideKlass) ->
+    sideRowStart = row
+    advanceToBoundary()
+    description = sideDescription()
+    row += 1 # Advance past the boundary line.
+    sideRowEnd = row
 
-  # Private: Mark the current lines as "ours".
-  #
-  # Returns [Side] marking the current conflict's side.
-  #
-  markOurs: -> @_markHunk OurSide
+    textRange = [[sideRowStart, 0], [sideRowEnd - 1, 0]]
+    textMarker = editor.markBufferRange(textRange, options)
+    text = editor.getTextInBufferRange(textRange)
 
-  # Private: Mark the current lines as "base".
-  #
-  # Returns [Side] marking the base of conflict, or null if no base conflict marker is found.
-  #
-  markBase: -> @_markHunk BaseSide
+    bannerMarker = editor.markBufferRange([[sideRowEnd - 1, 0], [sideRowEnd, 0]], options)
+    previousSide.followingMarker = bannerMarker if previousSide?
 
-  # Private: Mark the current lines as a separator.
-  #
-  # Returns [Navigator] containing a marker to the separator line.
-  #
-  markSeparator: ->
-    unless @position is MIDDLE
-      throw new Error("Unexpected position for separator: #{@position}")
-    @position = BOTTOM
+    previousSide = new sideKlass(text, description, textMarker, bannerMarker, position)
+    previousSide.followingMarker = bannerMarker
+    previousSide
 
-    sepRowStart = @currentRow
-    sepRowEnd = @_advance 1
+  maybeMarkBase = -> if isAtSeparator() then null else markHeaderSide(BASE, BaseSide)
 
-    marker = @editor.markBufferRange(
-      [[sepRowStart, 0], [sepRowEnd, 0]], @options
-    )
+  markSeparator = ->
+    sepRowStart = row
+    row += 1
+    sepRowEnd = row
 
-    # @previousSide should always be populated because @position is MIDDLE.
-    @previousSide.followingMarker = marker
+    marker = editor.markBufferRange([[sepRowStart, 0], [sepRowEnd, 0]], options)
+    previousSide.followingMarker = marker
+    previousSide = new Navigator(marker)
 
-    new Navigator(marker)
+  sideDescription = -> editor.lineTextForBufferRow(row).match(/^[<|>]{7} (.*)$/)[1]
 
-  # Private: Mark the current lines as "theirs".
-  #
-  # Returns [Side] marking the current conflict's side.
-  #
-  markTheirs: -> @_markHunk TheirSide
+  isAtBoundary = -> /^[<|=>]{7}/.test editor.lineTextForBufferRow(row)
 
-  # Private: Mark the current lines and construct a Side of the appropriate class.
-  #
-  # sideKlass [Class] Side subclass to construct.
-  # returns [sideKlass] marking the current lines.
-  #
-  _markHunk: (sideKlass) ->
-    sidePosition = @position
-    switch @position
-      when TOP
-        ref = @chunks.shift()
-        text = @chunks.shift()
-        lines = text.split /\n/
+  isAtSeparator = -> /^={7}$/.test editor.lineTextForBufferRow(row)
 
-        bannerRowStart = @currentRow
-        bannerRowEnd = rowStart = @_advance 1
-        rowEnd = @_advance lines.length - 1
+  advanceToBoundary = ->
+    row += 1
+    until isAtBoundary()
+      row += 1
 
-        @position = BASE
-      when BASE
-        @position = MIDDLE
+  if state.isRebase
+    theirs = markHeaderSide(TOP, TheirSide)
+    base = maybeMarkBase()
+    nav = markSeparator()
+    ours = markFooterSide(BOTTOM, OurSide)
+  else
+    ours = markHeaderSide(TOP, OurSide)
+    base = maybeMarkBase()
+    nav = markSeparator()
+    theirs = markFooterSide(BOTTOM, TheirSide)
 
-        ref = @chunks.shift()
-        text = @chunks.shift()
-        # base is optional
-        return null unless text
-        lines = text.split /\n/
+  conflict = new Conflict(ours, theirs, base, nav, state)
 
-        bannerRowStart = @currentRow
-        bannerRowEnd = rowStart = @_advance 1
-        rowEnd = @_advance lines.length - 1
-      when BOTTOM
-        text = @chunks.shift()
-        ref = @chunks.shift()
-        lines = text.split /\n/
-
-        rowStart = @currentRow
-        bannerRowStart = rowEnd = @_advance lines.length - 1
-        bannerRowEnd = @_advance 1
-
-        @position = INVALID
-      else
-        throw new Error("Unexpected position for side: #{@position}")
-
-    bannerMarker = @editor.markBufferRange(
-      [[bannerRowStart, 0], [bannerRowEnd, 0]], @options
-    )
-    marker = @editor.markBufferRange(
-      [[rowStart, 0], [rowEnd, 0]], @options
-    )
-
-    @previousSide.followingMarker = bannerMarker if sidePosition is BASE
-
-    side = new sideKlass(text, ref, marker, bannerMarker, sidePosition)
-    @previousSide = side
-    side
-
-  # Private: Advance the row counter.
-  #
-  # rowCount [Integer] The number of rows to advance.
-  #
-  _advance: (rowCount) -> @currentRow += rowCount
+  return { conflict: conflict, endRow: row }
 
 # Public: Model an individual conflict parsed from git's automatic conflict resolution output.
 #
@@ -231,33 +169,19 @@ class Conflict
   # return [Array<Conflict>] A (possibly empty) collection of parsed Conflicts.
   #
   @all: (state, editor) ->
-    results = []
-    previous = null
-    marker = new ConflictParser(state, editor)
+    conflicts = []
+    lastRow = -1
 
-    editor.getBuffer().scan CONFLICT_REGEX, (m) ->
-      marker.start m
+    editor.getBuffer().scan CONFLICT_START_REGEX, (m) ->
+      conflictStartRow = m.range.start.row
+      return if conflictStartRow < lastRow
 
-      if state.isRebase
-        theirs = marker.markTheirs()
-        base = marker.markBase()
-        nav = marker.markSeparator()
-        ours = marker.markOurs()
-      else
-        ours = marker.markOurs()
-        base = marker.markBase()
-        nav = marker.markSeparator()
-        theirs = marker.markTheirs()
+      result = parseConflict state, editor, conflictStartRow
+      result.conflict.navigator.linkToPrevious conflicts[conflicts.length - 1] if conflicts.length > 0
+      conflicts.push result.conflict
+      lastRow = result.endRow
 
-      marker.finish()
-
-      c = new Conflict(ours, theirs, base, nav, state)
-      results.push c
-
-      nav.linkToPrevious previous
-      previous = c
-
-    results
+    conflicts
 
 module.exports =
   Conflict: Conflict
