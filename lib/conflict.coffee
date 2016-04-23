@@ -23,15 +23,34 @@ options =
 parseConflict = (state, editor, row) ->
   previousSide = null
 
-  d = (x) -> console.log "#{x} - #{editor.lineTextForBufferRow row}"
-
   # Mark and construct a Side that begins with a banner and description as its first line.
   markHeaderSide = (position, sideKlass) ->
     sideRowStart = row
     description = sideDescription()
-    advanceToBoundary()
+    row += 1
+    advanceToBoundary('|=')
     sideRowEnd = row
 
+    createHeaderSide(sideRowStart, sideRowEnd, description, sideKlass, position)
+
+  maybeMarkBase = ->
+    return null if isAtBoundary('=')
+
+    sideRowStart = row
+    description = sideDescription()
+    row += 1
+
+    b = advanceToBoundary('<=')
+    until b is '='
+      # Embedded recursive conflict within the base. Advance beyond it.
+      row = parseConflict(state, editor, row).endRow
+      b = advanceToBoundary('<=')
+
+    sideRowEnd = row
+
+    createHeaderSide(sideRowStart, sideRowEnd, description, BaseSide, BASE)
+
+  createHeaderSide = (sideRowStart, sideRowEnd, description, sideKlass, position) ->
     bannerMarker = editor.markBufferRange([[sideRowStart, 0], [sideRowStart + 1, 0]], options)
     previousSide.followingMarker = bannerMarker if previousSide?
 
@@ -41,12 +60,21 @@ parseConflict = (state, editor, row) ->
 
     previousSide = new sideKlass(text, description, textMarker, bannerMarker, position)
 
+  markSeparator = ->
+    sepRowStart = row
+    row += 1
+    sepRowEnd = row
+
+    marker = editor.markBufferRange([[sepRowStart, 0], [sepRowEnd, 0]], options)
+    previousSide.followingMarker = marker
+    previousSide = new Navigator(marker)
+
   # Mark and construct a Side with a banner and description as its last line.
   markFooterSide = (position, sideKlass) ->
     sideRowStart = row
-    advanceToBoundary()
+    advanceToBoundary('>')
     description = sideDescription()
-    row += 1 # Advance past the boundary line.
+    row += 1
     sideRowEnd = row
 
     textRange = [[sideRowStart, 0], [sideRowEnd - 1, 0]]
@@ -60,27 +88,20 @@ parseConflict = (state, editor, row) ->
     previousSide.followingMarker = bannerMarker
     previousSide
 
-  maybeMarkBase = -> if isAtSeparator() then null else markHeaderSide(BASE, BaseSide)
-
-  markSeparator = ->
-    sepRowStart = row
-    row += 1
-    sepRowEnd = row
-
-    marker = editor.markBufferRange([[sepRowStart, 0], [sepRowEnd, 0]], options)
-    previousSide.followingMarker = marker
-    previousSide = new Navigator(marker)
-
   sideDescription = -> editor.lineTextForBufferRow(row).match(/^[<|>]{7} (.*)$/)[1]
 
-  isAtBoundary = -> /^[<|=>]{7}/.test editor.lineTextForBufferRow(row)
+  isAtBoundary = (boundaryKinds = '<|=>') ->
+    line = editor.lineTextForBufferRow(row)
+    for b in boundaryKinds
+      return b if line.startsWith(b.repeat(7))
+    null
 
-  isAtSeparator = -> /^={7}$/.test editor.lineTextForBufferRow(row)
-
-  advanceToBoundary = ->
-    row += 1
-    until isAtBoundary()
+  advanceToBoundary = (boundaryKinds = '<|=>') ->
+    b = isAtBoundary(boundaryKinds)
+    until b
       row += 1
+      b = isAtBoundary(boundaryKinds)
+    b
 
   if state.isRebase
     theirs = markHeaderSide(TOP, TheirSide)
