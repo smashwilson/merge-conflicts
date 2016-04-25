@@ -1,6 +1,12 @@
-## 1.4.1
+## 1.4.2
 
 - Rewrite the Conflict parser as a proper recursive descent parser. [#229](https://github.com/smashwilson/merge-conflicts/pull/229)
+- Register custom repository contexts to move toward support for non-git repositories. [#222](https://github.com/smashwilson/merge-conflicts/pull/222)
+- Transact resolve actions to group as single undo operations. [#221](https://github.com/smashwilson/merge-conflicts/pull/221)
+
+## 1.4.1
+
+- Fix hangs with broken conflict markers. [#220](https://github.com/smashwilson/merge-conflicts/pull/220)
 
 ## 1.4.0
 
