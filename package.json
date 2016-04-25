@@ -13,8 +13,8 @@
     "atom": ">=0.185.0 <2.0.0"
   },
   "dependencies": {
-    "space-pen": "^5.0.1",
-    "underscore-plus": "1.x"
+    "etch": "0.6.0",
+    "underscore-plus": "1.6.6"
   },
   "providedServices": {
     "merge-conflicts": {
