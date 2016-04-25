@@ -1,3 +1,7 @@
+## 1.4.1
+
+- Rewrite the Conflict parser as a proper recursive descent parser. [#229](https://github.com/smashwilson/merge-conflicts/pull/229)
+
 ## 1.4.0
 
 - Handle three-way merge markers. [#219](https://github.com/smashwilson/merge-conflicts/pull/219)

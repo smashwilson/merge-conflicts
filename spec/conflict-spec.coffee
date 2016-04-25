@@ -87,6 +87,22 @@ describe "Conflict", ->
       expect(util.rowRangeFrom cs[1].ours.marker).toEqual([14, 15])
       expect(util.rowRangeFrom cs[1].theirs.marker).toEqual([16, 17])
 
+  describe 'with corrupted diffs', ->
+
+    it 'handles corrupted diff output', ->
+      util.openPath 'corrupted-2way-diff.txt', (editorView) ->
+        cs = Conflict.all({}, editorView.getModel())
+        expect(cs.length).toBe(0)
+
+    it 'handles corrupted diff3 output', ->
+      util.openPath 'corrupted-3way-diff.txt', (editorView) ->
+        cs = Conflict.all({}, editorView.getModel())
+
+        expect(cs.length).toBe(1)
+        expect(util.rowRangeFrom cs[0].ours.marker).toEqual([13, 14])
+        expect(util.rowRangeFrom cs[0].base.marker).toEqual([15, 16])
+        expect(util.rowRangeFrom cs[0].theirs.marker).toEqual([17, 18])
+
   describe 'when rebasing', ->
     [conflict] = []
 
