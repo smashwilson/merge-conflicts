@@ -1,32 +1,35 @@
 'use babel'
+/* global describe it beforeEach waitsForPromise expect */
 
 import Switchboard from '../../lib/model/switchboard'
-import Merge, {ConflictingFile} from '../../lib/model/merge'
+import Merge from '../../lib/model/merge'
 
 describe('Merge', () => {
-  let sb, fs, vcsContext, merge
+  let sb, fs, vcs, merge
 
   beforeEach(() => {
     sb = new Switchboard()
 
     fs = [
-      new ConflictingFile('lib/aaa.c', 'both modified'),
-      new ConflictingFile('lib/bbb.c', 'both modified'),
-      new ConflictingFile('lib/ccc.c', 'both modified')
+      { path: '/root/lib/aaa.c', relativePath: 'lib/aaa.c', message: 'both modified' },
+      { path: '/root/lib/bbb.c', relativePath: 'lib/bbb.c', message: 'both modified' },
+      { path: '/root/lib/ccc.c', relativePath: 'lib/ccc.c', message: 'both modified' }
     ]
 
-    vcsContext = {
+    vcs = {
       isRebasing: () => false,
       readConflicts: () => Promise.resolve(fs)
     }
 
-    waitsForPromise(() => Merge.read(sb, vcsContext).then((m) => merge = m))
+    waitsForPromise(() => Merge.read(sb, vcs).then((m) => (merge = m)))
   })
 
   it('is read from a VCS context', () => {
     expect(merge.switchboard).toBe(sb)
-    expect(merge.vcsContext).toBe(vcsContext)
-    expect(merge.files).toBe(fs)
+    expect(merge.vcs).toBe(vcs)
+    expect(merge.conflictingFiles.get('/root/lib/aaa.c').path).toBe(fs[0].relativePath)
+    expect(merge.conflictingFiles.get('/root/lib/bbb.c').path).toBe(fs[1].relativePath)
+    expect(merge.conflictingFiles.get('/root/lib/ccc.c').path).toBe(fs[2].relativePath)
     expect(merge.isRebase).toBe(false)
   })
 
@@ -36,7 +39,7 @@ describe('Merge', () => {
 
   it('reports emptiness', () => {
     fs = []
-    waitsForPromise(() => Merge.read(sb, vcsContext).then((other) => {
+    waitsForPromise(() => Merge.read(sb, vcs).then((other) => {
       expect(other.isEmpty()).toBe(true)
     }))
   })
