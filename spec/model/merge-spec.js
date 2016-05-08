@@ -30,11 +30,6 @@ describe('Merge', () => {
     expect(merge.isRebase).toBe(false)
   })
 
-  it('enumerates conflicting paths', () => {
-    const ps = merge.conflictingPaths()
-    expect(ps).toEqual(['lib/aaa.c', 'lib/bbb.c', 'lib/ccc.c'])
-  })
-
   it('reports non-emptiness', () => {
     expect(merge.isEmpty()).toBe(false)
   })
