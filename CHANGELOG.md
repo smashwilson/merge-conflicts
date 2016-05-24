@@ -1,3 +1,9 @@
+## 1.4.3
+
+- Normalize paths coming from `git status`. [#236](https://github.com/smashwilson/merge-conflicts/pull/236)
+- Avoid overlays rendering over the MergeConflictsView. [#235](https://github.com/smashwilson/merge-conflicts/pull/235)
+- Document key binding customization in the README. [#235](https://github.com/smashwilson/merge-conflicts/pull/235)
+
 ## 1.4.2
 
 - Rewrite the Conflict parser as a proper recursive descent parser. [#229](https://github.com/smashwilson/merge-conflicts/pull/229)
