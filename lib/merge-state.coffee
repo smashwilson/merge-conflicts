@@ -5,7 +5,7 @@ class MergeState
   conflictPaths: -> c.path for c in @conflicts
 
   reread: ->
-    @context.readConflicts().then (@conflicts) ->
+    @context.readConflicts().then (@conflicts) =>
 
   isEmpty: -> @conflicts.length is 0
 

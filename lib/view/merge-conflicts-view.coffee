@@ -74,18 +74,8 @@ class MergeConflictsView extends View
 
   quit: ->
     @pkg.didQuitConflictResolution()
-
-    detail = "Careful, you've still got conflict markers left!\n"
-    if @state.isRebase
-      detail += '"git rebase --abort"'
-    else
-      detail += '"git merge --abort"'
-    detail += " if you just want to give up on this one."
-
     @finish()
-    atom.notifications.addWarning "Maybe Later",
-      detail: detail
-      dismissable: true
+    @state.context.quit(@state.isRebase)
 
   refresh: ->
     @state.reread().catch(handleErr).then =>
@@ -100,19 +90,10 @@ class MergeConflictsView extends View
           icon.addClass 'icon-check text-success'
           @pathList.find("li[data-path='#{p}'] .stage-ready").hide()
 
-      if @state.isEmpty()
-        @pkg.didCompleteConflictResolution()
-
-        detail = "That's everything. "
-        if @state.isRebase
-          detail += '"git rebase --continue" at will to resume rebasing.'
-        else
-          detail += '"git commit" at will to finish the merge.'
-
-        @finish()
-        atom.notifications.addSuccess "All Conflicts Resolved",
-          detail: detail,
-          dismissable: true
+      return unless @state.isEmpty()
+      @pkg.didCompleteConflictResolution()
+      @finish()
+      @state.context.complete(@state.isRebase)
 
   finish: ->
     @subs.dispose()
