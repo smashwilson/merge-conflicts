@@ -4,12 +4,8 @@ class MergeState
 
   conflictPaths: -> c.path for c in @conflicts
 
-  reread: (callback) ->
-    @context.readConflicts()
-    .then (@conflicts) =>
-      callback(null, this)
-    .catch (err) =>
-      callback(err, this)
+  reread: ->
+    @context.readConflicts().then (@conflicts) =>
 
   isEmpty: -> @conflicts.length is 0
 
@@ -17,13 +13,10 @@ class MergeState
 
   join: (relativePath) -> @context.joinPath(relativePath)
 
-  @read: (context, callback) ->
+  @read: (context) ->
     isr = context.isRebasing()
-    context.readConflicts()
-    .then (cs) ->
-      callback(null, new MergeState(cs, context, isr))
-    .catch (err) ->
-      callback(err, null)
+    context.readConflicts().then (cs) ->
+      new MergeState(cs, context, isr)
 
 module.exports =
   MergeState: MergeState
