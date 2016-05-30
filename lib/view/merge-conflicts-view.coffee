@@ -74,23 +74,11 @@ class MergeConflictsView extends View
 
   quit: ->
     @pkg.didQuitConflictResolution()
-
-    detail = "Careful, you've still got conflict markers left!\n"
-    if @state.isRebase
-      detail += '"git rebase --abort"'
-    else
-      detail += '"git merge --abort"'
-    detail += " if you just want to give up on this one."
-
-    @finish ->
-      atom.notifications.addWarning "Maybe Later",
-        detail: detail
-        dismissable: true
+    @finish()
+    @state.context.quit(@state.isRebase)
 
   refresh: ->
-    @state.reread (err, state) =>
-      return if handleErr(err)
-
+    @state.reread().catch(handleErr).then =>
       # Any files that were present, but aren't there any more, have been resolved.
       for item in @pathList.find('li')
         p = $(item).data('path')
@@ -102,28 +90,16 @@ class MergeConflictsView extends View
           icon.addClass 'icon-check text-success'
           @pathList.find("li[data-path='#{p}'] .stage-ready").hide()
 
-      if @state.isEmpty()
-        @pkg.didCompleteConflictResolution()
+      return unless @state.isEmpty()
+      @pkg.didCompleteConflictResolution()
+      @finish()
+      @state.context.complete(@state.isRebase)
 
-        detail = "That's everything. "
-        if @state.isRebase
-          detail += '"git rebase --continue" at will to resume rebasing.'
-        else
-          detail += '"git commit" at will to finish the merge.'
-
-        @finish ->
-          atom.notifications.addSuccess "All Conflicts Resolved",
-            detail: detail,
-            dismissable: true
-
-  finish: (andThen) ->
+  finish: ->
     @subs.dispose()
-
     @hide 'fast', =>
       MergeConflictsView.instance = null
       @remove()
-
-    andThen()
 
   sideResolver: (side) ->
     (event) =>
@@ -152,36 +128,47 @@ class MergeConflictsView extends View
   @registerContextApi: (contextApi) ->
     @contextApis.push(contextApi)
 
+  @showForContext: (context, pkg) ->
+    if @instance
+      @instance.finish()
+    MergeState.read(context).then (state) =>
+      return if state.isEmpty()
+      @openForState(state, pkg)
+    .catch handleErr
+
+  @hideForContext: (context) ->
+    return unless @instance
+    return unless @instance.state.context == context
+    @instance.finish()
+
   @detect: (pkg) ->
     return if @instance?
 
     Promise.all(@contextApis.map (contextApi) => contextApi.getContext())
     .then (contexts) =>
       # filter out nulls and take the highest priority context.
-      context = (
+      Promise.all(
         _.filter(contexts, Boolean)
         .sort (context1, context2) => context2.priority - context1.priority
-      )[0];
-      unless context?
-        atom.notifications.addWarning "No repository context found",
-          detail: "Tip: if you have multiple projects open, open an editor in the one
-            containing conflicts."
+        .map (context) => MergeState.read context
+      )
+    .then (states) =>
+      state = states.find (state) -> not state.isEmpty()
+      unless state?
+        atom.notifications.addInfo "Nothing to Merge",
+          detail: "No conflicts here!",
+          dismissable: true
         return
+      @openForState(state, pkg)
+    .catch handleErr
 
-      MergeState.read context, (err, state) =>
-        return if handleErr(err)
+  @openForState: (state, pkg) ->
+    view = new MergeConflictsView(state, pkg)
+    @instance = view
+    atom.workspace.addBottomPanel item: view
 
-        if not state.isEmpty()
-          view = new MergeConflictsView(state, pkg)
-          @instance = view
-          atom.workspace.addBottomPanel item: view
-
-          @instance.subs.add atom.workspace.observeTextEditors (editor) =>
-            @markConflictsIn state, editor, pkg
-        else
-          atom.notifications.addInfo "Nothing to Merge",
-            detail: "No conflicts here!",
-            dismissable: true
+    @instance.subs.add atom.workspace.observeTextEditors (editor) =>
+      @markConflictsIn state, editor, pkg
 
   @markConflictsIn: (state, editor, pkg) ->
     return if state.isEmpty()

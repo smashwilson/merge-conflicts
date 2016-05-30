@@ -65,10 +65,19 @@ module.exports =
   registerContextApi: (contextApi) ->
     MergeConflictsView.registerContextApi(contextApi)
 
+
+  showForContext: (context) ->
+    MergeConflictsView.showForContext(context, pkgEmitter)
+
+  hideForContext: (context) ->
+    MergeConflictsView.hideForContext(context)
+
   provideApi: ->
     if (pkgApi == null)
       pkgApi = Object.freeze({
         registerContextApi: @registerContextApi,
+        showForContext: @showForContext,
+        hideForContext: @hideForContext,
         onDidResolveConflict: pkgEmitter.onDidResolveConflict,
         onDidResolveFile: pkgEmitter.onDidResolveConflict,
         onDidQuitConflictResolution: pkgEmitter.onDidQuitConflictResolution,
