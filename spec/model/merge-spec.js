@@ -25,7 +25,7 @@ describe('Merge', () => {
   })
 
   it('is read from a VCS context', () => {
-    expect(merge.switchboard).toBe(sb)
+    expect(merge._switchboard).toBe(sb)
     expect(merge.vcs).toBe(vcs)
     expect(merge.conflictingFiles.get('/root/lib/aaa.c').path).toBe(fs[0].relativePath)
     expect(merge.conflictingFiles.get('/root/lib/bbb.c').path).toBe(fs[1].relativePath)
