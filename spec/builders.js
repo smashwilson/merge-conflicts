@@ -253,16 +253,20 @@ function makeLiterateSetters (builderPrototype, attributeNames) {
 function makeParentHeirarchy (builderPrototype, parentChain) {
   const makeParentAccessor = (chain) => {
     return function (thunk) {
-      let builder
-      chain.forEach((link) => builder = builder[`_${link}Builder`])
+      let builder = this
+      chain.forEach((link) => {
+        builder = builder[`_${link}Builder`]
+      })
       thunk(builder)
       return this
     }
   }
 
-  parentChain.forEach((link, i) => {
-    const withName = `with${link[0].toUpperCase()}${link.slice(1)}`
+  for (let i = 0; i < parentChain.length; i++) {
+    const parent = parentChain[i]
+    const withName = `with${parent[0].toUpperCase()}${parent.slice(1)}`
+    const chain = parentChain.slice(0, i + 1)
 
-    builderPrototype[withName] = makeParentAccessor(parentChain.slice(i))
-  })
+    builderPrototype[withName] = makeParentAccessor(chain)
+  }
 }
