@@ -147,7 +147,16 @@ describe('Conflict', () => {
     })
 
     describe('multiple two-way diffs', () => {
-      it('finds all conflict markings')
+      beforeEach(() => useFixture('multi-2way-diff.txt'))
+
+      it('finds all conflict markings', () => {
+        expect(conflicts.length).toBe(2)
+
+        expect(rowRangeFrom(conflicts[0].ours.textMarker)).toEqual([5, 7])
+        expect(rowRangeFrom(conflicts[0].theirs.textMarker)).toEqual([8, 9])
+        expect(rowRangeFrom(conflicts[1].ours.textMarker)).toEqual([14, 15])
+        expect(rowRangeFrom(conflicts[1].theirs.textMarker)).toEqual([16, 17])
+      })
     })
 
     describe('when rebasing', () => {
