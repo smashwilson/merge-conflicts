@@ -4,6 +4,7 @@
 import {CompositeDisposable} from 'atom'
 
 import Conflict from '../../lib/model/conflict'
+import {Positions} from '../../lib/model/side'
 
 import {makeConflict} from '../builders'
 import {openFixture, rowRangeFrom} from '../helpers'
@@ -79,10 +80,23 @@ describe('Conflict', () => {
         expect(conflict.theirs.originalText).toBe('These are your changes\n')
       })
 
-      it('finds the ref banners')
-      it('finds the separator')
-      it('marks "ours" as the top and "theirs" as the bottom')
-      it('does not have a base side')
+      it('finds the ref banners', () => {
+        expect(rowRangeFrom(conflict.ours.bannerMarker)).toEqual([0, 1])
+        expect(rowRangeFrom(conflict.theirs.bannerMarker)).toEqual([4, 5])
+      })
+
+      it('finds the separator', () => {
+        expect(rowRangeFrom(conflict.separator.bannerMarker)).toEqual([2, 3])
+      })
+
+      it('marks "ours" as the top and "theirs" as the bottom', () => {
+        expect(conflict.ours.position).toBe(Positions.TOP)
+        expect(conflict.theirs.position).toBe(Positions.BOTTOM)
+      })
+
+      it('does not have a base side', () => {
+        expect(conflict.base).toBeNull()
+      })
     })
 
     describe('single three-way diff', () => {
