@@ -160,9 +160,22 @@ describe('Conflict', () => {
     })
 
     describe('when rebasing', () => {
-      it('swaps the lines for "ours" and "theirs"')
-      it('recognizes banner lines with commit shortlog messages')
-      it('marks "theirs" as the top and "ours" as the bottom')
+      beforeEach(() => useFixture('rebase-2way-diff.txt', true))
+
+      it('swaps the lines for "ours" and "theirs"', () => {
+        expect(rowRangeFrom(conflict.theirs.textMarker)).toEqual([3, 4])
+        expect(rowRangeFrom(conflict.ours.textMarker)).toEqual([5, 6])
+      })
+
+      it('recognizes banner lines with commit shortlog messages', () => {
+        expect(rowRangeFrom(conflict.theirs.bannerMarker)).toEqual([2, 3])
+        expect(rowRangeFrom(conflict.ours.bannerMarker)).toEqual([6, 7])
+      })
+
+      it('marks "theirs" as the top and "ours" as the bottom', () => {
+        expect(conflict.theirs.position).toBe(Positions.TOP)
+        expect(conflict.ours.position).toBe(Positions.BOTTOM)
+      })
     })
 
     describe('corrupted diff markers', () => {
