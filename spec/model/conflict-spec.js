@@ -1,8 +1,12 @@
 'use babel'
-/* global describe it expect beforeEach afterEach */
+/* global describe it expect beforeEach afterEach waitsForPromise */
 
 import {CompositeDisposable} from 'atom'
+
+import Conflict from '../../lib/model/conflict'
+
 import {makeConflict} from '../builders'
+import {openFixture, rowRangeFrom} from '../helpers'
 
 describe('Conflict', () => {
   let conflict, subs
@@ -51,8 +55,30 @@ describe('Conflict', () => {
   })
 
   describe('parsing', () => {
+    let conflicts
+
+    function useFixture (fixtureName, rebase) {
+      waitsForPromise(() => openFixture(fixtureName)
+        .then((editor) => Conflict.allInEditor(editor, rebase))
+        .then((cs) => {
+          conflicts = cs
+          if (conflicts.length > 0) conflict = conflicts[0]
+        }))
+    }
+
     describe('single two-way diff', () => {
-      it('identifies the correct rows')
+      beforeEach(() => useFixture('single-2way-diff.txt', false))
+
+      it('finds the conflict text', () => {
+        expect(rowRangeFrom(conflict.ours.textMarker)).toEqual([1, 2])
+        expect(conflict.ours.description).toBe('HEAD')
+        expect(conflict.ours.originalText).toBe('These are my changes\n')
+
+        expect(rowRangeFrom(conflict.theirs.textMarker)).toEqual([3, 4])
+        expect(conflict.theirs.description).toBe('master')
+        expect(conflict.theirs.originalText).toBe('These are your changes\n')
+      })
+
       it('finds the ref banners')
       it('finds the separator')
       it('marks "ours" as the top and "theirs" as the bottom')
