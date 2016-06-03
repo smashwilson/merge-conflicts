@@ -1,5 +1,5 @@
 'use babel'
-/* global describe it expect beforeEach afterEach waitsForPromise */
+/* global describe it expect beforeEach afterEach waitsForPromise runs */
 
 import {CompositeDisposable} from 'atom'
 
@@ -179,8 +179,24 @@ describe('Conflict', () => {
     })
 
     describe('corrupted diff markers', () => {
-      it('handles corrupted diff output')
-      it('handles corrupted diff3 output')
+      it('handles corrupted diff output', () => {
+        useFixture('corrupted-2way-diff.txt')
+
+        runs(() => {
+          expect(conflicts.length).toBe(0)
+        })
+      })
+
+      it('handles corrupted diff3 output', () => {
+        useFixture('corrupted-3way-diff.txt')
+
+        runs(() => {
+          expect(conflicts.length).toBe(1)
+          expect(rowRangeFrom(conflicts[0].ours.textMarker)).toEqual([13, 14])
+          expect(rowRangeFrom(conflicts[0].base.textMarker)).toEqual([15, 16])
+          expect(rowRangeFrom(conflicts[0].theirs.textMarker)).toEqual([17, 18])
+        })
+      })
     })
   })
 
