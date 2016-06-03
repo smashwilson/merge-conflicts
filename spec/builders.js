@@ -87,7 +87,7 @@ class SideBuilder {
   build () {
     const s = new Side(this._kind, this._position, this._description, this._originalText, this._bannerMarker, this._textMarker)
 
-    if (!this._conflict && this._constructConflict) {
+    if (!this._conflict && this._buildConflict) {
       const c = this._conflictBuilder
       if (this._kind === Kinds.OURS) c.ours(s)
       if (this._kind === Kinds.BASE) c.base(s)

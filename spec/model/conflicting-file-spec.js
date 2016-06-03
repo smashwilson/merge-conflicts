@@ -41,6 +41,28 @@ describe('ConflictingFile', () => {
     })
   })
 
+  describe('safePath', () => {
+    it('preserves lowercase letters and numbers', () => {
+      cf = makeConflictingFile().path('aaa123').build()
+      expect(cf.safePath()).toBe('aaa123')
+    })
+
+    it('escapes non-alphanumeric symbols', () => {
+      cf = makeConflictingFile().path('some/path.c').build()
+      expect(cf.safePath()).toBe('some_002fpath_002ec')
+    })
+
+    it('escapes capital letters', () => {
+      cf = makeConflictingFile().path('aBcDeF').build()
+      expect(cf.safePath()).toBe('a__bc__de__f')
+    })
+
+    it('escapes an actual underscore', () => {
+      cf = makeConflictingFile().path('aaa_bbb').build()
+      expect(cf.safePath()).toBe('aaa_005fbbb')
+    })
+  })
+
   afterEach(() => {
     if (cf) cf.destroy()
   })
