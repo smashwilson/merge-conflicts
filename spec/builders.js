@@ -8,10 +8,44 @@ import ConflictingFile from '../lib/model/conflicting-file'
 import Merge from '../lib/model/merge'
 import Switchboard from '../lib/model/switchboard'
 
+// Constructing interconnected model objects for test cases is awkward and verbose. These builders
+// help by providing a way to construct fully initialized and valid model trees while only
+// explicitly mentioning the model attributes that each case actually uses.
+//
+// This package exports a `makeXyz()` function corresponding to each model class. It returns a
+// Builder instance populated with reasonable and valid default values for each model attribute,
+// which may be selectively overridden by calling a literate method of the same name with the new
+// value. Call the `build()` method to finalize the object's construction, including any required
+// parent or child objects in the model tree.
+//
+// For example, to construct a Side:
+//
+// ```
+// import {makeSide} from '../builders'
+//
+// const side = makeSide()
+//   .description('custom')
+//   .build()
+// ```
+//
+// The Side object will have a description of "custom", valid placeholders for all other attributes,
+// and will belong to a valid Conflict, ConflictingFile, and Merge, all populated with reasonable
+// values.
+//
+// The structure of parent objects can be influenced by calling a `withXyz` method on the builder
+// during construction. Each `withXyz` method calls a function object with the appropriate parent
+// builder:
+//
+// ```
+// const conflict = makeConflict()
+//   .withMerge((mb) => mb.isRebase(true))
+//   .build()
+// ```
+
 class SideBuilder {
   constructor () {
     this._kind = Kinds.OURS
-    this._position = Positions
+    this._position = Positions.TOP
     this._description = 'aaa111'
     this._originalText = 'original text'
     this._bannerMarker = new MockMarker()
