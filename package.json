@@ -1,8 +1,7 @@
 {
   "name": "merge-conflicts",
-  "main": "./lib/main",
+  "main": "./lib/index",
   "version": "1.4.3",
-  "private": true,
   "description": "Resolve git conflicts within Atom",
   "contributors": [
     "Maximilian Schüßler <maximilian@mschuessler.org>"
@@ -24,6 +23,11 @@
         "0.0.0": "provideApi"
       }
     }
+  },
+  "activationCommands": {
+    "atom-workspace": [
+      "merge-conflicts:detect"
+    ]
   },
   "devDependencies": {
     "babel-eslint": "^6.0.4",
