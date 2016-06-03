@@ -1,17 +1,13 @@
 'use babel'
 /* global describe it expect beforeEach afterEach */
 
-import ConflictingFile from '../../lib/model/conflicting-file'
-import {createConflict, createMerge} from '../helpers'
+import {makeConflictingFile, makeConflict} from '../builders'
 
 describe('ConflictingFile', () => {
   let cf
 
   describe('uninstalled', () => {
-    beforeEach(() => {
-      cf = new ConflictingFile('some/file.js', 'both modified')
-      cf.belongsToMerge(createMerge())
-    })
+    beforeEach(() => cf = makeConflictingFile().build())
 
     it('reports 0 resolved conflicts', () => {
       expect(cf.resolvedConflictCount()).toBe(0)
@@ -24,19 +20,16 @@ describe('ConflictingFile', () => {
 
   describe('installed', () => {
     beforeEach(() => {
-      cf = new ConflictingFile('some/file.js', 'both modified')
-      cf.belongsToMerge(createMerge())
+      cf = makeConflictingFile().build()
 
-      cf.conflicts = []
-      for (let i = 0; i < 3; i++) {
-        const c = createConflict()
-        c.belongsToConflictingFile(cf)
-        cf.conflicts.push(c)
+      const cs = [
+        makeConflict().build(),
+        makeConflict().build(),
+        makeConflict().build()
+      ]
+      cf.installConflicts(cs)
 
-        if (i === 0) {
-          c.ours.resolve()
-        }
-      }
+      cs[0].ours.resolve()
     })
 
     it('counts total conflicts', () => {
