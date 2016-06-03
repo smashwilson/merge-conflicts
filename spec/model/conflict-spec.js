@@ -45,7 +45,7 @@ describe('Conflict', () => {
         .withMerge((m) => m.isRebase(true))
         .build()
 
-      const theirTarget = conflict.theirs.bannerMarker.getHeadBufferPosition()
+      const theirTarget = conflict.theirs.bannerMarker.getTailBufferPosition()
       expect(conflict.scrollTarget()).toEqual(theirTarget)
     })
   })

@@ -1,5 +1,7 @@
 'use babel'
 
+import {Point} from 'atom'
+
 import Side, {Kinds, Positions} from '../lib/model/side'
 import Conflict from '../lib/model/conflict'
 import Separator from '../lib/model/separator'
@@ -48,11 +50,13 @@ class SideBuilder {
     this._position = Positions.TOP
     this._description = 'aaa111'
     this._originalText = 'original text'
-    this._bannerMarker = new MockMarker()
-    this._textMarker = new MockMarker()
+    this._bannerMarker = mockMarkerFrom(0, 1)
+    this._textMarker = mockMarkerFrom(1, 2)
 
     this._conflictBuilder = new ConflictBuilder()
     this._conflict = null
+
+    this._buildConflict = true
   }
 
   beTheirs () {
@@ -60,6 +64,8 @@ class SideBuilder {
     this.position(Positions.BOTTOM)
     this.description('bbb222')
     this.originalText('their side text')
+    this.bannerMarker(mockMarkerFrom(3, 4))
+    this.textMarker(mockMarkerFrom(5, 6))
     return this
   }
 
@@ -68,16 +74,23 @@ class SideBuilder {
     this.position(Positions.MIDDLE)
     this.description('ccc333')
     this.originalText('base side text')
+    this.bannerMarker(7, 8)
+    this.textMarker(9, 10)
+    return this
+  }
+
+  omitParent () {
+    this._buildConflict = false
     return this
   }
 
   build () {
     const s = new Side(this._kind, this._position, this._description, this._originalText, this._bannerMarker, this._textMarker)
 
-    if (!this._conflict) {
+    if (!this._conflict && this._constructConflict) {
       this._conflict = this._conflictBuilder.build()
     }
-    s.belongsToConflict(this._conflict)
+    if (this._conflict) s.belongsToConflict(this._conflict)
 
     return s
   }
@@ -99,15 +112,21 @@ class SeparatorBuilder {
 
     this._conflictBuilder = new ConflictBuilder()
     this._conflict = null
+    this._buildConflict = true
+  }
+
+  omitParent () {
+    this._buildConflict = false
+    return this
   }
 
   build () {
     const s = new Separator(this._bannerMarker)
 
-    if (!this._conflict) {
+    if (!this._conflict && this._buildConflict) {
       this._conflict = this._conflictBuilder.build()
     }
-    s.belongsToConflict(this._conflict)
+    if (this._conflict) s.belongsToConflict(this._conflict)
 
     return s
   }
@@ -127,15 +146,21 @@ class NavigatorBuilder {
   constructor () {
     this._conflictBuilder = new ConflictBuilder()
     this._conflict = null
+    this._buildConflict = true
+  }
+
+  omitParent () {
+    this._buildConflict = false
+    return this
   }
 
   build () {
     const n = new Navigator()
 
-    if (!this._conflict) {
+    if (!this._conflict && this._buildConflict) {
       this._conflict = this._conflictBuilder.build()
     }
-    n.belongsToConflict(this._conflict)
+    if (this._conflict) n.belongsToConflict(this._conflict)
 
     return n
   }
@@ -160,32 +185,49 @@ class ConflictBuilder {
 
     this._conflictingFileBuilder = new ConflictingFileBuilder()
     this._conflictingFile = null
+    this._buildConflictingFile = true
   }
 
   beThreeWay () {
-    this.base(makeSide().beBase().build())
+    this.base(makeSide().beBase().omitParent().build())
+    return this
+  }
+
+  omitParent () {
+    this._buildConflictingFile = false
     return this
   }
 
   build () {
+    if (!this._conflictingFile && this._buildConflictingFile) {
+      this._conflictingFile = this._conflictingFileBuilder.build()
+    }
+
+    const isRebase = this._conflictingFile &&
+      this._conflictingFile._merge &&
+      this._conflictingFile._merge.isRebase
+
     if (!this._ours) {
-      this._ours = makeSide().conflict(true).build()
+      this._ours = makeSide()
+        .omitParent()
+        .position(isRebase ? Positions.BOTTOM : Positions.TOP)
+        .build()
     }
 
     if (!this._theirs) {
-      this._theirs = makeSide().beTheirs().conflict(true).build()
+      this._theirs = makeSide()
+        .omitParent()
+        .position(isRebase ? Positions.TOP : Positions.BOTTOM)
+        .build()
     }
 
     if (!this._separator) {
-      this._separator = makeSeparator().conflict(true).build()
+      this._separator = makeSeparator().omitParent().build()
     }
 
     const c = new Conflict(this._ours, this._theirs, this._base, this._separator)
 
-    if (!this._conflictingFile) {
-      this._conflictingFile = this._conflictingFileBuilder.build()
-    }
-    c.belongsToConflictingFile(this._conflictingFile)
+    if (this._conflictingFile) c.belongsToConflictingFile(this._conflictingFile)
 
     return c
   }
@@ -208,15 +250,21 @@ class ConflictingFileBuilder {
 
     this._mergeBuilder = new MergeBuilder()
     this._merge = null
+    this._buildMerge = true
+  }
+
+  omitParent () {
+    this._buildMerge = false
+    return this
   }
 
   build () {
     const cf = new ConflictingFile(this._path, this._message)
 
-    if (!this._merge) {
+    if (!this._merge && this._buildMerge) {
       this._merge = this._mergeBuilder.build()
     }
-    cf.belongsToMerge(this._merge)
+    if (this._merge) cf.belongsToMerge(this._merge)
 
     return cf
   }
@@ -261,14 +309,42 @@ export class MockVCS {
   }
 }
 
-export class MockMarker {
+class MockMarker {
   constructor () {
     this.destroyed = false
+    this._headBufferRow = 0
+    this._tailBufferRow = 0
+  }
+
+  headRow (row) {
+    this._headBufferRow = row
+    return this
+  }
+
+  tailRow (row) {
+    this._tailBufferRow = row
+    return this
+  }
+
+  getHeadBufferPosition () {
+    return new Point(this._headBufferRow, 0)
+  }
+
+  getTailBufferPosition () {
+    return new Point(this._tailBufferRow, 0)
   }
 
   destroy () {
     this.destroyed = true
   }
+}
+
+export function makeMockMarker () {
+  return new MockMarker()
+}
+
+export function mockMarkerFrom (headRow, tailRow) {
+  return makeMockMarker().headRow(headRow).tailRow(tailRow)
 }
 
 function makeLiterateSetters (builderPrototype, attributeNames) {
