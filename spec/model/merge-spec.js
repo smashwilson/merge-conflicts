@@ -1,46 +1,52 @@
 'use babel'
-/* global describe it beforeEach waitsForPromise expect */
+/* global describe it beforeEach waitsForPromise runs expect */
 
 import Switchboard from '../../lib/model/switchboard'
 import Merge from '../../lib/model/merge'
 
+import {makeMerge, makeMockVCS} from '../builders'
+
 describe('Merge', () => {
-  let sb, fs, vcs, merge
+  let sb, merge
 
-  beforeEach(() => {
-    sb = new Switchboard()
-
-    fs = [
-      { path: '/root/lib/aaa.c', relativePath: 'lib/aaa.c', message: 'both modified' },
-      { path: '/root/lib/bbb.c', relativePath: 'lib/bbb.c', message: 'both modified' },
-      { path: '/root/lib/ccc.c', relativePath: 'lib/ccc.c', message: 'both modified' }
-    ]
-
-    vcs = {
-      isRebasing: () => false,
-      readConflicts: () => Promise.resolve(fs)
-    }
-
-    waitsForPromise(() => Merge.read(sb, vcs).then((m) => (merge = m)))
-  })
+  beforeEach(() => sb = new Switchboard())
 
   it('is read from a VCS context', () => {
-    expect(merge._switchboard).toBe(sb)
-    expect(merge.vcs).toBe(vcs)
-    expect(merge.conflictingFiles.get('/root/lib/aaa.c').path).toBe(fs[0].relativePath)
-    expect(merge.conflictingFiles.get('/root/lib/bbb.c').path).toBe(fs[1].relativePath)
-    expect(merge.conflictingFiles.get('/root/lib/ccc.c').path).toBe(fs[2].relativePath)
-    expect(merge.isRebase).toBe(false)
+    const vcs = makeMockVCS()
+      .addConflict({ path: '/root/lib/aaa.c', relativePath: 'lib/aaa.c', message: 'both modified' })
+      .addConflict({ path: '/root/lib/bbb.c', relativePath: 'lib/bbb.c', message: 'both modified' })
+      .addConflict({ path: '/root/lib/ccc.c', relativePath: 'lib/ccc.c', message: 'both modified' })
+
+    waitsForPromise(() => Merge.read(sb, vcs).then((m) => (merge = m)))
+
+    runs(() => {
+      expect(merge.switchboard()).toBe(sb)
+      expect(merge.vcs).toBe(vcs)
+      expect(merge.conflictingFiles.get('/root/lib/aaa.c').path).toBe('lib/aaa.c')
+      expect(merge.conflictingFiles.get('/root/lib/bbb.c').path).toBe('lib/bbb.c')
+      expect(merge.conflictingFiles.get('/root/lib/ccc.c').path).toBe('lib/ccc.c')
+      expect(merge.isRebase).toBe(false)
+    })
   })
 
   it('reports non-emptiness', () => {
-    expect(merge.isEmpty()).toBe(false)
+    const vcs = makeMockVCS()
+      .addConflict({ path: '/root/lib/aaa.c', relativePath: 'lib/aaa.c', message: 'both modified' })
+    merge = makeMerge().vcs(vcs).build()
+    waitsForPromise(() => merge.reread())
+
+    runs(() => {
+      expect(merge.isEmpty()).toBe(false)
+    })
   })
 
   it('reports emptiness', () => {
-    fs = []
-    waitsForPromise(() => Merge.read(sb, vcs).then((other) => {
-      expect(other.isEmpty()).toBe(true)
-    }))
+    const vcs = makeMockVCS()
+    merge = makeMerge().vcs(vcs).build()
+    waitsForPromise(() => merge.reread())
+
+    runs(() => {
+      expect(merge.isEmpty()).toBe(true)
+    })
   })
 })

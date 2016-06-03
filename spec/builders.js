@@ -299,14 +299,28 @@ export function makeMerge () {
   return new MergeBuilder()
 }
 
-export class MockVCS {
+class MockVCS {
   constructor () {
     this.conflicts = []
+    this._isRebase = false
+  }
+
+  addConflict (entry) {
+    this.conflicts.push(entry)
+    return this
+  }
+
+  isRebasing () {
+    return this._isRebase
   }
 
   readConflicts () {
     return Promise.resolve(this.conflicts)
   }
+}
+
+export function makeMockVCS () {
+  return new MockVCS()
 }
 
 class MockMarker {
