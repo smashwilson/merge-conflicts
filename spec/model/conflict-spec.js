@@ -100,10 +100,37 @@ describe('Conflict', () => {
     })
 
     describe('single three-way diff', () => {
-      it('identifies the correct rows')
-      it('finds all three ref banners')
-      it('finds the separators')
-      it('marks "ours" as the top and "theirs" as the bottom')
+      beforeEach(() => useFixture('single-3way-diff.txt'))
+
+      it('identifies the correct rows', () => {
+        expect(rowRangeFrom(conflict.ours.textMarker)).toEqual([1, 2])
+        expect(conflict.ours.description).toBe('HEAD')
+        expect(conflict.ours.originalText).toBe('These are my changes\n')
+
+        expect(rowRangeFrom(conflict.base.textMarker)).toEqual([3, 4])
+        expect(conflict.base.description).toBe('merged common ancestors')
+        expect(conflict.base.originalText).toBe('These are original texts\n')
+
+        expect(rowRangeFrom(conflict.theirs.textMarker)).toEqual([5, 6])
+        expect(conflict.theirs.description).toBe('master')
+        expect(conflict.theirs.originalText).toBe('These are your changes\n')
+      })
+
+      it('finds all three banners', () => {
+        expect(rowRangeFrom(conflict.ours.bannerMarker)).toEqual([0, 1])
+        expect(rowRangeFrom(conflict.base.bannerMarker)).toEqual([2, 3])
+        expect(rowRangeFrom(conflict.theirs.bannerMarker)).toEqual([6, 7])
+      })
+
+      it('finds the separator', () => {
+        expect(rowRangeFrom(conflict.separator.bannerMarker)).toEqual([4, 5])
+      })
+
+      it('marks side positions correctly', () => {
+        expect(conflict.ours.position).toBe(Positions.TOP)
+        expect(conflict.base.position).toBe(Positions.MIDDLE)
+        expect(conflict.theirs.position).toBe(Positions.BOTTOM)
+      })
     })
 
     describe('complex three-way diff', () => {
