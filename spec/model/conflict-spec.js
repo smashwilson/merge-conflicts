@@ -68,7 +68,7 @@ describe('Conflict', () => {
     }
 
     describe('single two-way diff', () => {
-      beforeEach(() => useFixture('single-2way-diff.txt', false))
+      beforeEach(() => useFixture('single-2way-diff.txt'))
 
       it('finds the conflict text', () => {
         expect(rowRangeFrom(conflict.ours.textMarker)).toEqual([1, 2])
@@ -134,7 +134,16 @@ describe('Conflict', () => {
     })
 
     describe('complex three-way diff', () => {
-      it('identifies the correct rows for complex three-way diffs')
+      beforeEach(() => useFixture('single-3way-diff-complex.txt'))
+
+      it('identifies the correct rows for complex three-way diffs', () => {
+        expect(rowRangeFrom(conflict.ours.textMarker)).toEqual([1, 2])
+        expect(conflict.ours.description).toBe('HEAD')
+        expect(rowRangeFrom(conflict.base.textMarker)).toEqual([3, 18])
+        expect(conflict.base.description).toBe('merged common ancestors')
+        expect(rowRangeFrom(conflict.theirs.textMarker)).toEqual([19, 20])
+        expect(conflict.theirs.description).toBe('master')
+      })
     })
 
     describe('multiple two-way diffs', () => {

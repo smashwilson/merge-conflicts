@@ -74,8 +74,8 @@ class SideBuilder {
     this.position(Positions.MIDDLE)
     this.description('ccc333')
     this.originalText('base side text')
-    this.bannerMarker(7, 8)
-    this.textMarker(9, 10)
+    this.bannerMarker(mockMarkerFrom(7, 8))
+    this.textMarker(mockMarkerFrom(9, 10))
     return this
   }
 
