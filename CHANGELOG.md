@@ -1,3 +1,7 @@
+## 1.4.4
+
+- Custom repository contexts and multi-context projects. [#237](https://github.com/smashwilson/merge-conflicts/pull/237)
+
 ## 1.4.3
 
 - Normalize paths coming from `git status`. [#236](https://github.com/smashwilson/merge-conflicts/pull/236)
