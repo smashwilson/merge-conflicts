@@ -8,6 +8,11 @@ Resolve your git merge conflicts in Atom!
 
 This package detects the conflict markers left by `git merge` and overlays a set of controls for resolving each and navigating among them. Additionally, it displays your progress through a merge.
 
+## Installation
+```bash
+apm install merge-conflicts
+```
+
 ## Features
 
  * Conflict resolution controls are provided for each detected conflict.
