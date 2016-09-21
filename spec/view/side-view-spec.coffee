@@ -47,10 +47,24 @@ describe 'SideView', ->
       expect(t).toBe("These are my changes\n")
       expect(ours.isDirty).toBe(false)
 
-  it 'triggers conflict resolution', ->
-    spyOn(ours, "resolve")
-    view.useMe()
-    expect(ours.resolve).toHaveBeenCalled()
+  describe 'conflict resolution', ->
+    it 'should call `resolve` for simple resolutions ("Use Me")' ->
+      spyOn(ours, "resolve")
+      view.useMe()
+      expect(ours.resolve).toHaveBeenCalled()
+      
+    describe 'complex resolutions ("Keep Both")' ->
+      it 'should have an instance of `ConflictedEditor`' ->
+        expect(ours.editor).toBeDefined()
+        ## TODO: expect(ours.editor).toBe("ConflictedEditor")...?
+
+      it 'should call `ConflictedEditor#acceptOursThenTheirs` for "Use Me First"' ->
+        ## TODO: Setup spy
+        ## TODO: expect(spy).toHaveBeenCalled()
+
+      it 'should call `ConflictedEditor#acceptTheirsThenOurs` for "Use Me Last"' ->
+        ## TODO: Setup...
+        ## TODO: expect(spy).toHaveBeenCalled()
 
   describe 'when chosen as the resolution', ->
 
