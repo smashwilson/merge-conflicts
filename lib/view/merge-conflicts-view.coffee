@@ -140,11 +140,10 @@ class MergeConflictsView extends View
     return unless @instance
     return unless @instance.state.context == context
     @instance.finish()
-
-  @detect: (pkg) ->
+  @detect: (pkg,filePath) ->
     return if @instance?
 
-    Promise.all(@contextApis.map (contextApi) => contextApi.getContext())
+    Promise.all(@contextApis.map (contextApi) => contextApi.getContext(filePath))
     .then (contexts) =>
       # filter out nulls and take the highest priority context.
       Promise.all(

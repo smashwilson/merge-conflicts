@@ -7,7 +7,9 @@ pkgEmitter = null;
 pkgApi = null;
 
 module.exports =
-
+  detect: (filePath) ->
+    # Support custom project path for conflict detection
+    MergeConflictsView.detect(pkgEmitter,filePath)
   activate: (state) ->
     @subs = new CompositeDisposable
     @emitter = new Emitter
@@ -24,8 +26,8 @@ module.exports =
       onDidCompleteConflictResolution: (callback) => @onDidCompleteConflictResolution(callback)
       didCompleteConflictResolution: => @emitter.emit 'did-complete-conflict-resolution'
 
-    @subs.add atom.commands.add 'atom-workspace', 'merge-conflicts:detect', ->
-      MergeConflictsView.detect(pkgEmitter)
+    @subs.add atom.commands.add 'atom-workspace', 'merge-conflicts:detect', =>
+      @detect()
 
   deactivate: ->
     @subs.dispose()
