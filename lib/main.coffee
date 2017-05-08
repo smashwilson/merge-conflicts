@@ -36,6 +36,10 @@ module.exports =
       type: 'string'
       default: ''
       description: 'Absolute path to your git executable.'
+    skipStage:
+      description: "Skip all stage functionality"
+      type: 'boolean'
+      default: false
 
   # Invoke a callback each time that an individual conflict is resolved.
   #

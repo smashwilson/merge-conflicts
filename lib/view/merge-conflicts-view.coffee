@@ -39,19 +39,41 @@ class MergeConflictsView extends View
     @subs.add @pkg.onDidResolveConflict (event) =>
       p = @state.relativize event.file
       found = false
+      atom.notifications.addSuccess("MergeConflictsView 5")
       for listElement in @pathList.children()
         li = $(listElement)
         if li.data('path') is p
           found = true
 
           progress = li.find('progress')[0]
-          progress.max = event.total
-          progress.value = event.resolved
+          if event.total is 0
+            progress.max = 1
+            progress.value = 1
+          else
+            progress.max = event.total
+            progress.value = event.resolved
 
-          li.find('.stage-ready').show() if event.total is event.resolved
+          if event.total is event.resolved
+            if not atom.config.get("merge-conflicts.skipStage")
+              li.find('.stage-ready').show()
+            else
+              icon = li.find('.staged')
+              icon.removeClass 'icon-dash icon-check text-success'
+              icon.addClass 'icon-check text-success'
 
       unless found
         console.error "Unrecognized conflict path: #{p}"
+
+      atom.notifications.addSuccess("MergeConflictsView 6")
+
+      @state.showResolved()
+
+      if @state.isResolved()
+        atom.notifications.addSuccess("MergeConflictsView 7")
+        # @pkg.didCompleteConflictResolution()
+        # @finish()
+        # @state.context.complete(@state.isRebase)
+
 
     @subs.add @pkg.onDidResolveFile => @refresh()
 
@@ -85,12 +107,16 @@ class MergeConflictsView extends View
         icon = $(item).find('.staged')
         icon.removeClass 'icon-dash icon-check text-success'
         if _.contains @state.conflictPaths(), p
+          atom.notifications.addSuccess("MergeConflictsView 3")
           icon.addClass 'icon-dash'
         else
+          atom.notifications.addSuccess("MergeConflictsView 4")
           icon.addClass 'icon-check text-success'
           @pathList.find("li[data-path='#{p}'] .stage-ready").hide()
 
+      atom.notifications.addSuccess("MergeConflictsView 1")
       return unless @state.isEmpty()
+      atom.notifications.addSuccess("MergeConflictsView 2")
       @pkg.didCompleteConflictResolution()
       @finish()
       @state.context.complete(@state.isRebase)
@@ -107,7 +133,10 @@ class MergeConflictsView extends View
       @state.context.checkoutSide(side, p)
       .then =>
         full = @state.join p
-        @pkg.didResolveConflict file: full, total: 1, resolved: 1
+        if atom.config.get("merge-conflicts.skipStage")
+          atom.notifications.addSuccess("MergeConflictsView 8")
+          @state.setResolved()
+        @pkg.didResolveConflict file: full, total: 0, resolved: 0
         atom.workspace.open p
       .catch (err) ->
         handleErr(err)
