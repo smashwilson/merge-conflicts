@@ -7,7 +7,6 @@ _ = require 'underscore-plus'
 {SideView} = require './view/side-view'
 {NavigationView} = require './view/navigation-view'
 {ResolverView} = require './view/resolver-view'
-{MergeConflictsView} = require './view/merge-conflicts-view'
 
 # Public: Mediate conflict-related decorations and events on behalf of a specific TextEditor.
 #
@@ -45,9 +44,7 @@ class ConflictedEditor
       @subs.add c.onDidResolveConflict =>
         unresolved = (v for v in @coveringViews when not v.conflict().isResolved())
         resolvedCount = @conflicts.length - Math.floor(unresolved.length / 3)
-        atom.notifications.addSuccess("ConflictedEditor 3")
         if atom.config.get("merge-conflicts.skipStage") and @conflicts.length is resolvedCount
-          atom.notifications.addSuccess("ConflictedEditor 8")
           @state.setResolved()
         @pkg.didResolveConflict
           file: @editor.getPath(),
@@ -62,13 +59,11 @@ class ConflictedEditor
       @focusConflict @conflicts[0]
     else
       if atom.config.get("merge-conflicts.skipStage")
-        atom.notifications.addSuccess("ConflictedEditor 7")
         @state.setResolved()
       @pkg.didResolveConflict
         file: @editor.getPath(),
         total: 1, resolved: 1,
         source: this
-      atom.notifications.addSuccess("ConflictedEditor 1")
       @conflictsResolved()
 
   # Private: Install Atom commands related to Conflict resolution and navigation on the TextEditor.
@@ -92,18 +87,12 @@ class ConflictedEditor
 
     @subs.add @pkg.onDidResolveConflict ({total, resolved, file}) =>
       if atom.config.get("merge-conflicts.skipStage")
-        # return unless not @state.isResolved()
-        atom.notifications.addSuccess("ConflictedEditor 5")
         if total == 0
-          atom.notifications.addSuccess("ConflictedEditor 6")
           @cleanup()
-      atom.notifications.addSuccess("ConflictedEditor 4")
       if file is @editor.getPath() and total is resolved
         if  total != 0
           atom.notifications.addSuccess("All conflicts in file resolved. Remember to save the file.")
-        atom.notifications.addSuccess("ConflictedEditor 2")
         @conflictsResolved()
-      atom.notifications.addSuccess("ConflictedEditor 10")
 
     @subs.add @pkg.onDidCompleteConflictResolution => @cleanup()
     @subs.add @pkg.onDidQuitConflictResolution => @cleanup()
@@ -115,8 +104,6 @@ class ConflictedEditor
 
     for c in @conflicts
       m.destroy() for m in c.markers()
-
-    atom.notifications.addSuccess("ConflictedEditor 9")
 
     v.remove() for v in @coveringViews
 

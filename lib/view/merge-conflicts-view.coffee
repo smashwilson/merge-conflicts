@@ -39,7 +39,6 @@ class MergeConflictsView extends View
     @subs.add @pkg.onDidResolveConflict (event) =>
       p = @state.relativize event.file
       found = false
-      atom.notifications.addSuccess("MergeConflictsView 5")
       for listElement in @pathList.children()
         li = $(listElement)
         if li.data('path') is p
@@ -63,16 +62,6 @@ class MergeConflictsView extends View
 
       unless found
         console.error "Unrecognized conflict path: #{p}"
-
-      atom.notifications.addSuccess("MergeConflictsView 6")
-
-      @state.showResolved()
-
-      if @state.isResolved()
-        atom.notifications.addSuccess("MergeConflictsView 7")
-        # @pkg.didCompleteConflictResolution()
-        # @finish()
-        # @state.context.complete(@state.isRebase)
 
 
     @subs.add @pkg.onDidResolveFile => @refresh()
@@ -107,16 +96,12 @@ class MergeConflictsView extends View
         icon = $(item).find('.staged')
         icon.removeClass 'icon-dash icon-check text-success'
         if _.contains @state.conflictPaths(), p
-          atom.notifications.addSuccess("MergeConflictsView 3")
           icon.addClass 'icon-dash'
         else
-          atom.notifications.addSuccess("MergeConflictsView 4")
           icon.addClass 'icon-check text-success'
           @pathList.find("li[data-path='#{p}'] .stage-ready").hide()
 
-      atom.notifications.addSuccess("MergeConflictsView 1")
       return unless @state.isEmpty()
-      atom.notifications.addSuccess("MergeConflictsView 2")
       @pkg.didCompleteConflictResolution()
       @finish()
       @state.context.complete(@state.isRebase)
@@ -134,7 +119,6 @@ class MergeConflictsView extends View
       .then =>
         full = @state.join p
         if atom.config.get("merge-conflicts.skipStage")
-          atom.notifications.addSuccess("MergeConflictsView 8")
           @state.setResolved()
         @pkg.didResolveConflict file: full, total: 0, resolved: 0
         atom.workspace.open p
