@@ -86,11 +86,10 @@ class ConflictedEditor
       'merge-conflicts:revert-current': => @revertCurrent()
 
     @subs.add @pkg.onDidResolveConflict ({total, resolved, file}) =>
-      if atom.config.get("merge-conflicts.skipStage")
-        if total == 0
+      if atom.config.get("merge-conflicts.skipStage") and total is 0
           @cleanup()
       if file is @editor.getPath() and total is resolved
-        if  total != 0
+        if atom.config.get("merge-conflicts.skipStage") and total isnt 0
           atom.notifications.addSuccess("All conflicts in file resolved. Remember to save the file.")
         @conflictsResolved()
 

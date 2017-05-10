@@ -45,7 +45,7 @@ class MergeConflictsView extends View
           found = true
 
           progress = li.find('progress')[0]
-          if event.total is 0
+          if atom.config.get("merge-conflicts.skipStage") and event.total is 0
             progress.max = 1
             progress.value = 1
           else
@@ -53,12 +53,12 @@ class MergeConflictsView extends View
             progress.value = event.resolved
 
           if event.total is event.resolved
-            if not atom.config.get("merge-conflicts.skipStage")
-              li.find('.stage-ready').show()
-            else
+            if atom.config.get("merge-conflicts.skipStage")
               icon = li.find('.staged')
               icon.removeClass 'icon-dash icon-check text-success'
               icon.addClass 'icon-check text-success'
+            else
+              li.find('.stage-ready').show()
 
       unless found
         console.error "Unrecognized conflict path: #{p}"
@@ -120,7 +120,9 @@ class MergeConflictsView extends View
         full = @state.join p
         if atom.config.get("merge-conflicts.skipStage")
           @state.setResolved()
-        @pkg.didResolveConflict file: full, total: 0, resolved: 0
+          @pkg.didResolveConflict file: full, total: 0, resolved: 0
+        else
+          @pkg.didResolveConflict file: full, total: 1, resolved: 1
         atom.workspace.open p
       .catch (err) ->
         handleErr(err)
