@@ -11,6 +11,9 @@ class SideView extends CoveringView
         @span class: 'pull-right', =>
           @button class: 'btn btn-xs inline-block-tight revert', click: 'revert', outlet: 'revertBtn', 'Revert'
           @button class: 'btn btn-xs inline-block-tight', click: 'useMe', outlet: 'useMeBtn', 'Use Me'
+          @button class: 'btn btn-xs inline-block-tight', click: 'useMeFirst', outlet: 'useMeFirstBtn', 'Use Me, Then Them'
+          @button class: 'btn btn-xs inline-block-tight', click: 'useMeLast', outlet: 'useMeLastBtn', 'Use Them, Then Me'
+          ## TODO: Add `title` attributes to describe these actions better?
 
   initialize: (@side, editor) ->
     @subs = new CompositeDisposable
@@ -61,6 +64,18 @@ class SideView extends CoveringView
   useMe: ->
     @editor.transact =>
       @side.resolve()
+    @decorate()
+    
+  useMeFirst: ->
+    ## FIXME: Use `ConflictedEditor#acceptOursThenTheirs` instead?
+    ## @side.resolve()
+    ## TODO: Get the _other_ side and resolve it, too...
+    @decorate()
+    
+  useMeLast: ->
+    ## FIXME: Use `ConflictedEditor#acceptTheirsThenOurs` instead?
+    ## TODO: Get the _other_ side and resolve it, too...
+    ## @side.resolve()
     @decorate()
 
   revert: ->
