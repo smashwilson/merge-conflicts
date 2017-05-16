@@ -44,6 +44,8 @@ class ConflictedEditor
       @subs.add c.onDidResolveConflict =>
         unresolved = (v for v in @coveringViews when not v.conflict().isResolved())
         resolvedCount = @conflicts.length - Math.floor(unresolved.length / 3)
+        if atom.config.get("merge-conflicts.skipStage") and @conflicts.length is resolvedCount
+          @state.setResolved()
         @pkg.didResolveConflict
           file: @editor.getPath(),
           total: @conflicts.length, resolved: resolvedCount,
@@ -56,6 +58,8 @@ class ConflictedEditor
       @installEvents()
       @focusConflict @conflicts[0]
     else
+      if atom.config.get("merge-conflicts.skipStage")
+        @state.setResolved()
       @pkg.didResolveConflict
         file: @editor.getPath(),
         total: 1, resolved: 1,
@@ -82,7 +86,11 @@ class ConflictedEditor
       'merge-conflicts:revert-current': => @revertCurrent()
 
     @subs.add @pkg.onDidResolveConflict ({total, resolved, file}) =>
+      if atom.config.get("merge-conflicts.skipStage") and total is 0
+          @cleanup()
       if file is @editor.getPath() and total is resolved
+        if atom.config.get("merge-conflicts.skipStage") and total isnt 0
+          atom.notifications.addSuccess("All conflicts in file resolved. Remember to save the file.")
         @conflictsResolved()
 
     @subs.add @pkg.onDidCompleteConflictResolution => @cleanup()
@@ -103,7 +111,8 @@ class ConflictedEditor
   # Private: Event handler invoked when all conflicts in this file have been resolved.
   #
   conflictsResolved: ->
-    atom.workspace.addTopPanel item: new ResolverView(@editor, @state, @pkg)
+    if not atom.config.get("merge-conflicts.skipStage")
+      atom.workspace.addTopPanel item: new ResolverView(@editor, @state, @pkg)
 
   detectDirty: ->
     # Only detect dirty regions within CoveringViews that have a cursor within them.
